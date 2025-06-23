@@ -11,17 +11,17 @@ import ResonantDirective from '../components/ResonantDirective';
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-halo-background flex w-full">
+    <div className="h-screen bg-halo-background flex w-full overflow-hidden">
       {/* Sidebar */}
       <Sidebar />
       
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 h-full">
         {/* Header */}
         <Header />
         
         {/* Dashboard Content */}
-        <main className="flex-1 p-6 overflow-auto">
+        <main className="flex-1 p-6 overflow-y-auto">
           {/* Welcome Section */}
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-halo-text mb-2">
