@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -25,12 +26,26 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					DEFAULT: '#1A1A2E',
+					foreground: '#FFFFFF'
 				},
 				secondary: {
-					DEFAULT: 'hsl(var(--secondary))',
-					foreground: 'hsl(var(--secondary-foreground))'
+					DEFAULT: '#0F3460',
+					foreground: '#FFFFFF'
+				},
+				accent: {
+					DEFAULT: '#E94560',
+					foreground: '#FFFFFF'
+				},
+				halo: {
+					primary: '#1A1A2E',
+					secondary: '#0F3460',
+					accent: '#E94560',
+					sidebar: '#0F1A2E',
+					background: '#F7F7F7',
+					widget: '#FFFFFF',
+					text: '#1C1C1C',
+					textSecondary: '#4A4A4A'
 				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
@@ -39,10 +54,6 @@ export default {
 				muted: {
 					DEFAULT: 'hsl(var(--muted))',
 					foreground: 'hsl(var(--muted-foreground))'
-				},
-				accent: {
-					DEFAULT: 'hsl(var(--accent))',
-					foreground: 'hsl(var(--accent-foreground))'
 				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',
@@ -63,10 +74,17 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				}
 			},
+			fontFamily: {
+				sans: ['Inter', 'Helvetica Neue', 'Arial', 'sans-serif'],
+			},
 			borderRadius: {
-				lg: 'var(--radius)',
-				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				lg: '12px',
+				md: '8px',
+				sm: '6px'
+			},
+			boxShadow: {
+				'widget': '0px 4px 12px rgba(0,0,0,0.06)',
+				'widget-hover': '0px 6px 16px rgba(0,0,0,0.1)'
 			},
 			keyframes: {
 				'accordion-down': {
@@ -84,11 +102,20 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'pulse-glow': {
+					'0%, 100%': {
+						boxShadow: '0 0 0 0 rgba(233, 69, 96, 0.4)'
+					},
+					'50%': {
+						boxShadow: '0 0 0 8px rgba(233, 69, 96, 0)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
 			}
 		}
 	},
