@@ -112,7 +112,7 @@ const ResonantDirective = () => {
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Ask about workflow optimization..."
                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                className="flex-1 border-gray-300 focus:border-halo-accent focus:ring-halo-accent/20 bg-white/80 backdrop-blur-sm shadow-sm"
+                className="flex-1 border-gray-300 focus:border-halo-accent focus:ring-halo-accent/20 bg-white/80 backdrop-blur-sm shadow-sm placeholder:text-gray-400"
               />
               <Button onClick={handleSendMessage} size="icon" className="bg-halo-accent hover:bg-halo-accent/90 shadow-sm">
                 <Send className="h-4 w-4 text-white" />
