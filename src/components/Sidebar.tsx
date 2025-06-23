@@ -31,7 +31,7 @@ const Sidebar = () => {
       title: "MAIN",
       items: [
         { title: "Dashboard", icon: LayoutDashboard, isActive: true },
-        { title: "Workflows", icon: List },
+        { title: "Automations", icon: List },
         { title: "Metrics", icon: BarChart },
         { title: "Insights", icon: BarChart },
         { title: "Logs", icon: List },
