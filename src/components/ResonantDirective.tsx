@@ -68,8 +68,8 @@ const ResonantDirective = () => {
           </Button>
         </DialogTrigger>
         
-        <DialogContent className="max-w-md h-96 flex flex-col p-0">
-          <DialogHeader className="p-4 border-b bg-halo-primary text-white rounded-t-lg">
+        <DialogContent className="fixed bottom-24 right-6 top-auto left-auto translate-x-0 translate-y-0 max-w-md h-96 flex flex-col p-0 bg-gradient-to-br from-white to-gray-50 border-2 border-halo-primary/10 shadow-2xl">
+          <DialogHeader className="p-4 border-b bg-gradient-to-r from-halo-primary to-halo-secondary text-white rounded-t-lg">
             <DialogTitle className="flex items-center space-x-2">
               <MessageCircle className="h-5 w-5" />
               <span>Resonant Directive</span>
@@ -78,7 +78,7 @@ const ResonantDirective = () => {
           </DialogHeader>
           
           {/* Chat Messages */}
-          <ScrollArea className="flex-1 p-4">
+          <ScrollArea className="flex-1 p-4 bg-gradient-to-b from-gray-50/50 to-white">
             <div className="space-y-4">
               {messages.map((message) => (
                 <div
@@ -86,10 +86,10 @@ const ResonantDirective = () => {
                   className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[80%] p-3 rounded-lg text-sm ${
+                    className={`max-w-[80%] p-3 rounded-lg text-sm shadow-sm ${
                       message.sender === 'user'
-                        ? 'bg-halo-accent text-white'
-                        : 'bg-gray-100 text-halo-text'
+                        ? 'bg-gradient-to-r from-halo-accent to-halo-accent/90 text-white'
+                        : 'bg-white text-halo-text border border-gray-200'
                     }`}
                   >
                     <p>{message.text}</p>
@@ -105,16 +105,16 @@ const ResonantDirective = () => {
           </ScrollArea>
           
           {/* Input Area */}
-          <div className="p-4 border-t">
+          <div className="p-4 border-t bg-white">
             <div className="flex space-x-2">
               <Input
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Ask about workflow optimization..."
                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                className="flex-1"
+                className="flex-1 border-gray-300 focus:border-halo-accent focus:ring-halo-accent/20"
               />
-              <Button onClick={handleSendMessage} size="icon" className="bg-halo-accent hover:bg-halo-accent/90">
+              <Button onClick={handleSendMessage} size="icon" className="bg-halo-accent hover:bg-halo-accent/90 shadow-sm">
                 <Send className="h-4 w-4 text-white" />
               </Button>
             </div>
