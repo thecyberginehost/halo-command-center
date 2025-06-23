@@ -105,14 +105,14 @@ const ResonantDirective = () => {
           </ScrollArea>
           
           {/* Input Area */}
-          <div className="p-4 border-t bg-white">
+          <div className="p-4 border-t bg-gradient-to-r from-gray-50 to-white backdrop-blur-sm">
             <div className="flex space-x-2">
               <Input
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Ask about workflow optimization..."
                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                className="flex-1 border-gray-300 focus:border-halo-accent focus:ring-halo-accent/20"
+                className="flex-1 border-gray-300 focus:border-halo-accent focus:ring-halo-accent/20 bg-white/80 backdrop-blur-sm shadow-sm"
               />
               <Button onClick={handleSendMessage} size="icon" className="bg-halo-accent hover:bg-halo-accent/90 shadow-sm">
                 <Send className="h-4 w-4 text-white" />
