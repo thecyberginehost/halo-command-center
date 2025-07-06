@@ -34,6 +34,23 @@ serve(async (req) => {
 
     // Get tenant-specific knowledge base if tenantId is provided
     let knowledgeContext = '';
+    let systemKnowledgeContext = '';
+    
+    // Get system knowledge base (general HALO/MASP knowledge for workflow generation)
+    const { data: systemKB } = await supabase
+      .from('system_knowledge_base')
+      .select('category, title, content')
+      .in('category', ['platform', 'automation', 'troubleshooting']) // Focus on relevant categories
+      .eq('priority', 1) // Only highest priority for workflow generation
+      .order('created_at', { ascending: false })
+      .limit(8);
+
+    if (systemKB && systemKB.length > 0) {
+      systemKnowledgeContext = systemKB
+        .map(kb => `${kb.title}: ${kb.content}`)
+        .join('\n\n');
+    }
+    
     if (tenantId) {
       const { data: knowledgeBase } = await supabase
         .from('tenant_knowledge_bases')
@@ -52,7 +69,10 @@ serve(async (req) => {
 
 Your task is to analyze business requirements and generate sophisticated, enterprise-grade workflows with proper logic flow, error handling, and integration patterns.
 
-TENANT KNOWLEDGE BASE:
+HALO SYSTEM KNOWLEDGE:
+${systemKnowledgeContext}
+
+TENANT-SPECIFIC KNOWLEDGE:
 ${knowledgeContext || 'No tenant-specific knowledge provided. Use general automation best practices.'}
 
 ADVANCED WORKFLOW GENERATION RULES:
