@@ -166,10 +166,10 @@ const ResonantDirective = () => {
       <Dialog>
         <DialogTrigger asChild>
           <Button 
-            className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-halo-accent hover:bg-halo-accent/90 shadow-lg animate-pulse-glow z-50"
+            className="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-halo-accent hover:bg-halo-accent/90 shadow-2xl animate-pulse-glow z-50 ring-4 ring-halo-accent/20 hover:ring-halo-accent/30 transition-all duration-300"
             size="icon"
           >
-            <MessageCircle className="h-6 w-6 text-white" />
+            <MessageCircle className="h-7 w-7 text-white" />
           </Button>
         </DialogTrigger>
         
