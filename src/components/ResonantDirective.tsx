@@ -166,7 +166,7 @@ const ResonantDirective = () => {
       <Dialog>
         <DialogTrigger asChild>
           <Button 
-            className="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-halo-accent hover:bg-halo-accent/90 shadow-2xl animate-pulse-glow z-50 ring-4 ring-halo-accent/20 hover:ring-halo-accent/30 transition-all duration-300"
+            className="fixed bottom-6 right-6 w-16 h-16 rounded-full shadow-2xl z-50 transition-all duration-300 bg-gradient-to-br from-primary via-secondary to-accent bg-[length:200%_200%] animate-space-drift hover:scale-105"
             size="icon"
           >
             <MessageCircle className="h-7 w-7 text-white" />
