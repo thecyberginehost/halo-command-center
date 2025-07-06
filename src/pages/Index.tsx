@@ -24,7 +24,7 @@ const Index = () => {
   }
 
   return (
-    <>
+    <div className="flex min-h-screen w-full">
       <AppSidebar />
       <SidebarInset className="bg-background">
         <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
@@ -137,11 +137,11 @@ const Index = () => {
             </CardContent>
           </Card>
         </main>
+        
+        {/* Floating AI Assistant */}
+        <ResonantDirective />
       </SidebarInset>
-      
-      {/* Floating AI Assistant */}
-      <ResonantDirective />
-    </>
+    </div>
   );
 };
 
