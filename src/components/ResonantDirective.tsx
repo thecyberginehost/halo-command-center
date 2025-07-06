@@ -166,10 +166,18 @@ const ResonantDirective = () => {
       <Dialog>
         <DialogTrigger asChild>
           <Button 
-            className="fixed bottom-6 right-6 w-16 h-16 rounded-full shadow-2xl z-50 transition-all duration-300 bg-gradient-to-br from-primary via-secondary to-accent bg-[length:200%_200%] animate-space-drift hover:scale-105"
+            className="fixed bottom-6 right-6 w-16 h-16 rounded-full shadow-2xl z-50 transition-all duration-300 bg-primary hover:bg-primary/90 relative overflow-hidden"
             size="icon"
           >
-            <MessageCircle className="h-7 w-7 text-white" />
+            {/* Rotating stars background */}
+            <div className="absolute inset-0 animate-rotate-stars opacity-70">
+              <div className="absolute top-2 left-2 w-1 h-1 bg-white rounded-full shadow-[0_0_6px_white]"></div>
+              <div className="absolute top-4 right-3 w-0.5 h-0.5 bg-white rounded-full shadow-[0_0_4px_white]"></div>
+              <div className="absolute bottom-3 left-4 w-0.5 h-0.5 bg-white rounded-full shadow-[0_0_4px_white]"></div>
+              <div className="absolute bottom-2 right-2 w-1 h-1 bg-white rounded-full shadow-[0_0_6px_white]"></div>
+              <div className="absolute top-1/2 left-1/2 w-0.5 h-0.5 bg-white rounded-full shadow-[0_0_4px_white] -translate-x-1/2 -translate-y-1/2"></div>
+            </div>
+            <MessageCircle className="h-7 w-7 text-white relative z-10" />
           </Button>
         </DialogTrigger>
         
