@@ -161,10 +161,10 @@ Current user context: ${context ? JSON.stringify(context) : 'General consultatio
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4.1-2025-04-14',
+        model: 'gpt-4o-mini',
         messages: messages,
         temperature: 0.7,
-        max_tokens: 300,
+        max_tokens: 500,
         presence_penalty: 0.1,
         frequency_penalty: 0.1,
       }),
