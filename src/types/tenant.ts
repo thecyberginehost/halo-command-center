@@ -2,7 +2,7 @@ export interface Tenant {
   id: string;
   name: string;
   subdomain: string;
-  settings: Record<string, any>;
+  settings: any;
   created_at: string;
   updated_at: string;
 }
@@ -18,10 +18,16 @@ export interface TenantKnowledgeBase {
   updated_at: string;
 }
 
-export interface WorkflowRecord extends Omit<import('./workflow').Workflow, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'executionCount' | 'lastExecuted'> {
+export interface WorkflowRecord {
   id: string;
   tenant_id: string;
+  name: string;
+  description: string | null;
+  status: string | null;
+  steps: any;
+  execution_count: number | null;
+  last_executed: string | null;
   created_at: string;
   updated_at: string;
-  created_by?: string;
+  created_by: string | null;
 }
