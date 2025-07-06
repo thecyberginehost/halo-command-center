@@ -22,6 +22,7 @@ import {
 import { Workflow, WorkflowStep } from '@/types/workflow';
 import { WorkflowAIService } from '@/services/workflowAI';
 import { useToast } from '@/hooks/use-toast';
+import { useTenant } from '@/contexts/TenantContext';
 
 interface WorkflowBuilderProps {
   onClose: () => void;
@@ -31,14 +32,16 @@ const stepIcons = {
   trigger: Zap,
   action: Play,
   condition: GitBranch,
-  delay: Clock
+  delay: Clock,
+  utility: Settings
 };
 
 const stepColors = {
   trigger: 'bg-halo-accent',
   action: 'bg-halo-primary', 
   condition: 'bg-halo-secondary',
-  delay: 'bg-gray-500'
+  delay: 'bg-gray-500',
+  utility: 'bg-purple-500'
 };
 
 const WorkflowBuilder = ({ onClose }: WorkflowBuilderProps) => {
@@ -47,7 +50,13 @@ const WorkflowBuilder = ({ onClose }: WorkflowBuilderProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [explanation, setExplanation] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [complexityAnalysis, setComplexityAnalysis] = useState<{
+    estimated_execution_time?: string;
+    reliability_score?: string;
+    maintenance_requirements?: string;
+  } | null>(null);
   const { toast } = useToast();
+  const { currentTenant } = useTenant();
 
   const handleGenerateWorkflow = async () => {
     if (!prompt.trim()) {
@@ -64,7 +73,7 @@ const WorkflowBuilder = ({ onClose }: WorkflowBuilderProps) => {
       const aiService = new WorkflowAIService();
       const response = await aiService.generateWorkflow({ 
         prompt,
-        tenantId: 'demo-tenant' // TODO: Get actual tenant ID from context
+        tenantId: currentTenant?.id
       });
       
       const newWorkflow: Workflow = {
@@ -79,10 +88,11 @@ const WorkflowBuilder = ({ onClose }: WorkflowBuilderProps) => {
       setWorkflow(newWorkflow);
       setExplanation(response.explanation);
       setSuggestions(response.suggestions);
+      setComplexityAnalysis(response.complexity_analysis || null);
       
       toast({
         title: "Workflow Generated!",
-        description: "Your automation workflow has been created successfully.",
+        description: `Advanced workflow created with o3 reasoning. Reliability: ${response.complexity_analysis?.reliability_score || 'N/A'}`,
       });
     } catch (error) {
       toast({
@@ -136,10 +146,10 @@ const WorkflowBuilder = ({ onClose }: WorkflowBuilderProps) => {
           <div className="p-2 bg-halo-accent rounded-lg">
             <Wand2 className="h-5 w-5 text-white" />
           </div>
-          <div>
-            <h2 className="text-xl font-bold text-halo-text">AI Workflow Builder</h2>
-            <p className="text-sm text-halo-textSecondary">Generate automations with natural language</p>
-          </div>
+            <div>
+              <h2 className="text-xl font-bold text-halo-text">AI Workflow Builder</h2>
+              <p className="text-sm text-halo-textSecondary">Powered by o3 reasoning for advanced automation logic</p>
+            </div>
         </div>
         <Button variant="outline" onClick={onClose}>
           Close
@@ -191,13 +201,42 @@ const WorkflowBuilder = ({ onClose }: WorkflowBuilderProps) => {
 
             {suggestions.length > 0 && (
               <div className="mt-4">
-                <h3 className="font-medium text-halo-text mb-2">Suggestions</h3>
+                <h3 className="font-medium text-halo-text mb-2">o3 Suggestions</h3>
                 <div className="space-y-2">
                   {suggestions.map((suggestion, index) => (
                     <div key={index} className="text-xs text-halo-textSecondary bg-blue-50 p-2 rounded">
                       {suggestion}
                     </div>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {complexityAnalysis && (
+              <div className="mt-4">
+                <h3 className="font-medium text-halo-text mb-2">Complexity Analysis</h3>
+                <div className="space-y-2 text-xs">
+                  {complexityAnalysis.estimated_execution_time && (
+                    <div className="bg-gray-50 p-2 rounded">
+                      <span className="font-medium">Execution Time:</span> {complexityAnalysis.estimated_execution_time}
+                    </div>
+                  )}
+                  {complexityAnalysis.reliability_score && (
+                    <div className="bg-gray-50 p-2 rounded">
+                      <span className="font-medium">Reliability:</span> 
+                      <Badge variant={
+                        complexityAnalysis.reliability_score === 'high' ? 'default' : 
+                        complexityAnalysis.reliability_score === 'medium' ? 'secondary' : 'outline'
+                      } className="ml-2">
+                        {complexityAnalysis.reliability_score}
+                      </Badge>
+                    </div>
+                  )}
+                  {complexityAnalysis.maintenance_requirements && (
+                    <div className="bg-gray-50 p-2 rounded">
+                      <span className="font-medium">Maintenance:</span> {complexityAnalysis.maintenance_requirements}
+                    </div>
+                  )}
                 </div>
               </div>
             )}

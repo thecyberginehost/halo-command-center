@@ -66,7 +66,12 @@ export class WorkflowAIService {
         'Add email notifications for completion',
         'Include error handling conditions',
         'Add data validation steps'
-      ]
+      ],
+      complexity_analysis: {
+        estimated_execution_time: '< 30 seconds',
+        reliability_score: 'medium',
+        maintenance_requirements: 'Low - simple two-step workflow'
+      }
     };
   }
 }

@@ -50,35 +50,74 @@ serve(async (req) => {
 
     const systemPrompt = `You are an expert automation engineer for HALO, a professional automation platform for MASP (Managed Automation Service Provider) certified professionals.
 
-Generate executable workflows from natural language descriptions using the tenant's specific knowledge base and requirements.
+Your task is to analyze business requirements and generate sophisticated, enterprise-grade workflows with proper logic flow, error handling, and integration patterns.
 
 TENANT KNOWLEDGE BASE:
 ${knowledgeContext || 'No tenant-specific knowledge provided. Use general automation best practices.'}
 
-WORKFLOW GENERATION RULES:
-1. Always start with a trigger (webhook, schedule, email, form_submit, or file_upload)
-2. Include logical action steps (email, slack, webhook, database, file_operation, ai_process)
-3. Add conditions when logic branching is needed
-4. Ensure steps are properly connected with realistic configurations
-5. Position steps in a logical flow layout
-6. Consider tenant-specific integrations and preferences
-7. Generate enterprise-grade workflows suitable for MASP providers
+ADVANCED WORKFLOW GENERATION RULES:
+1. TRIGGERS: Choose appropriate triggers (webhook, schedule, email, form_submit, file_upload, database_change)
+2. LOGIC FLOW: Design proper sequential and parallel processing paths
+3. CONDITIONS: Add branching logic with proper boolean conditions and fallback paths
+4. ERROR HANDLING: Include try-catch patterns and failure notifications
+5. DATA TRANSFORMATION: Add data validation, mapping, and formatting steps
+6. INTEGRATIONS: Select optimal service connections based on business context
+7. MONITORING: Include logging and success/failure tracking
+8. SCALABILITY: Design for enterprise-level volume and reliability
 
-AVAILABLE INTEGRATIONS: Email, Slack, Webhooks, Databases, File Operations, AI Processing, CRM Systems, Marketing Tools
+STEP TYPES & CONFIGURATIONS:
+- TRIGGERS: webhook (POST/GET), schedule (cron), email (IMAP/webhook), form_submit, file_upload, database_change
+- ACTIONS: email (SMTP/API), slack (webhook/API), http_request, database_operation, file_operation, ai_process, crm_update
+- CONDITIONS: if/else logic, data_validation, approval_gate, time_based, user_permission
+- UTILITIES: delay, logger, data_transformer, error_handler, loop, parallel_processor
 
-RESPONSE FORMAT: Return only valid JSON with this structure:
+INTEGRATION ECOSYSTEM: 
+Email (SMTP, SendGrid, Mailgun), Slack, Teams, CRM (Salesforce, HubSpot), Databases (PostgreSQL, MySQL), File Storage (S3, Google Drive), APIs (REST/GraphQL), AI Services (OpenAI, custom models)
+
+RESPONSE FORMAT - Generate valid JSON with this exact structure:
 {
   "workflow": {
-    "name": "string",
-    "description": "string", 
+    "name": "string (descriptive business name)",
+    "description": "string (clear business purpose)", 
     "status": "draft",
-    "steps": [/* WorkflowStep array with proper positioning */]
+    "steps": [
+      {
+        "id": "unique-step-id",
+        "type": "trigger|action|condition|utility",
+        "title": "Step Display Name",
+        "description": "What this step does",
+        "config": {
+          // Step-specific configuration object
+          "integration": "service_name",
+          "parameters": {},
+          "error_handling": {},
+          "retry_policy": {}
+        },
+        "position": { "x": number, "y": number },
+        "connections": ["next-step-id"],
+        "conditions": [
+          {
+            "field": "data_field",
+            "operator": "equals|contains|greater_than",
+            "value": "comparison_value",
+            "next_step": "conditional-step-id"
+          }
+        ]
+      }
+    ]
   },
-  "explanation": "string explaining how this workflow addresses the tenant's needs",
-  "suggestions": ["string array of optimization suggestions"]
+  "explanation": "string explaining the workflow logic and business value",
+  "suggestions": ["array of specific optimization and enhancement suggestions"],
+  "complexity_analysis": {
+    "estimated_execution_time": "string",
+    "reliability_score": "high|medium|low",
+    "maintenance_requirements": "string"
+  }
 }
 
-Generate a complete, executable workflow for: "${prompt}"`;
+TASK: Generate a complete, production-ready workflow for: "${prompt}"
+
+Think through the business process step-by-step, considering all edge cases, error scenarios, and integration points. Design for enterprise reliability and maintainability.`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -87,13 +126,14 @@ Generate a complete, executable workflow for: "${prompt}"`;
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'o3-2025-04-16',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: prompt }
         ],
-        temperature: 0.3,
-        max_tokens: 2000,
+        temperature: 0.2, // Lower temperature for more consistent reasoning
+        max_tokens: 4000, // Higher token limit for complex workflows
+        reasoning_effort: 'medium', // o3-specific parameter for reasoning depth
       }),
     });
 

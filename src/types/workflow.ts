@@ -1,11 +1,17 @@
 export interface WorkflowStep {
   id: string;
-  type: 'trigger' | 'action' | 'condition' | 'delay';
+  type: 'trigger' | 'action' | 'condition' | 'delay' | 'utility';
   title: string;
   description: string;
   config: Record<string, any>;
   position: { x: number; y: number };
   connections: string[];
+  conditions?: Array<{
+    field: string;
+    operator: 'equals' | 'contains' | 'greater_than' | 'less_than' | 'exists';
+    value: any;
+    next_step: string;
+  }>;
 }
 
 export interface WorkflowTrigger extends WorkflowStep {
@@ -67,4 +73,9 @@ export interface AIGenerationResponse {
   workflow: Omit<Workflow, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'executionCount'>;
   explanation: string;
   suggestions: string[];
+  complexity_analysis?: {
+    estimated_execution_time?: string;
+    reliability_score?: 'high' | 'medium' | 'low';
+    maintenance_requirements?: string;
+  };
 }
