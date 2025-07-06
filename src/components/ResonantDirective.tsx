@@ -1,5 +1,6 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -11,8 +12,12 @@ import {
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { Send, MessageCircle, Wand2, Settings } from 'lucide-react';
+import { Send, MessageCircle, Wand2, Settings, Loader2 } from 'lucide-react';
 import WorkflowBuilder from './WorkflowBuilder';
+import { AIChatService, ChatMessage } from '@/services/aiChatService';
+import { useWorkflows } from '@/hooks/useWorkflows';
+import { useTenant } from '@/contexts/TenantContext';
+import { useToast } from '@/hooks/use-toast';
 
 interface Message {
   id: number;
@@ -22,64 +27,123 @@ interface Message {
 }
 
 const ResonantDirective = () => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 1,
-      text: "Hello! I'm Resonant Directive, your AI automation assistant. I can help you create workflows, optimize automations, and provide insights. Try saying 'create a workflow' or ask about your system performance!",
-      sender: 'ai',
-      timestamp: '10:30 AM'
-    }
-  ]);
+  const location = useLocation();
+  const { workflows } = useWorkflows();
+  const { currentTenant } = useTenant();
+  const { toast } = useToast();
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [showWorkflowBuilder, setShowWorkflowBuilder] = useState(false);
+  const [conversationHistory, setConversationHistory] = useState<ChatMessage[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [aiChatService] = useState(() => new AIChatService());
 
-  const handleSendMessage = () => {
-    if (!inputValue.trim()) return;
+  // Initialize with welcome message
+  useEffect(() => {
+    const welcomeMessage: Message = {
+      id: 1,
+      text: "Hello! I'm Resonant Directive, your AI automation assistant. I can help you create workflows, optimize automations, and provide insights. What would you like to work on today?",
+      sender: 'ai',
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+    setMessages([welcomeMessage]);
+  }, []);
 
-    const newMessage: Message = {
+  const handleSendMessage = async () => {
+    if (!inputValue.trim() || isLoading) return;
+
+    const userMessage: Message = {
       id: messages.length + 1,
       text: inputValue,
       sender: 'user',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
-    setMessages([...messages, newMessage]);
-    const userInput = inputValue.toLowerCase();
+    const currentInput = inputValue;
+    setMessages(prev => [...prev, userMessage]);
     setInputValue('');
+    setIsLoading(true);
 
     // Check for workflow creation requests
-    if (userInput.includes('create') && (userInput.includes('workflow') || userInput.includes('automation'))) {
-      setTimeout(() => {
-        const aiResponse: Message = {
-          id: messages.length + 2,
-          text: "I'd be happy to help you create a workflow! I'll open the AI Workflow Builder where you can describe your automation in natural language, and I'll generate it for you.",
-          sender: 'ai',
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        };
-        setMessages(prev => [...prev, aiResponse]);
-        setShowWorkflowBuilder(true);
-      }, 1000);
-      return;
-    }
-
-    // Simulate contextual AI responses
-    setTimeout(() => {
-      let responseText = "I understand you're looking for optimization suggestions. Based on your current workflows, I recommend implementing parallel processing for your email campaigns to reduce execution time by 25%.";
+    if (currentInput.toLowerCase().includes('create') && 
+        (currentInput.toLowerCase().includes('workflow') || currentInput.toLowerCase().includes('automation'))) {
+      setIsLoading(false);
       
-      if (userInput.includes('performance') || userInput.includes('metrics')) {
-        responseText = "Your system is performing well! Current uptime is 99.8%, with 1,247 successful workflow executions this month. I notice some opportunities to optimize your email workflows for better performance.";
-      } else if (userInput.includes('help') || userInput.includes('what can you do')) {
-        responseText = "I can help you with: 🔧 Create new workflows from natural language, 📊 Analyze performance metrics, 🔍 Debug automation issues, 💡 Suggest optimizations, and ⚡ Manage your HALO automations. What would you like to work on?";
-      }
-
       const aiResponse: Message = {
         id: messages.length + 2,
-        text: responseText,
+        text: "I'd be happy to help you create a workflow! I'll open the AI Workflow Builder where you can describe your automation in natural language, and I'll generate it for you.",
         sender: 'ai',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, aiResponse]);
-    }, 1000);
+      setTimeout(() => setShowWorkflowBuilder(true), 500);
+      return;
+    }
+
+    try {
+      // Build context for AI
+      const context = {
+        currentPage: aiChatService.getCurrentPageContext(location.pathname),
+        workflowCount: workflows.length,
+        recentWorkflows: aiChatService.buildWorkflowContext(workflows)
+      };
+
+      // Update conversation history
+      const newHistory: ChatMessage[] = [
+        ...conversationHistory,
+        { role: 'user', content: currentInput }
+      ];
+
+      const response = await aiChatService.sendMessage({
+        message: currentInput,
+        tenantId: currentTenant?.id,
+        context,
+        conversationHistory: newHistory.slice(-10) // Keep last 10 messages for context
+      });
+
+      const aiResponse: Message = {
+        id: messages.length + 2,
+        text: response.message,
+        sender: 'ai',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+
+      setMessages(prev => [...prev, aiResponse]);
+      
+      // Update conversation history
+      setConversationHistory([
+        ...newHistory,
+        { role: 'assistant' as const, content: response.message }
+      ].slice(-10)); // Keep last 10 messages
+
+      if (response.error) {
+        toast({
+          title: "Connection Issue",
+          description: "AI assistant is having connection issues but can still help with basic automation questions.",
+          variant: "destructive"
+        });
+      }
+
+    } catch (error) {
+      console.error('Error sending message:', error);
+      
+      const errorResponse: Message = {
+        id: messages.length + 2,
+        text: "I'm experiencing some technical difficulties right now. However, I'm still here to help with your automation needs. Try asking about creating workflows or system optimization!",
+        sender: 'ai',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      
+      setMessages(prev => [...prev, errorResponse]);
+      
+      toast({
+        title: "AI Assistant Error",
+        description: "There was a problem connecting to the AI service. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCreateWorkflow = () => {
@@ -142,6 +206,18 @@ const ResonantDirective = () => {
                   </div>
                 </div>
               ))}
+              
+              {/* Loading indicator */}
+              {isLoading && (
+                <div className="flex justify-start">
+                  <div className="max-w-[80%] p-3 rounded-lg text-sm shadow-sm bg-white text-halo-text border border-gray-200">
+                    <div className="flex items-center space-x-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>Resonant Directive is thinking...</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </ScrollArea>
           
@@ -173,11 +249,21 @@ const ResonantDirective = () => {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Ask about automation or say 'create workflow'..."
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                onKeyPress={(e) => e.key === 'Enter' && !isLoading && handleSendMessage()}
+                disabled={isLoading}
                 className="flex-1 border-gray-300 focus:border-halo-accent focus:ring-halo-accent/20 bg-white/80 backdrop-blur-sm shadow-sm placeholder:text-gray-400"
               />
-              <Button onClick={handleSendMessage} size="icon" className="bg-halo-accent hover:bg-halo-accent/90 shadow-sm">
-                <Send className="h-4 w-4 text-white" />
+              <Button 
+                onClick={handleSendMessage} 
+                size="icon" 
+                disabled={isLoading || !inputValue.trim()}
+                className="bg-halo-accent hover:bg-halo-accent/90 shadow-sm disabled:opacity-50"
+              >
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin text-white" />
+                ) : (
+                  <Send className="h-4 w-4 text-white" />
+                )}
               </Button>
             </div>
           </div>
