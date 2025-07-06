@@ -25,7 +25,6 @@ import { useToast } from '@/hooks/use-toast';
 
 interface WorkflowBuilderProps {
   onClose: () => void;
-  apiKey?: string;
 }
 
 const stepIcons = {
@@ -42,7 +41,7 @@ const stepColors = {
   delay: 'bg-gray-500'
 };
 
-const WorkflowBuilder = ({ onClose, apiKey }: WorkflowBuilderProps) => {
+const WorkflowBuilder = ({ onClose }: WorkflowBuilderProps) => {
   const [prompt, setPrompt] = useState('');
   const [workflow, setWorkflow] = useState<Workflow | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -60,19 +59,13 @@ const WorkflowBuilder = ({ onClose, apiKey }: WorkflowBuilderProps) => {
       return;
     }
 
-    if (!apiKey) {
-      toast({
-        title: "API Key Required", 
-        description: "OpenAI API key is required for workflow generation.",
-        variant: "destructive"
-      });
-      return;
-    }
-
     setIsGenerating(true);
     try {
-      const aiService = new WorkflowAIService(apiKey);
-      const response = await aiService.generateWorkflow({ prompt });
+      const aiService = new WorkflowAIService();
+      const response = await aiService.generateWorkflow({ 
+        prompt,
+        tenantId: 'demo-tenant' // TODO: Get actual tenant ID from context
+      });
       
       const newWorkflow: Workflow = {
         ...response.workflow,

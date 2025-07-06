@@ -1,72 +1,31 @@
 import { AIGenerationRequest, AIGenerationResponse, WorkflowStep } from '@/types/workflow';
+import { supabase } from '@/integrations/supabase/client';
 
-const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
-
-export class WorkflowAIService {
-  private apiKey: string;
-
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
-  }
-
-  async generateWorkflow(request: AIGenerationRequest): Promise<AIGenerationResponse> {
-    const systemPrompt = `You are an expert automation engineer for HALO, a professional automation platform. Generate executable workflows from natural language descriptions.
-
-WORKFLOW GENERATION RULES:
-1. Always start with a trigger (webhook, schedule, email, form_submit, or file_upload)
-2. Include logical action steps (email, slack, webhook, database, file_operation, ai_process)
-3. Add conditions when logic branching is needed
-4. Ensure steps are properly connected
-5. Generate realistic configurations for each step
-6. Position steps in a logical flow layout
-
-RESPONSE FORMAT: Return only valid JSON with this structure:
-{
-  "workflow": {
-    "name": "string",
-    "description": "string", 
-    "status": "draft",
-    "steps": [/* WorkflowStep array */]
-  },
-  "explanation": "string",
-  "suggestions": ["string array"]
+export interface TenantAwareRequest extends AIGenerationRequest {
+  tenantId?: string;
 }
 
-AVAILABLE INTEGRATIONS: Email, Slack, Webhooks, Databases, File Operations, AI Processing
+export class WorkflowAIService {
+  constructor() {
+    // No API key needed - handled by edge function
+  }
 
-Generate a complete, executable workflow for: "${request.prompt}"`;
-
+  async generateWorkflow(request: TenantAwareRequest): Promise<AIGenerationResponse> {
     try {
-      const response = await fetch(OPENAI_API_URL, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'o3-2025-01-31',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: request.prompt }
-          ],
-          temperature: 0.3,
-          max_tokens: 2000,
-        }),
+      const { data, error } = await supabase.functions.invoke('generate-workflow', {
+        body: {
+          prompt: request.prompt,
+          tenantId: request.tenantId,
+          context: request.context,
+          preferredIntegrations: request.preferredIntegrations
+        }
       });
 
-      if (!response.ok) {
-        throw new Error(`OpenAI API error: ${response.statusText}`);
+      if (error) {
+        throw new Error(`Workflow generation error: ${error.message}`);
       }
 
-      const data = await response.json();
-      const content = data.choices[0].message.content;
-      
-      try {
-        return JSON.parse(content);
-      } catch (parseError) {
-        // Fallback if JSON parsing fails
-        return this.createFallbackWorkflow(request.prompt);
-      }
+      return data;
     } catch (error) {
       console.error('Workflow generation error:', error);
       return this.createFallbackWorkflow(request.prompt);

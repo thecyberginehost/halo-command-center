@@ -32,8 +32,6 @@ const ResonantDirective = () => {
   ]);
   const [inputValue, setInputValue] = useState('');
   const [showWorkflowBuilder, setShowWorkflowBuilder] = useState(false);
-  const [apiKey, setApiKey] = useState('');
-  const [showApiKeyInput, setShowApiKeyInput] = useState(false);
 
   const handleSendMessage = () => {
     if (!inputValue.trim()) return;
@@ -85,10 +83,6 @@ const ResonantDirective = () => {
   };
 
   const handleCreateWorkflow = () => {
-    if (!apiKey && !showApiKeyInput) {
-      setShowApiKeyInput(true);
-      return;
-    }
     setShowWorkflowBuilder(true);
   };
 
@@ -97,7 +91,6 @@ const ResonantDirective = () => {
       <div className="fixed inset-0 z-50 bg-white">
         <WorkflowBuilder 
           onClose={() => setShowWorkflowBuilder(false)}
-          apiKey={apiKey}
         />
       </div>
     );
@@ -173,29 +166,6 @@ const ResonantDirective = () => {
                 System Status
               </Button>
             </div>
-
-            {showApiKeyInput && (
-              <div className="mb-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-xs text-blue-800 mb-2">Enter your OpenAI API key to enable AI workflow generation:</p>
-                <div className="flex space-x-2">
-                  <Input
-                    type="password"
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                    placeholder="sk-..."
-                    className="flex-1 text-xs h-8"
-                  />
-                  <Button 
-                    onClick={() => setShowApiKeyInput(false)}
-                    size="sm"
-                    className="h-8 text-xs"
-                    disabled={!apiKey}
-                  >
-                    Save
-                  </Button>
-                </div>
-              </div>
-            )}
 
             {/* Input Area */}
             <div className="flex space-x-2">
