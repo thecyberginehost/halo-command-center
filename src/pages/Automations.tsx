@@ -4,13 +4,23 @@ import { SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Play, Pause, Settings, MoreVertical, Plus } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Settings, MoreVertical, Copy, Trash2 } from 'lucide-react';
 import { useWorkflows } from '@/hooks/useWorkflows';
 import { useTenant } from '@/contexts/TenantContext';
+import { WorkflowCreateModal } from '@/components/WorkflowCreateModal';
+import { WorkflowEditModal } from '@/components/WorkflowEditModal';
+import { WorkflowDeleteDialog } from '@/components/WorkflowDeleteDialog';
+import { WorkflowStatusToggle } from '@/components/WorkflowStatusToggle';
+import ResonantDirective from '../components/ResonantDirective';
+import { WorkflowRecord } from '@/types/tenant';
+import { useState } from 'react';
 
 const Automations = () => {
-  const { workflows, loading, error } = useWorkflows();
+  const { workflows, loading, error, refreshWorkflows } = useWorkflows();
   const { currentTenant } = useTenant();
+  const [editingWorkflow, setEditingWorkflow] = useState<WorkflowRecord | null>(null);
+  const [deletingWorkflow, setDeletingWorkflow] = useState<WorkflowRecord | null>(null);
 
   const formatLastExecuted = (lastExecuted: string | null) => {
     if (!lastExecuted) return 'Never';
@@ -46,10 +56,7 @@ const Automations = () => {
                   Manage and monitor your workflow automations for {currentTenant?.name}
                 </p>
               </div>
-              <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">
-                <Plus className="h-4 w-4 mr-2" />
-                Create Automation
-              </Button>
+              <WorkflowCreateModal onWorkflowCreated={refreshWorkflows} />
             </div>
           </div>
           
@@ -67,10 +74,7 @@ const Automations = () => {
               <p className="text-muted-foreground mb-4">
                 Get started by creating your first workflow automation
               </p>
-              <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">
-                <Plus className="h-4 w-4 mr-2" />
-                Create Your First Automation
-              </Button>
+              <WorkflowCreateModal onWorkflowCreated={refreshWorkflows} />
             </div>
           ) : (
             <div className="space-y-4">
@@ -91,9 +95,30 @@ const Automations = () => {
                       >
                         {workflow.status || 'draft'}
                       </Badge>
-                      <Button variant="ghost" size="sm">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => setEditingWorkflow(workflow)}>
+                            <Settings className="h-4 w-4 mr-2" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Copy className="h-4 w-4 mr-2" />
+                            Duplicate
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => setDeletingWorkflow(workflow)}
+                            className="text-destructive focus:text-destructive"
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </CardHeader>
                   <CardContent>
@@ -109,27 +134,18 @@ const Automations = () => {
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Button variant="outline" size="sm">
-                          <Settings className="h-4 w-4 mr-2" />
-                          Configure
-                        </Button>
                         <Button 
                           variant="outline" 
                           size="sm"
-                          className={workflow.status === 'active' ? 'text-orange-600 hover:text-orange-700' : 'text-green-600 hover:text-green-700'}
+                          onClick={() => setEditingWorkflow(workflow)}
                         >
-                          {workflow.status === 'active' ? (
-                            <>
-                              <Pause className="h-4 w-4 mr-2" />
-                              Pause
-                            </>
-                          ) : (
-                            <>
-                              <Play className="h-4 w-4 mr-2" />
-                              {workflow.status === 'draft' ? 'Activate' : 'Resume'}
-                            </>
-                          )}
+                          <Settings className="h-4 w-4 mr-2" />
+                          Configure
                         </Button>
+                        <WorkflowStatusToggle 
+                          workflow={workflow}
+                          onStatusChanged={refreshWorkflows}
+                        />
                       </div>
                     </div>
                   </CardContent>
@@ -138,6 +154,29 @@ const Automations = () => {
             </div>
           )}
         </main>
+        
+        {/* Edit Modal */}
+        {editingWorkflow && (
+          <WorkflowEditModal
+            workflow={editingWorkflow}
+            open={!!editingWorkflow}
+            onOpenChange={(open) => !open && setEditingWorkflow(null)}
+            onWorkflowUpdated={refreshWorkflows}
+          />
+        )}
+        
+        {/* Delete Dialog */}
+        {deletingWorkflow && (
+          <WorkflowDeleteDialog
+            workflow={deletingWorkflow}
+            open={!!deletingWorkflow}
+            onOpenChange={(open) => !open && setDeletingWorkflow(null)}
+            onWorkflowDeleted={refreshWorkflows}
+          />
+        )}
+        
+        {/* Resonant Directive AI Assistant */}
+        <ResonantDirective />
       </SidebarInset>
     </div>
   );
