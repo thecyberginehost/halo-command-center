@@ -37,16 +37,6 @@ export default {
 					DEFAULT: 'hsl(var(--accent))',
 					foreground: 'hsl(var(--accent-foreground))'
 				},
-				halo: {
-					primary: '#1A1A2E',
-					secondary: '#0F3460',
-					accent: '#E94560',
-					sidebar: '#0F1A2E',
-					background: '#F7F7F7',
-					widget: '#FFFFFF',
-					text: '#1C1C1C',
-					textSecondary: '#4A4A4A'
-				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
 					foreground: 'hsl(var(--destructive-foreground))'
