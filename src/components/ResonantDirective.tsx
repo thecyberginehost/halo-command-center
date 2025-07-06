@@ -10,7 +10,9 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, MessageCircle } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Send, MessageCircle, Wand2, Settings } from 'lucide-react';
+import WorkflowBuilder from './WorkflowBuilder';
 
 interface Message {
   id: number;
@@ -23,12 +25,15 @@ const ResonantDirective = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
-      text: "Hello! I'm Resonant Directive, your AI automation assistant. How can I help you optimize your workflows today?",
+      text: "Hello! I'm Resonant Directive, your AI automation assistant. I can help you create workflows, optimize automations, and provide insights. Try saying 'create a workflow' or ask about your system performance!",
       sender: 'ai',
       timestamp: '10:30 AM'
     }
   ]);
   const [inputValue, setInputValue] = useState('');
+  const [showWorkflowBuilder, setShowWorkflowBuilder] = useState(false);
+  const [apiKey, setApiKey] = useState('');
+  const [showApiKeyInput, setShowApiKeyInput] = useState(false);
 
   const handleSendMessage = () => {
     if (!inputValue.trim()) return;
@@ -41,19 +46,62 @@ const ResonantDirective = () => {
     };
 
     setMessages([...messages, newMessage]);
+    const userInput = inputValue.toLowerCase();
     setInputValue('');
 
-    // Simulate AI response
+    // Check for workflow creation requests
+    if (userInput.includes('create') && (userInput.includes('workflow') || userInput.includes('automation'))) {
+      setTimeout(() => {
+        const aiResponse: Message = {
+          id: messages.length + 2,
+          text: "I'd be happy to help you create a workflow! I'll open the AI Workflow Builder where you can describe your automation in natural language, and I'll generate it for you.",
+          sender: 'ai',
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+        setMessages(prev => [...prev, aiResponse]);
+        setShowWorkflowBuilder(true);
+      }, 1000);
+      return;
+    }
+
+    // Simulate contextual AI responses
     setTimeout(() => {
+      let responseText = "I understand you're looking for optimization suggestions. Based on your current workflows, I recommend implementing parallel processing for your email campaigns to reduce execution time by 25%.";
+      
+      if (userInput.includes('performance') || userInput.includes('metrics')) {
+        responseText = "Your system is performing well! Current uptime is 99.8%, with 1,247 successful workflow executions this month. I notice some opportunities to optimize your email workflows for better performance.";
+      } else if (userInput.includes('help') || userInput.includes('what can you do')) {
+        responseText = "I can help you with: 🔧 Create new workflows from natural language, 📊 Analyze performance metrics, 🔍 Debug automation issues, 💡 Suggest optimizations, and ⚡ Manage your HALO automations. What would you like to work on?";
+      }
+
       const aiResponse: Message = {
         id: messages.length + 2,
-        text: "I understand you're looking for optimization suggestions. Based on your current workflows, I recommend implementing parallel processing for your email campaigns to reduce execution time by 25%.",
+        text: responseText,
         sender: 'ai',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, aiResponse]);
     }, 1000);
   };
+
+  const handleCreateWorkflow = () => {
+    if (!apiKey && !showApiKeyInput) {
+      setShowApiKeyInput(true);
+      return;
+    }
+    setShowWorkflowBuilder(true);
+  };
+
+  if (showWorkflowBuilder) {
+    return (
+      <div className="fixed inset-0 z-50 bg-white">
+        <WorkflowBuilder 
+          onClose={() => setShowWorkflowBuilder(false)}
+          apiKey={apiKey}
+        />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -104,13 +152,57 @@ const ResonantDirective = () => {
             </div>
           </ScrollArea>
           
-          {/* Input Area */}
-          <div className="p-4 border-t bg-gradient-to-r from-gray-50 to-white backdrop-blur-sm">
+          {/* Quick Actions */}
+          <div className="p-4 border-t bg-gradient-to-r from-gray-50 to-white">
+            <div className="flex flex-wrap gap-2 mb-3">
+              <Button 
+                onClick={handleCreateWorkflow}
+                size="sm" 
+                variant="outline"
+                className="text-xs h-7"
+              >
+                <Wand2 className="h-3 w-3 mr-1" />
+                Create Workflow
+              </Button>
+              <Button 
+                size="sm" 
+                variant="outline"
+                className="text-xs h-7"
+              >
+                <Settings className="h-3 w-3 mr-1" />
+                System Status
+              </Button>
+            </div>
+
+            {showApiKeyInput && (
+              <div className="mb-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <p className="text-xs text-blue-800 mb-2">Enter your OpenAI API key to enable AI workflow generation:</p>
+                <div className="flex space-x-2">
+                  <Input
+                    type="password"
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    placeholder="sk-..."
+                    className="flex-1 text-xs h-8"
+                  />
+                  <Button 
+                    onClick={() => setShowApiKeyInput(false)}
+                    size="sm"
+                    className="h-8 text-xs"
+                    disabled={!apiKey}
+                  >
+                    Save
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Input Area */}
             <div className="flex space-x-2">
               <Input
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Ask about workflow optimization..."
+                placeholder="Ask about automation or say 'create workflow'..."
                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                 className="flex-1 border-gray-300 focus:border-halo-accent focus:ring-halo-accent/20 bg-white/80 backdrop-blur-sm shadow-sm placeholder:text-gray-400"
               />
