@@ -137,10 +137,10 @@ const Index = () => {
             </CardContent>
           </Card>
         </main>
-        
-        {/* Floating AI Assistant */}
-        <ResonantDirective />
       </SidebarInset>
+      
+      {/* Floating AI Assistant - positioned relative to viewport */}
+      <ResonantDirective />
     </div>
   );
 };

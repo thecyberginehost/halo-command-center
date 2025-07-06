@@ -174,10 +174,10 @@ const Automations = () => {
             onWorkflowDeleted={refreshWorkflows}
           />
         )}
-        
-        {/* Resonant Directive AI Assistant */}
-        <ResonantDirective />
       </SidebarInset>
+      
+      {/* Resonant Directive AI Assistant - positioned relative to viewport */}
+      <ResonantDirective />
     </div>
   );
 };
