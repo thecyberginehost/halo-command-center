@@ -12,7 +12,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { Send, MessageCircle, Wand2, Settings, Loader2 } from 'lucide-react';
+import { Send, MessageCircle, Wand2, Settings, Loader2, X } from 'lucide-react';
 import WorkflowBuilder from './WorkflowBuilder';
 import { AIChatService, ChatMessage } from '@/services/aiChatService';
 import { useWorkflows } from '@/hooks/useWorkflows';
@@ -37,8 +37,9 @@ const ResonantDirective = () => {
   const [conversationHistory, setConversationHistory] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [aiChatService] = useState(() => new AIChatService());
+  const [showWelcomePopup, setShowWelcomePopup] = useState(false);
 
-  // Initialize with welcome message
+  // Initialize with welcome message and show popup on "login"
   useEffect(() => {
     const welcomeMessage: Message = {
       id: 1,
@@ -47,6 +48,11 @@ const ResonantDirective = () => {
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
     setMessages([welcomeMessage]);
+    
+    // Show welcome popup after a brief delay to simulate login
+    setTimeout(() => {
+      setShowWelcomePopup(true);
+    }, 1000);
   }, []);
 
   const handleSendMessage = async () => {
@@ -166,7 +172,7 @@ const ResonantDirective = () => {
       <Dialog>
         <DialogTrigger asChild>
           <Button 
-            className="fixed bottom-8 right-8 w-20 h-20 rounded-full shadow-2xl z-50 transition-all duration-300 bg-primary hover:bg-primary/90 hover:scale-105 relative overflow-hidden"
+            className="fixed bottom-8 right-8 w-20 h-20 rounded-full shadow-2xl z-50 transition-all duration-300 bg-primary hover:bg-primary/90 hover:scale-105 relative overflow-hidden safe-area-inset-bottom safe-area-inset-right"
             size="icon"
           >
             {/* Rotating stars background */}
@@ -278,6 +284,29 @@ const ResonantDirective = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Welcome Popup */}
+      {showWelcomePopup && (
+        <div className="fixed bottom-32 right-4 z-50 animate-fade-in">
+          <div className="relative bg-gradient-to-br from-primary to-secondary text-white p-4 rounded-lg shadow-2xl max-w-sm border border-accent/30">
+            <Button
+              onClick={() => setShowWelcomePopup(false)}
+              size="icon"
+              variant="ghost"
+              className="absolute -top-2 -right-2 w-6 h-6 bg-accent hover:bg-accent/90 text-white rounded-full"
+            >
+              <X className="h-3 w-3" />
+            </Button>
+            <div className="pr-4">
+              <h3 className="font-semibold text-sm mb-2">Welcome, Reclaimer</h3>
+              <p className="text-xs leading-relaxed">
+                I am Resonant Directive, your devoted Ancilla. My protocols are dedicated to accelerating your automation endeavors into hyperdrive. Query me for assistance with workflows, optimizations, and strategic implementations.
+              </p>
+            </div>
+            <div className="absolute -bottom-2 right-8 w-0 h-0 border-l-[8px] border-r-[8px] border-t-[8px] border-l-transparent border-r-transparent border-t-secondary"></div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
