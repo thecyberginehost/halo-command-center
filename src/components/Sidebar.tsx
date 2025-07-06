@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Settings, 
@@ -15,7 +16,7 @@ import { Switch } from '@/components/ui/switch';
 interface MenuItem {
   title: string;
   icon: React.ComponentType<{ className?: string }>;
-  isActive?: boolean;
+  path: string;
 }
 
 interface MenuSection {
@@ -25,32 +26,33 @@ interface MenuSection {
 
 const Sidebar = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const location = useLocation();
 
   const menuSections: MenuSection[] = [
     {
       title: "MAIN",
       items: [
-        { title: "Dashboard", icon: LayoutDashboard, isActive: true },
-        { title: "Automations", icon: List },
-        { title: "Metrics", icon: BarChart },
-        { title: "Insights", icon: BarChart },
-        { title: "Logs", icon: List },
+        { title: "Dashboard", icon: LayoutDashboard, path: "/" },
+        { title: "Automations", icon: List, path: "/automations" },
+        { title: "Metrics", icon: BarChart, path: "/metrics" },
+        { title: "Insights", icon: BarChart, path: "/insights" },
+        { title: "Logs", icon: List, path: "/logs" },
       ]
     },
     {
       title: "AI ASSIST",
       items: [
-        { title: "Resonant Directive", icon: Bell },
-        { title: "Suggestions", icon: List },
-        { title: "AI Recommendations", icon: BarChart },
+        { title: "Resonant Directive", icon: Bell, path: "/ai-assist" },
+        { title: "Suggestions", icon: List, path: "/suggestions" },
+        { title: "AI Recommendations", icon: BarChart, path: "/ai-recommendations" },
       ]
     },
     {
       title: "SETTINGS",
       items: [
-        { title: "User Management", icon: Users },
-        { title: "Credentials", icon: User },
-        { title: "System Config", icon: Settings },
+        { title: "User Management", icon: Users, path: "/settings/users" },
+        { title: "Credentials", icon: User, path: "/settings/credentials" },
+        { title: "System Config", icon: Settings, path: "/settings/system" },
       ]
     }
   ];
@@ -65,20 +67,23 @@ const Sidebar = () => {
               {section.title}
             </h3>
             <nav className="space-y-1">
-              {section.items.map((item, itemIndex) => (
-                <Button
-                  key={itemIndex}
-                  variant="ghost"
-                  className={`w-full justify-start text-left px-3 py-2 text-sm font-medium transition-all duration-200 ${
-                    item.isActive
-                      ? 'bg-halo-accent text-white shadow-lg border-l-4 border-white'
-                      : 'text-gray-300 hover:bg-halo-secondary hover:text-white'
-                  }`}
-                >
-                  <item.icon className="mr-3 h-4 w-4" />
-                  {item.title}
-                </Button>
-              ))}
+              {section.items.map((item, itemIndex) => {
+                const isActive = location.pathname === item.path;
+                return (
+                  <NavLink
+                    key={itemIndex}
+                    to={item.path}
+                    className={`w-full justify-start text-left px-3 py-2 text-sm font-medium transition-all duration-200 flex items-center rounded-md ${
+                      isActive
+                        ? 'bg-halo-accent text-white shadow-lg border-l-4 border-white'
+                        : 'text-gray-300 hover:bg-halo-secondary hover:text-white'
+                    }`}
+                  >
+                    <item.icon className="mr-3 h-4 w-4" />
+                    {item.title}
+                  </NavLink>
+                );
+              })}
             </nav>
           </div>
         ))}
