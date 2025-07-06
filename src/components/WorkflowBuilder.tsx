@@ -17,8 +17,28 @@ import {
   Database,
   MessageSquare,
   Clock,
-  GitBranch
+  GitBranch,
+  GripVertical
 } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import {
+  CSS,
+} from '@dnd-kit/utilities';
 import { Workflow, WorkflowStep } from '@/types/workflow';
 import { WorkflowAIService } from '@/services/workflowAI';
 import { useToast } from '@/hooks/use-toast';
@@ -57,6 +77,33 @@ const WorkflowBuilder = ({ onClose }: WorkflowBuilderProps) => {
   } | null>(null);
   const { toast } = useToast();
   const { currentTenant } = useTenant();
+
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (active.id !== over?.id && workflow) {
+      const oldIndex = workflow.steps.findIndex(step => step.id === active.id);
+      const newIndex = workflow.steps.findIndex(step => step.id === over?.id);
+
+      setWorkflow({
+        ...workflow,
+        steps: arrayMove(workflow.steps, oldIndex, newIndex)
+      });
+
+      toast({
+        title: "Steps Reordered",
+        description: "Workflow steps have been successfully reordered.",
+      });
+    }
+  };
 
   const handleGenerateWorkflow = async () => {
     if (!prompt.trim()) {
@@ -115,12 +162,40 @@ const WorkflowBuilder = ({ onClose }: WorkflowBuilderProps) => {
     });
   };
 
-  const renderWorkflowStep = (step: WorkflowStep, index: number) => {
+  // Sortable Workflow Step Component
+  const SortableWorkflowStep = ({ step, index }: { step: WorkflowStep; index: number }) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging,
+    } = useSortable({ id: step.id });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+    };
+
     const Icon = stepIcons[step.type];
     const colorClass = stepColors[step.type];
     
     return (
-      <div key={step.id} className="flex items-center space-x-4 p-4 bg-white rounded-lg border border-gray-200">
+      <div 
+        ref={setNodeRef} 
+        style={style} 
+        className={`flex items-center space-x-4 p-4 bg-white rounded-lg border border-gray-200 ${
+          isDragging ? 'shadow-lg opacity-75' : 'hover:shadow-md'
+        } transition-shadow cursor-grab active:cursor-grabbing`}
+      >
+        <div 
+          {...attributes} 
+          {...listeners}
+          className="flex items-center cursor-grab hover:bg-gray-50 p-1 rounded"
+        >
+          <GripVertical className="h-4 w-4 text-gray-400" />
+        </div>
         <div className={`p-2 rounded-full ${colorClass}`}>
           <Icon className="h-4 w-4 text-white" />
         </div>
@@ -265,18 +340,29 @@ const WorkflowBuilder = ({ onClose }: WorkflowBuilderProps) => {
               </div>
 
               <ScrollArea className="flex-1">
-                <div className="space-y-4">
-                  {workflow.steps.map((step, index) => (
-                    <div key={step.id}>
-                      {renderWorkflowStep(step, index)}
-                      {index < workflow.steps.length - 1 && (
-                        <div className="flex justify-center py-2">
-                          <div className="w-px h-8 bg-gray-300" />
+                <DndContext 
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext 
+                    items={workflow.steps.map(step => step.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="space-y-4">
+                      {workflow.steps.map((step, index) => (
+                        <div key={step.id}>
+                          <SortableWorkflowStep step={step} index={index} />
+                          {index < workflow.steps.length - 1 && (
+                            <div className="flex justify-center py-2">
+                              <div className="w-px h-8 bg-gray-300" />
+                            </div>
+                          )}
                         </div>
-                      )}
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </SortableContext>
+                </DndContext>
               </ScrollArea>
             </div>
           ) : (
