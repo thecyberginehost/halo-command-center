@@ -172,8 +172,9 @@ const ResonantDirective = () => {
       <Dialog>
         <DialogTrigger asChild>
           <Button 
-            className="fixed bottom-8 right-6 w-20 h-20 rounded-full shadow-2xl z-50 transition-all duration-300 bg-primary hover:bg-primary/90 hover:scale-105 relative overflow-hidden"
+            className="fixed bottom-8 right-6 w-20 h-20 rounded-full shadow-2xl z-50 transition-all duration-300 bg-primary hover:bg-primary/90 hover:scale-105 overflow-hidden"
             size="icon"
+            style={{ position: 'fixed', bottom: '2rem', right: '1.5rem' }}
           >
             {/* Rotating stars background */}
             <div className="absolute inset-0 animate-rotate-stars opacity-70">
