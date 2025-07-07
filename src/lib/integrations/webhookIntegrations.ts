@@ -1,27 +1,29 @@
 import { IntegrationNode } from '@/types/integrations';
+import { Zap, Globe, MessageSquare } from 'lucide-react';
 
 export const webhookTrigger: IntegrationNode = {
   id: 'webhook-trigger',
   name: 'Webhook Trigger',
   description: 'Trigger workflow when webhook receives data',
   category: 'webhook',
-  icon: 'Zap',
-  color: 'bg-purple-500',
+  icon: Zap,
+  color: '#9C27B0',
   type: 'trigger',
   requiresAuth: false,
-  configSchema: {
-    path: {
-      type: 'text',
+  configSchema: {},
+  fields: [
+    {
+      name: 'path',
       label: 'Webhook Path',
-      placeholder: '/webhook/my-automation',
+      type: 'text',
       required: true,
-      validation: {
-        pattern: '^/[a-zA-Z0-9-_/]+$'
-      }
+      placeholder: '/webhook/my-automation',
+      helpText: 'The URL path where your webhook will be accessible'
     },
-    method: {
-      type: 'select',
+    {
+      name: 'method',
       label: 'HTTP Method',
+      type: 'select',
       required: true,
       options: [
         { label: 'POST', value: 'POST' },
@@ -30,13 +32,14 @@ export const webhookTrigger: IntegrationNode = {
         { label: 'DELETE', value: 'DELETE' }
       ]
     },
-    secretKey: {
-      type: 'password',
+    {
+      name: 'secretKey',
       label: 'Secret Key (Optional)',
-      placeholder: 'For webhook validation',
-      required: false
+      type: 'password',
+      required: false,
+      placeholder: 'For webhook validation'
     }
-  },
+  ],
   endpoints: [
     {
       id: 'receive',
@@ -54,23 +57,23 @@ export const httpRequestAction: IntegrationNode = {
   name: 'HTTP Request',
   description: 'Make HTTP requests to any API',
   category: 'webhook',
-  icon: 'Globe',
-  color: 'bg-gray-600',
+  icon: Globe,
+  color: '#607D8B',
   type: 'action',
   requiresAuth: false,
-  configSchema: {
-    url: {
-      type: 'text',
+  configSchema: {},
+  fields: [
+    {
+      name: 'url',
       label: 'URL',
-      placeholder: 'https://api.example.com/endpoint',
+      type: 'text',
       required: true,
-      validation: {
-        pattern: '^https?://.+'
-      }
+      placeholder: 'https://api.example.com/endpoint'
     },
-    method: {
-      type: 'select',
+    {
+      name: 'method',
       label: 'HTTP Method',
+      type: 'select',
       required: true,
       options: [
         { label: 'GET', value: 'GET' },
@@ -80,19 +83,21 @@ export const httpRequestAction: IntegrationNode = {
         { label: 'PATCH', value: 'PATCH' }
       ]
     },
-    headers: {
-      type: 'textarea',
+    {
+      name: 'headers',
       label: 'Headers (JSON)',
-      placeholder: '{"Authorization": "Bearer token", "Content-Type": "application/json"}',
-      required: false
-    },
-    body: {
       type: 'textarea',
+      required: false,
+      placeholder: '{"Authorization": "Bearer token", "Content-Type": "application/json"}'
+    },
+    {
+      name: 'body',
       label: 'Request Body (JSON)',
-      placeholder: '{"key": "value"}',
-      required: false
+      type: 'textarea',
+      required: false,
+      placeholder: '{"key": "value"}'
     }
-  },
+  ],
   endpoints: [
     {
       id: 'execute',
@@ -100,22 +105,7 @@ export const httpRequestAction: IntegrationNode = {
       description: 'Execute the HTTP request',
       method: 'POST',
       path: '/http/request',
-      parameters: {
-        url: {
-          type: 'text',
-          label: 'URL',
-          required: true
-        },
-        method: {
-          type: 'select',
-          label: 'Method',
-          required: true,
-          options: [
-            { label: 'GET', value: 'GET' },
-            { label: 'POST', value: 'POST' }
-          ]
-        }
-      }
+      parameters: {}
     }
   ]
 };
@@ -125,40 +115,42 @@ export const slackIntegration: IntegrationNode = {
   name: 'Slack',
   description: 'Send messages to Slack channels',
   category: 'communication',
-  icon: 'MessageSquare',
-  color: 'bg-purple-600',
+  icon: MessageSquare,
+  color: '#4A154B',
   type: 'action',
   requiresAuth: true,
   authType: 'api_key',
-  configSchema: {
-    webhookUrl: {
-      type: 'text',
+  configSchema: {},
+  fields: [
+    {
+      name: 'webhookUrl',
       label: 'Slack Webhook URL',
-      placeholder: 'https://hooks.slack.com/services/...',
+      type: 'text',
       required: true,
-      validation: {
-        pattern: '^https://hooks\\.slack\\.com/services/.+'
-      }
+      placeholder: 'https://hooks.slack.com/services/...'
     },
-    channel: {
-      type: 'text',
+    {
+      name: 'channel',
       label: 'Channel',
-      placeholder: '#general',
-      required: false
-    },
-    message: {
-      type: 'textarea',
-      label: 'Message',
-      placeholder: 'Your message here',
-      required: true
-    },
-    username: {
       type: 'text',
+      required: false,
+      placeholder: '#general'
+    },
+    {
+      name: 'message',
+      label: 'Message',
+      type: 'textarea',
+      required: true,
+      placeholder: 'Your message here'
+    },
+    {
+      name: 'username',
       label: 'Bot Username',
-      placeholder: 'Automation Bot',
-      required: false
+      type: 'text',
+      required: false,
+      placeholder: 'Automation Bot'
     }
-  },
+  ],
   endpoints: [
     {
       id: 'send-message',
@@ -166,18 +158,7 @@ export const slackIntegration: IntegrationNode = {
       description: 'Send a message to Slack channel',
       method: 'POST',
       path: '/slack/message',
-      parameters: {
-        message: {
-          type: 'textarea',
-          label: 'Message',
-          required: true
-        },
-        channel: {
-          type: 'text',
-          label: 'Channel',
-          required: false
-        }
-      }
+      parameters: {}
     }
   ]
 };

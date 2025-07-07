@@ -1,47 +1,54 @@
 import { IntegrationNode } from '@/types/integrations';
+import { Mail } from 'lucide-react';
 
 export const gmailIntegration: IntegrationNode = {
   id: 'gmail',
   name: 'Gmail',
   description: 'Send and receive emails using Gmail',
   category: 'communication',
-  icon: 'Mail',
-  color: 'bg-red-500',
+  icon: Mail,
+  color: '#EA4335',
   type: 'action',
   requiresAuth: true,
   authType: 'oauth',
-  configSchema: {
-    to: {
-      type: 'email',
+  configSchema: {},
+  fields: [
+    {
+      name: 'to',
       label: 'To',
-      placeholder: 'recipient@example.com',
-      required: true
-    },
-    subject: {
       type: 'text',
+      required: true,
+      placeholder: 'recipient@example.com'
+    },
+    {
+      name: 'subject',
       label: 'Subject',
-      placeholder: 'Email subject',
-      required: true
+      type: 'text',
+      required: true,
+      placeholder: 'Email subject'
     },
-    body: {
-      type: 'textarea',
+    {
+      name: 'body',
       label: 'Body',
-      placeholder: 'Email content',
-      required: true
+      type: 'textarea',
+      required: true,
+      placeholder: 'Email content'
     },
-    cc: {
-      type: 'text',
+    {
+      name: 'cc',
       label: 'CC',
-      placeholder: 'cc@example.com',
-      required: false
-    },
-    bcc: {
       type: 'text',
+      required: false,
+      placeholder: 'cc@example.com'
+    },
+    {
+      name: 'bcc',
       label: 'BCC',
-      placeholder: 'bcc@example.com',
-      required: false
+      type: 'text',
+      required: false,
+      placeholder: 'bcc@example.com'
     }
-  },
+  ],
   endpoints: [
     {
       id: 'send',
@@ -49,23 +56,7 @@ export const gmailIntegration: IntegrationNode = {
       description: 'Send an email via Gmail',
       method: 'POST',
       path: '/gmail/send',
-      parameters: {
-        to: {
-          type: 'email',
-          label: 'To',
-          required: true
-        },
-        subject: {
-          type: 'text',
-          label: 'Subject',
-          required: true
-        },
-        body: {
-          type: 'textarea',
-          label: 'Body',
-          required: true
-        }
-      }
+      parameters: {}
     }
   ]
 };
@@ -75,25 +66,17 @@ export const sesIntegration: IntegrationNode = {
   name: 'Amazon SES',
   description: 'Send emails using Amazon Simple Email Service',
   category: 'communication',
-  icon: 'Mail',
-  color: 'bg-orange-500',
+  icon: Mail,
+  color: '#FF9900',
   type: 'action',
   requiresAuth: true,
   authType: 'api_key',
-  configSchema: {
-    accessKeyId: {
-      type: 'text',
-      label: 'AWS Access Key ID',
-      required: true
-    },
-    secretAccessKey: {
-      type: 'password',
-      label: 'AWS Secret Access Key',
-      required: true
-    },
-    region: {
-      type: 'select',
+  configSchema: {},
+  fields: [
+    {
+      name: 'region',
       label: 'AWS Region',
+      type: 'select',
       required: true,
       options: [
         { label: 'US East (N. Virginia)', value: 'us-east-1' },
@@ -101,25 +84,28 @@ export const sesIntegration: IntegrationNode = {
         { label: 'Europe (Ireland)', value: 'eu-west-1' }
       ]
     },
-    to: {
-      type: 'email',
+    {
+      name: 'to',
       label: 'To',
-      placeholder: 'recipient@example.com',
-      required: true
-    },
-    subject: {
       type: 'text',
-      label: 'Subject',
-      placeholder: 'Email subject',
-      required: true
+      required: true,
+      placeholder: 'recipient@example.com'
     },
-    body: {
-      type: 'textarea',
+    {
+      name: 'subject',
+      label: 'Subject',
+      type: 'text',
+      required: true,
+      placeholder: 'Email subject'
+    },
+    {
+      name: 'body',
       label: 'Body',
-      placeholder: 'Email content',
-      required: true
+      type: 'textarea',
+      required: true,
+      placeholder: 'Email content'
     }
-  },
+  ],
   endpoints: [
     {
       id: 'send',
@@ -127,23 +113,7 @@ export const sesIntegration: IntegrationNode = {
       description: 'Send an email via Amazon SES',
       method: 'POST',
       path: '/ses/send',
-      parameters: {
-        to: {
-          type: 'email',
-          label: 'To',
-          required: true
-        },
-        subject: {
-          type: 'text',
-          label: 'Subject',
-          required: true
-        },
-        body: {
-          type: 'textarea',
-          label: 'Body',
-          required: true
-        }
-      }
+      parameters: {}
     }
   ]
 };
@@ -153,42 +123,42 @@ export const sendgridIntegration: IntegrationNode = {
   name: 'SendGrid',
   description: 'Send emails using SendGrid',
   category: 'communication',
-  icon: 'Mail',
-  color: 'bg-blue-500',
+  icon: Mail,
+  color: '#1A73E8',
   type: 'action',
   requiresAuth: true,
   authType: 'api_key',
-  configSchema: {
-    apiKey: {
-      type: 'password',
-      label: 'SendGrid API Key',
-      required: true
-    },
-    from: {
-      type: 'email',
+  configSchema: {},
+  fields: [
+    {
+      name: 'from',
       label: 'From Email',
-      placeholder: 'sender@example.com',
-      required: true
-    },
-    to: {
-      type: 'email',
-      label: 'To',
-      placeholder: 'recipient@example.com',
-      required: true
-    },
-    subject: {
       type: 'text',
-      label: 'Subject',
-      placeholder: 'Email subject',
-      required: true
+      required: true,
+      placeholder: 'sender@example.com'
     },
-    body: {
-      type: 'textarea',
+    {
+      name: 'to',
+      label: 'To',
+      type: 'text',
+      required: true,
+      placeholder: 'recipient@example.com'
+    },
+    {
+      name: 'subject',
+      label: 'Subject',
+      type: 'text',
+      required: true,
+      placeholder: 'Email subject'
+    },
+    {
+      name: 'body',
       label: 'Body',
-      placeholder: 'Email content',
-      required: true
+      type: 'textarea',
+      required: true,
+      placeholder: 'Email content'
     }
-  },
+  ],
   endpoints: [
     {
       id: 'send',
@@ -196,23 +166,7 @@ export const sendgridIntegration: IntegrationNode = {
       description: 'Send an email via SendGrid',
       method: 'POST',
       path: '/sendgrid/send',
-      parameters: {
-        to: {
-          type: 'email',
-          label: 'To',
-          required: true
-        },
-        subject: {
-          type: 'text',
-          label: 'Subject',
-          required: true
-        },
-        body: {
-          type: 'textarea',
-          label: 'Body',
-          required: true
-        }
-      }
+      parameters: {}
     }
   ]
 };

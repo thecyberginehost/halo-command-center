@@ -1,19 +1,22 @@
 import { IntegrationNode } from '@/types/integrations';
+import { Users } from 'lucide-react';
 
 export const salesforceIntegration: IntegrationNode = {
   id: 'salesforce',
   name: 'Salesforce',
   description: 'Manage leads, contacts, and opportunities in Salesforce',
   category: 'crm',
-  icon: 'Users',
-  color: 'bg-blue-600',
+  icon: Users,
+  color: '#1589FF',
   type: 'action',
   requiresAuth: true,
   authType: 'oauth',
-  configSchema: {
-    objectType: {
-      type: 'select',
+  configSchema: {},
+  fields: [
+    {
+      name: 'objectType',
       label: 'Object Type',
+      type: 'select',
       required: true,
       options: [
         { label: 'Lead', value: 'Lead' },
@@ -22,32 +25,42 @@ export const salesforceIntegration: IntegrationNode = {
         { label: 'Opportunity', value: 'Opportunity' }
       ]
     },
-    firstName: {
-      type: 'text',
+    {
+      name: 'firstName',
       label: 'First Name',
-      required: false
-    },
-    lastName: {
       type: 'text',
+      required: false,
+      placeholder: 'John'
+    },
+    {
+      name: 'lastName',
       label: 'Last Name',
-      required: true
+      type: 'text',
+      required: true,
+      placeholder: 'Doe'
     },
-    email: {
-      type: 'email',
+    {
+      name: 'email',
       label: 'Email',
-      required: false
-    },
-    company: {
       type: 'text',
+      required: false,
+      placeholder: 'john.doe@example.com'
+    },
+    {
+      name: 'company',
       label: 'Company',
-      required: false
-    },
-    phone: {
       type: 'text',
+      required: false,
+      placeholder: 'Acme Corp'
+    },
+    {
+      name: 'phone',
       label: 'Phone',
-      required: false
+      type: 'text',
+      required: false,
+      placeholder: '+1 555-123-4567'
     }
-  },
+  ],
   endpoints: [
     {
       id: 'create',
@@ -55,31 +68,7 @@ export const salesforceIntegration: IntegrationNode = {
       description: 'Create a new record in Salesforce',
       method: 'POST',
       path: '/salesforce/create',
-      parameters: {
-        objectType: {
-          type: 'select',
-          label: 'Object Type',
-          required: true,
-          options: [
-            { label: 'Lead', value: 'Lead' },
-            { label: 'Contact', value: 'Contact' }
-          ]
-        }
-      }
-    },
-    {
-      id: 'update',
-      name: 'Update Record',
-      description: 'Update an existing record in Salesforce',
-      method: 'PUT',
-      path: '/salesforce/update',
-      parameters: {
-        recordId: {
-          type: 'text',
-          label: 'Record ID',
-          required: true
-        }
-      }
+      parameters: {}
     }
   ]
 };
@@ -89,43 +78,49 @@ export const hubspotIntegration: IntegrationNode = {
   name: 'HubSpot',
   description: 'Manage contacts and deals in HubSpot CRM',
   category: 'crm',
-  icon: 'Users',
-  color: 'bg-orange-600',
+  icon: Users,
+  color: '#FF7A59',
   type: 'action',
   requiresAuth: true,
   authType: 'api_key',
-  configSchema: {
-    apiKey: {
-      type: 'password',
-      label: 'HubSpot API Key',
-      required: true
-    },
-    email: {
-      type: 'email',
+  configSchema: {},
+  fields: [
+    {
+      name: 'email',
       label: 'Email',
-      required: true
-    },
-    firstName: {
       type: 'text',
+      required: true,
+      placeholder: 'john.doe@example.com'
+    },
+    {
+      name: 'firstName',
       label: 'First Name',
-      required: false
-    },
-    lastName: {
       type: 'text',
+      required: false,
+      placeholder: 'John'
+    },
+    {
+      name: 'lastName',
       label: 'Last Name',
-      required: false
-    },
-    company: {
       type: 'text',
+      required: false,
+      placeholder: 'Doe'
+    },
+    {
+      name: 'company',
       label: 'Company',
-      required: false
-    },
-    phone: {
       type: 'text',
+      required: false,
+      placeholder: 'Acme Corp'
+    },
+    {
+      name: 'phone',
       label: 'Phone',
-      required: false
+      type: 'text',
+      required: false,
+      placeholder: '+1 555-123-4567'
     }
-  },
+  ],
   endpoints: [
     {
       id: 'create-contact',
@@ -133,23 +128,7 @@ export const hubspotIntegration: IntegrationNode = {
       description: 'Create a new contact in HubSpot',
       method: 'POST',
       path: '/hubspot/contacts',
-      parameters: {
-        email: {
-          type: 'email',
-          label: 'Email',
-          required: true
-        },
-        firstName: {
-          type: 'text',
-          label: 'First Name',
-          required: false
-        },
-        lastName: {
-          type: 'text',
-          label: 'Last Name',
-          required: false
-        }
-      }
+      parameters: {}
     }
   ]
 };
@@ -159,39 +138,42 @@ export const pipedriveIntegration: IntegrationNode = {
   name: 'Pipedrive',
   description: 'Manage leads and deals in Pipedrive CRM',
   category: 'crm',
-  icon: 'Users',
-  color: 'bg-green-600',
+  icon: Users,
+  color: '#00E676',
   type: 'action',
   requiresAuth: true,
   authType: 'api_key',
-  configSchema: {
-    apiToken: {
-      type: 'password',
-      label: 'Pipedrive API Token',
-      required: true
-    },
-    companyDomain: {
-      type: 'text',
+  configSchema: {},
+  fields: [
+    {
+      name: 'companyDomain',
       label: 'Company Domain',
-      placeholder: 'yourcompany',
-      required: true
-    },
-    name: {
       type: 'text',
+      required: true,
+      placeholder: 'yourcompany'
+    },
+    {
+      name: 'name',
       label: 'Person Name',
-      required: true
-    },
-    email: {
-      type: 'email',
-      label: 'Email',
-      required: false
-    },
-    phone: {
       type: 'text',
+      required: true,
+      placeholder: 'John Doe'
+    },
+    {
+      name: 'email',
+      label: 'Email',
+      type: 'text',
+      required: false,
+      placeholder: 'john.doe@example.com'
+    },
+    {
+      name: 'phone',
       label: 'Phone',
-      required: false
+      type: 'text',
+      required: false,
+      placeholder: '+1 555-123-4567'
     }
-  },
+  ],
   endpoints: [
     {
       id: 'create-person',
@@ -199,18 +181,7 @@ export const pipedriveIntegration: IntegrationNode = {
       description: 'Create a new person in Pipedrive',
       method: 'POST',
       path: '/pipedrive/persons',
-      parameters: {
-        name: {
-          type: 'text',
-          label: 'Name',
-          required: true
-        },
-        email: {
-          type: 'email',
-          label: 'Email',
-          required: false
-        }
-      }
+      parameters: {}
     }
   ]
 };

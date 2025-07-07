@@ -3,7 +3,7 @@ export interface BaseIntegration {
   name: string;
   description: string;
   category: IntegrationCategory;
-  icon: string;
+  icon?: any;
   color: string;
   requiresAuth: boolean;
   authType?: 'api_key' | 'oauth' | 'basic' | 'bearer';
@@ -33,8 +33,20 @@ export type IntegrationCategory =
   | 'analytics'
   | 'payment';
 
+export interface IntegrationField {
+  name: string;
+  label: string;
+  type: 'text' | 'number' | 'boolean' | 'select' | 'textarea' | 'password';
+  required: boolean;
+  placeholder?: string;
+  helpText?: string;
+  options?: Array<{ label: string; value: string }>;
+  defaultValue?: any;
+}
+
 export interface IntegrationNode extends BaseIntegration {
   type: 'trigger' | 'action';
+  fields: IntegrationField[];
   endpoints: IntegrationEndpoint[];
 }
 
