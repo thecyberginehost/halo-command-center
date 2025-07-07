@@ -11,6 +11,7 @@ export class WorkflowExecutionService {
         .from('workflow_executions')
         .insert({
           workflow_id: workflowId,
+          tenant_id: 'default-tenant', // TODO: Get from context
           status: 'running',
           input: triggerData,
           started_at: new Date().toISOString()
@@ -45,7 +46,7 @@ export class WorkflowExecutionService {
 
       if (!workflow) throw new Error('Workflow not found');
 
-      const steps = Array.isArray(workflow.steps) ? workflow.steps as WorkflowStep[] : [];
+      const steps = Array.isArray(workflow.steps) ? workflow.steps as unknown as WorkflowStep[] : [];
       let previousOutputs: Record<string, any> = { trigger: triggerData };
 
       // Execute each step
@@ -66,7 +67,7 @@ export class WorkflowExecutionService {
           }
 
           previousOutputs[step.id] = result.output;
-          await this.logStepExecution(executionId, step.id, 'success', result);
+          await this.logStepExecution(executionId, step.id, 'info', result);
 
         } catch (error) {
           await this.logStepExecution(executionId, step.id, 'error', { error: error.message });
