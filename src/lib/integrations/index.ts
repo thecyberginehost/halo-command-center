@@ -2,6 +2,13 @@ import { IntegrationNode, IntegrationCategory } from '@/types/integrations';
 import { gmailIntegration, sesIntegration, sendgridIntegration } from './emailIntegrations';
 import { salesforceIntegration, hubspotIntegration, pipedriveIntegration } from './crmIntegrations';
 import { webhookTrigger, httpRequestAction, slackIntegration } from './webhookIntegrations';
+import { 
+  openaiAgentIntegration, 
+  claudeAgentIntegration, 
+  openaiLLMIntegration, 
+  claudeLLMIntegration,
+  aiToolIntegration 
+} from './aiIntegrations';
 
 export const allIntegrations: IntegrationNode[] = [
   // Triggers
@@ -22,6 +29,13 @@ export const allIntegrations: IntegrationNode[] = [
   
   // Webhook Actions
   httpRequestAction,
+  
+  // AI Actions
+  openaiAgentIntegration,
+  claudeAgentIntegration,
+  openaiLLMIntegration,
+  claudeLLMIntegration,
+  aiToolIntegration,
 ];
 
 export const integrationsByCategory: Record<IntegrationCategory, IntegrationNode[]> = {
@@ -30,7 +44,7 @@ export const integrationsByCategory: Record<IntegrationCategory, IntegrationNode
   webhook: [webhookTrigger, httpRequestAction],
   database: [],
   file_storage: [],
-  ai: [],
+  ai: [openaiAgentIntegration, claudeAgentIntegration, openaiLLMIntegration, claudeLLMIntegration, aiToolIntegration],
   analytics: [],
   payment: []
 };
@@ -54,3 +68,4 @@ export const getActionIntegrations = (): IntegrationNode[] => {
 export * from './emailIntegrations';
 export * from './crmIntegrations';
 export * from './webhookIntegrations';
+export * from './aiIntegrations';

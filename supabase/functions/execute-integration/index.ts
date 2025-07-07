@@ -31,6 +31,126 @@ const supabase = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 );
 
+async function executeAIIntegration(integration: string, config: Record<string, any>, context: any): Promise<ExecutionResult> {
+  const logs: string[] = [];
+  
+  try {
+    switch (integration) {
+      case 'openai-agent':
+      case 'openai-llm':
+        logs.push('Executing OpenAI integration');
+        
+        const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: config.model || 'gpt-4.1-2025-04-14',
+            messages: integration === 'openai-agent' 
+              ? [
+                  { role: 'system', content: config.instructions },
+                  { role: 'user', content: context.input.message || 'Hello' }
+                ]
+              : [
+                  { role: 'user', content: config.prompt || context.input.message || 'Hello' }
+                ],
+            temperature: config.temperature || 0.7,
+            max_tokens: config.maxTokens || 1000,
+          }),
+        });
+
+        if (!openaiResponse.ok) {
+          throw new Error(`OpenAI API error: ${await openaiResponse.text()}`);
+        }
+
+        const openaiData = await openaiResponse.json();
+        const responseText = openaiData.choices[0].message.content;
+        
+        logs.push(`Generated response: ${responseText.substring(0, 100)}...`);
+        
+        return {
+          success: true,
+          output: {
+            response: responseText,
+            model: config.model,
+            tokens_used: openaiData.usage?.total_tokens || 0,
+            timestamp: new Date().toISOString()
+          },
+          logs
+        };
+        
+      case 'claude-agent':
+      case 'claude-llm':
+        logs.push('Executing Claude integration');
+        
+        const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'x-api-key': Deno.env.get('ANTHROPIC_API_KEY'),
+            'Content-Type': 'application/json',
+            'anthropic-version': '2023-06-01',
+          },
+          body: JSON.stringify({
+            model: config.model || 'claude-sonnet-4-20250514',
+            max_tokens: config.maxTokens || 1000,
+            messages: integration === 'claude-agent'
+              ? [
+                  { role: 'user', content: `${config.instructions}\n\nUser: ${context.input.message || 'Hello'}` }
+                ]
+              : [
+                  { role: 'user', content: config.prompt || context.input.message || 'Hello' }
+                ],
+          }),
+        });
+
+        if (!claudeResponse.ok) {
+          throw new Error(`Claude API error: ${await claudeResponse.text()}`);
+        }
+
+        const claudeData = await claudeResponse.json();
+        const claudeResponseText = claudeData.content[0].text;
+        
+        logs.push(`Generated response: ${claudeResponseText.substring(0, 100)}...`);
+        
+        return {
+          success: true,
+          output: {
+            response: claudeResponseText,
+            model: config.model,
+            tokens_used: claudeData.usage?.output_tokens || 0,
+            timestamp: new Date().toISOString()
+          },
+          logs
+        };
+        
+      case 'ai-tool':
+        logs.push('Executing AI Tool integration');
+        
+        // For now, just return the instructions as this is complex to implement fully
+        return {
+          success: true,
+          output: {
+            response: `AI Tool executed with instructions: ${config.instructions}`,
+            tools_available: config.availableTools ? JSON.parse(config.availableTools) : [],
+            timestamp: new Date().toISOString()
+          },
+          logs: [...logs, 'AI Tool functionality placeholder - tools execution not yet implemented']
+        };
+        
+      default:
+        throw new Error(`Unsupported AI integration: ${integration}`);
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message,
+      logs: [...logs, `Error: ${error.message}`]
+    };
+  }
+}
+
 async function executeEmailIntegration(integration: string, config: Record<string, any>, context: any): Promise<ExecutionResult> {
   const logs: string[] = [];
   
@@ -214,7 +334,9 @@ const handler = async (req: Request): Promise<Response> => {
     let result: ExecutionResult;
     
     // Route to appropriate integration handler
-    if (['gmail', 'sendgrid', 'ses'].includes(integration)) {
+    if (['openai-agent', 'openai-llm', 'claude-agent', 'claude-llm', 'ai-tool'].includes(integration)) {
+      result = await executeAIIntegration(integration, config, context);
+    } else if (['gmail', 'sendgrid', 'ses'].includes(integration)) {
       result = await executeEmailIntegration(integration, config, context);
     } else if (['webhook-trigger', 'http-request'].includes(integration)) {
       result = await executeWebhookIntegration(integration, config, context);

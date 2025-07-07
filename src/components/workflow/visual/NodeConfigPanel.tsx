@@ -201,20 +201,31 @@ export function NodeConfigPanel({ node, onConfigChange, onClose }: NodeConfigPan
         </p>
 
         <ScrollArea className="flex-1 pr-4">
-          <div className="space-y-4">
-            {node.data.integration.fields.map((field) => (
-              <div key={field.name} className="space-y-2">
-                <Label htmlFor={field.name} className="flex items-center gap-2">
-                  {field.label}
-                  {field.required && <span className="text-destructive">*</span>}
-                </Label>
-                {renderField(field)}
-                {field.helpText && (
-                  <p className="text-xs text-muted-foreground">{field.helpText}</p>
-                )}
+        <div className="space-y-4">
+          {node.data.integration.fields.map((field) => (
+            <div key={field.name} className="space-y-2">
+              <Label htmlFor={field.name} className="flex items-center gap-2">
+                {field.label}
+                {field.required && <span className="text-destructive">*</span>}
+              </Label>
+              {renderField(field)}
+              {field.helpText && (
+                <p className="text-xs text-muted-foreground">{field.helpText}</p>
+              )}
+            </div>
+          ))}
+          
+          {/* Show selected credential */}
+          {config.credential && (
+            <div className="mt-4 p-3 bg-muted rounded-lg">
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 bg-primary rounded-full" />
+                <span className="text-sm font-medium">Credential:</span>
+                <Badge variant="outline">{config.credential}</Badge>
               </div>
-            ))}
-          </div>
+            </div>
+          )}
+        </div>
         </ScrollArea>
 
         <div className="flex space-x-2 pt-4 border-t">
