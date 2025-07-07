@@ -3,10 +3,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Settings, MoreVertical, Copy, Trash2 } from 'lucide-react';
+import { Settings, MoreVertical, Copy, Trash2, Plus } from 'lucide-react';
 import { useWorkflows } from '@/hooks/useWorkflows';
 import { useTenant } from '@/contexts/TenantContext';
-import { WorkflowCreateModal } from '@/components/WorkflowCreateModal';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import { WorkflowEditModal } from '@/components/WorkflowEditModal';
 import { WorkflowDeleteDialog } from '@/components/WorkflowDeleteDialog';
 import { WorkflowStatusToggle } from '@/components/WorkflowStatusToggle';
@@ -17,13 +18,45 @@ import { useNavigate } from 'react-router-dom';
 const Automations = () => {
   const { workflows, loading, error, refreshWorkflows } = useWorkflows();
   const { currentTenant } = useTenant();
+  const { toast } = useToast();
   const navigate = useNavigate();
   const [editingWorkflow, setEditingWorkflow] = useState<WorkflowRecord | null>(null);
   const [deletingWorkflow, setDeletingWorkflow] = useState<WorkflowRecord | null>(null);
 
-  const handleWorkflowCreated = (workflowId: string) => {
-    refreshWorkflows();
-    navigate(`/workflow-builder/${workflowId}`);
+  const handleCreateAutomation = async () => {
+    if (!currentTenant) {
+      toast({
+        title: "Error",
+        description: "No tenant selected",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('workflows')
+        .insert({
+          name: 'My Automation',
+          description: '',
+          status: 'draft',
+          tenant_id: currentTenant.id,
+          steps: []
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      navigate(`/automations/create/${data.id}`);
+    } catch (error) {
+      console.error('Error creating workflow:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create automation",
+        variant: "destructive"
+      });
+    }
   };
 
   const formatLastExecuted = (lastExecuted: string | null) => {
@@ -50,7 +83,13 @@ const Automations = () => {
               Manage and monitor your workflow automations for {currentTenant?.name}
             </p>
           </div>
-          <WorkflowCreateModal onWorkflowCreated={handleWorkflowCreated} />
+          <Button 
+            className="bg-accent hover:bg-accent/90 text-accent-foreground"
+            onClick={handleCreateAutomation}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Create Automation
+          </Button>
         </div>
       </div>
       
@@ -68,7 +107,13 @@ const Automations = () => {
           <p className="text-muted-foreground mb-4">
             Get started by creating your first workflow automation
           </p>
-          <WorkflowCreateModal onWorkflowCreated={handleWorkflowCreated} />
+          <Button 
+            className="bg-accent hover:bg-accent/90 text-accent-foreground"
+            onClick={handleCreateAutomation}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Create Automation
+          </Button>
         </div>
       ) : (
         <div className="space-y-4">
