@@ -1,5 +1,6 @@
 import { Loader2 } from 'lucide-react';
 import { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface Message {
   id: number;
@@ -16,6 +17,29 @@ interface ChatMessagesProps {
 const ChatMessages = ({ messages, isLoading }: ChatMessagesProps) => {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+
+  // Function to render message text with clickable links
+  const renderMessageWithLinks = (text: string) => {
+    // Pattern to match navigation instructions like "Link: /automations"
+    const linkPattern = /Link: (\/[^\s)]+)/g;
+    const parts = text.split(linkPattern);
+    
+    return parts.map((part, index) => {
+      if (part.startsWith('/')) {
+        return (
+          <button
+            key={index}
+            onClick={() => navigate(part)}
+            className="text-blue-600 hover:text-blue-800 underline font-medium mx-1"
+          >
+            Go to {part === '/automations' ? 'Automations' : part}
+          </button>
+        );
+      }
+      return part;
+    });
+  };
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -42,7 +66,7 @@ const ChatMessages = ({ messages, isLoading }: ChatMessagesProps) => {
                   : 'bg-white text-halo-text border border-gray-200 rounded-bl-sm'
               }`}
             >
-              <p>{message.text}</p>
+              <div>{renderMessageWithLinks(message.text)}</div>
               <p className={`text-xs mt-1 ${
                 message.sender === 'user' ? 'text-white/70' : 'text-gray-500'
               }`}>

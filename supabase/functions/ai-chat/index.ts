@@ -44,10 +44,19 @@ serve(async (req) => {
 
     const { message, tenantId, context, conversationHistory = [] }: ChatRequest = await req.json();
 
+    // Check if this is a search query
+    const isSearchQuery = message.toLowerCase().includes("find") || 
+                         message.toLowerCase().includes("search") || 
+                         message.toLowerCase().includes("locate") ||
+                         message.toLowerCase().includes("where is") ||
+                         message.toLowerCase().includes("can't find") ||
+                         message.toLowerCase().includes("cannot find");
+
     // Get tenant-specific data for context
     let tenantContext = '';
     let workflowStats = '';
     let systemKnowledge = '';
+    let searchResults = '';
     
     // Get system knowledge base (general HALO/MASP knowledge)
     const { data: systemKB } = await supabase
@@ -109,6 +118,53 @@ WORKFLOW STATISTICS:
             .map(kb => `- ${kb.title} (${kb.category}): ${kb.content.substring(0, 200)}...`)
             .join('\n')}\n`;
         }
+
+        // Perform search if this is a search query
+        if (isSearchQuery) {
+          const searchTerms = message.toLowerCase()
+            .replace(/find|search|locate|where is|can't find|cannot find|the|a|an/g, '')
+            .trim();
+
+          if (searchTerms) {
+            // Search workflows
+            const { data: foundWorkflows } = await supabase
+              .from('workflows')
+              .select('id, name, description, status')
+              .eq('tenant_id', tenantId)
+              .or(`name.ilike.%${searchTerms}%,description.ilike.%${searchTerms}%`)
+              .limit(5);
+
+            // Search knowledge base entries
+            const { data: foundKnowledge } = await supabase
+              .from('tenant_knowledge_bases')
+              .select('id, title, content, category')
+              .eq('tenant_id', tenantId)
+              .or(`title.ilike.%${searchTerms}%,content.ilike.%${searchTerms}%`)
+              .limit(3);
+
+            if (foundWorkflows && foundWorkflows.length > 0) {
+              searchResults += `\nFOUND WORKFLOWS:\n`;
+              foundWorkflows.forEach(workflow => {
+                searchResults += `- "${workflow.name}" (${workflow.status}) - Link: /automations (search for "${workflow.name}")\n`;
+                if (workflow.description) {
+                  searchResults += `  Description: ${workflow.description.substring(0, 100)}...\n`;
+                }
+              });
+            }
+
+            if (foundKnowledge && foundKnowledge.length > 0) {
+              searchResults += `\nFOUND KNOWLEDGE ENTRIES:\n`;
+              foundKnowledge.forEach(kb => {
+                searchResults += `- "${kb.title}" (${kb.category}) - Available in knowledge base\n`;
+                searchResults += `  Content: ${kb.content.substring(0, 100)}...\n`;
+              });
+            }
+
+            if (!foundWorkflows?.length && !foundKnowledge?.length) {
+              searchResults = `\nSEARCH RESULTS: No items found matching "${searchTerms}" in workflows or knowledge base.`;
+            }
+          }
+        }
       }
     }
 
@@ -119,7 +175,7 @@ WORKFLOW STATISTICS:
 ${systemKnowledge}
 
 CURRENT SESSION CONTEXT:
-${tenantContext}${pageContext}${workflowStats}
+${tenantContext}${pageContext}${workflowStats}${searchResults}
 
 PERSONALITY & ROLE:
 - Expert automation engineer with deep knowledge of HALO platform capabilities
@@ -135,6 +191,9 @@ RESPONSE GUIDELINES:
 - Offer troubleshooting guidance based on common issues database
 - Consider industry-specific requirements when relevant (healthcare, finance, etc.)
 - Keep responses focused and professional (2-4 sentences for quick questions, longer for complex topics)
+- When users search for items, provide direct navigation links to help them find what they need
+- For found workflows, direct users to "/automations" page and mention they can search for the specific workflow name
+- If items don't exist, clearly state this and offer to help create them
 
 CAPABILITIES I EXCEL AT:
 - Analyzing workflow performance using HALO's monitoring capabilities
