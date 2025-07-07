@@ -63,7 +63,7 @@ const Layout = ({ children }: LayoutProps) => {
   return (
     <div className="flex min-h-screen w-full">
       <AppSidebar />
-      <SidebarInset className="bg-background transition-all duration-300">
+      <SidebarInset className={`bg-background transition-all duration-300 ${isChatOpen ? 'md:flex-1' : 'flex-1'}`}>
         <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger className="-ml-1" />
           <div className="ml-auto">
@@ -71,14 +71,14 @@ const Layout = ({ children }: LayoutProps) => {
           </div>
         </header>
         
-        <main className="flex-1 p-4 md:p-6 overflow-y-auto">
+        <main className={`flex-1 p-4 md:p-6 overflow-y-auto ${isChatOpen ? 'hidden md:block' : ''}`}>
           {children}
         </main>
       </SidebarInset>
       
       {/* Chat Sidebar - Responsive */}
       {isChatOpen && (
-        <div className="fixed inset-y-0 right-0 z-30 w-full bg-gradient-to-br from-white to-gray-50 border-l-2 border-halo-primary/10 shadow-2xl flex flex-col md:relative md:w-80 lg:w-96 xl:w-96">
+        <div className="fixed inset-0 z-30 w-full bg-gradient-to-br from-white to-gray-50 border-l-2 border-halo-primary/10 shadow-2xl flex flex-col md:relative md:inset-auto md:w-80 lg:w-96 xl:w-96">
           {/* Header */}
           <div className="flex-shrink-0 p-4 border-b bg-gradient-to-r from-halo-primary to-halo-secondary">
             <div className="flex items-center justify-between">
