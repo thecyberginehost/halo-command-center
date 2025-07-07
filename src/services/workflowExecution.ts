@@ -98,7 +98,10 @@ export class WorkflowExecutionService {
           integration: integration.id,
           endpoint: step.config.endpoint || integration.endpoints[0]?.id,
           config: step.config,
-          context
+          context: {
+            ...context,
+            tenantId: 'default-tenant' // TODO: Get actual tenant ID
+          }
         }
       });
 

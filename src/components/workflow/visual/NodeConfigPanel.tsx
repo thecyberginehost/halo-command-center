@@ -11,6 +11,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { X, Save, TestTube } from 'lucide-react';
 import { VisualWorkflowNode } from '@/types/visualWorkflow';
 import { IntegrationField } from '@/types/integrations';
+import { useTenant } from '@/contexts/TenantContext';
+import { CredentialsService, TenantCredential } from '@/services/credentialsService';
 
 interface NodeConfigPanelProps {
   node: VisualWorkflowNode;
@@ -19,9 +21,13 @@ interface NodeConfigPanelProps {
 }
 
 export function NodeConfigPanel({ node, onConfigChange, onClose }: NodeConfigPanelProps) {
+  const { currentTenant } = useTenant();
   const [config, setConfig] = useState(node.data.config || {});
   const [isValid, setIsValid] = useState(false);
+  const [availableCredentials, setAvailableCredentials] = useState<TenantCredential[]>([]);
+  const [loadingCredentials, setLoadingCredentials] = useState(false);
   const Icon = node.data.integration.icon;
+  const credentialsService = new CredentialsService();
 
   useEffect(() => {
     // Validate configuration
@@ -31,6 +37,36 @@ export function NodeConfigPanel({ node, onConfigChange, onClose }: NodeConfigPan
     );
     setIsValid(hasAllRequired);
   }, [config, node.data.integration.fields]);
+
+  useEffect(() => {
+    // Load available credentials for this integration
+    const loadCredentials = async () => {
+      if (!currentTenant) return;
+      
+      setLoadingCredentials(true);
+      try {
+        const serviceTypeMap: Record<string, string> = {
+          'openai-agent': 'openai',
+          'openai-llm': 'openai',
+          'claude-agent': 'anthropic',
+          'claude-llm': 'anthropic',
+          'ai-tool': 'openai', // Default to OpenAI for AI tools
+        };
+
+        const serviceType = serviceTypeMap[node.data.integration.id];
+        if (serviceType) {
+          const credentials = await credentialsService.getCredentialsByService(currentTenant.id, serviceType);
+          setAvailableCredentials(credentials);
+        }
+      } catch (error) {
+        console.error('Failed to load credentials:', error);
+      } finally {
+        setLoadingCredentials(false);
+      }
+    };
+
+    loadCredentials();
+  }, [currentTenant, node.data.integration.id]);
 
   const handleFieldChange = (fieldName: string, value: any) => {
     setConfig(prev => ({
@@ -129,22 +165,40 @@ export function NodeConfigPanel({ node, onConfigChange, onClose }: NodeConfigPan
         );
 
       case 'select':
+        const isCredentialField = field.name === 'credential';
+        const options = isCredentialField ? 
+          availableCredentials.map(cred => ({ label: cred.name, value: cred.name })) :
+          field.options || [];
+
         return (
-          <Select
-            value={value}
-            onValueChange={(newValue) => handleFieldChange(field.name, newValue)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder={field.placeholder} />
-            </SelectTrigger>
-            <SelectContent>
-              {field.options?.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div>
+            <Select
+              value={value}
+              onValueChange={(newValue) => handleFieldChange(field.name, newValue)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={field.placeholder} />
+              </SelectTrigger>
+              <SelectContent>
+                {loadingCredentials && isCredentialField ? (
+                  <SelectItem value="" disabled>Loading credentials...</SelectItem>
+                ) : options.length === 0 && isCredentialField ? (
+                  <SelectItem value="" disabled>No credentials available</SelectItem>
+                ) : (
+                  options.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))
+                )}
+              </SelectContent>
+            </Select>
+            {isCredentialField && options.length === 0 && !loadingCredentials && (
+              <p className="text-xs text-muted-foreground mt-1">
+                No credentials found. <span className="text-primary cursor-pointer">Add a credential</span> to continue.
+              </p>
+            )}
+          </div>
         );
 
       case 'password':

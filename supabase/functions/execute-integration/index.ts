@@ -31,19 +31,59 @@ const supabase = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 );
 
+async function getCredentialForTenant(tenantId: string, credentialName: string): Promise<Record<string, string> | null> {
+  try {
+    const { data, error } = await supabase
+      .from('tenant_credentials')
+      .select('credentials, service_type')
+      .eq('tenant_id', tenantId)
+      .eq('name', credentialName)
+      .eq('is_active', true)
+      .single();
+
+    if (error || !data) {
+      console.error('Failed to retrieve credential:', error);
+      return null;
+    }
+
+    return data.credentials as Record<string, string>;
+  } catch (error) {
+    console.error('Error getting credential:', error);
+    return null;
+  }
+}
+
 async function executeAIIntegration(integration: string, config: Record<string, any>, context: any): Promise<ExecutionResult> {
   const logs: string[] = [];
   
   try {
+    // Get tenant credentials instead of environment variables
+    const tenantId = context.tenantId || 'default-tenant';
+    const credentialName = config.credential;
+    
+    if (!credentialName) {
+      throw new Error('No credential selected for AI integration');
+    }
+    
+    const credentials = await getCredentialForTenant(tenantId, credentialName);
+    if (!credentials) {
+      throw new Error(`Credential '${credentialName}' not found or inactive`);
+    }
+    
     switch (integration) {
       case 'openai-agent':
       case 'openai-llm':
         logs.push('Executing OpenAI integration');
         
+        const openaiApiKey = credentials.api_key;
+        if (!openaiApiKey) {
+          throw new Error('OpenAI API key not found in credentials');
+        }
+        
         const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
+            'Authorization': `Bearer ${openaiApiKey}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
@@ -85,10 +125,15 @@ async function executeAIIntegration(integration: string, config: Record<string, 
       case 'claude-llm':
         logs.push('Executing Claude integration');
         
+        const claudeApiKey = credentials.api_key;
+        if (!claudeApiKey) {
+          throw new Error('Anthropic API key not found in credentials');
+        }
+        
         const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
           method: 'POST',
           headers: {
-            'x-api-key': Deno.env.get('ANTHROPIC_API_KEY'),
+            'x-api-key': claudeApiKey,
             'Content-Type': 'application/json',
             'anthropic-version': '2023-06-01',
           },

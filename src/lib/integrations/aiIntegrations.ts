@@ -86,10 +86,7 @@ export const openaiAgentIntegration: IntegrationNode = {
       label: 'OpenAI Credential',
       type: 'select',
       required: true,
-      options: [
-        { label: 'Default OpenAI Key', value: 'default-openai' },
-        { label: 'Production OpenAI Key', value: 'prod-openai' }
-      ],
+      options: [], // Will be populated dynamically from tenant credentials
       helpText: 'Select which API credential to use'
     }
   ],
@@ -168,10 +165,7 @@ export const claudeAgentIntegration: IntegrationNode = {
       label: 'Anthropic Credential',
       type: 'select',
       required: true,
-      options: [
-        { label: 'Default Anthropic Key', value: 'default-anthropic' },
-        { label: 'Production Anthropic Key', value: 'prod-anthropic' }
-      ],
+      options: [], // Will be populated dynamically from tenant credentials
       helpText: 'Select which API credential to use'
     }
   ],
@@ -259,10 +253,7 @@ export const openaiLLMIntegration: IntegrationNode = {
       label: 'OpenAI Credential',
       type: 'select',
       required: true,
-      options: [
-        { label: 'Default OpenAI Key', value: 'default-openai' },
-        { label: 'Production OpenAI Key', value: 'prod-openai' }
-      ],
+      options: [], // Will be populated dynamically from tenant credentials
       helpText: 'Select which API credential to use'
     }
   ],
@@ -340,10 +331,7 @@ export const claudeLLMIntegration: IntegrationNode = {
       label: 'Anthropic Credential',
       type: 'select',
       required: true,
-      options: [
-        { label: 'Default Anthropic Key', value: 'default-anthropic' },
-        { label: 'Production Anthropic Key', value: 'prod-anthropic' }
-      ],
+      options: [], // Will be populated dynamically from tenant credentials
       helpText: 'Select which API credential to use'
     }
   ],
@@ -417,10 +405,7 @@ export const aiToolIntegration: IntegrationNode = {
       label: 'AI Credential',
       type: 'select',
       required: true,
-      options: [
-        { label: 'Default OpenAI Key', value: 'default-openai' },
-        { label: 'Default Anthropic Key', value: 'default-anthropic' }
-      ],
+      options: [], // Will be populated dynamically from tenant credentials
       helpText: 'Select which API credential to use'
     }
   ],

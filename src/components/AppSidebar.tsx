@@ -7,7 +7,8 @@ import {
   List,
   Bell,
   User,
-  ChevronUp
+  ChevronUp,
+  Key
 } from 'lucide-react';
 import {
   Sidebar,
@@ -47,7 +48,7 @@ const menuSections = [
     title: "SETTINGS",
     items: [
       { title: "User Management", icon: Users, path: "/settings/users" },
-      { title: "Credentials", icon: User, path: "/settings/credentials" },
+      { title: "Credentials", icon: Key, path: "/credentials" },
       { title: "System Config", icon: Settings, path: "/settings/system" },
     ]
   }

@@ -88,6 +88,50 @@ export type Database = {
         }
         Relationships: []
       }
+      tenant_credentials: {
+        Row: {
+          created_at: string
+          credentials: Json
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          service_type: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          credentials: Json
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          service_type: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          credentials?: Json
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          service_type?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_credentials_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tenant_knowledge_bases: {
         Row: {
           category: string | null

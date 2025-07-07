@@ -11,6 +11,7 @@ import Automations from "./pages/Automations";
 import CreateAutomation from "./pages/CreateAutomation";
 import CreateOrganization from "./pages/CreateOrganization";
 import WorkflowBuilderPage from "./pages/WorkflowBuilderPage";
+import Credentials from "./pages/Credentials";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => (
               <Route path="/automations" element={<Automations />} />
               <Route path="/automations/create" element={<CreateAutomation />} />
               <Route path="/automations/create/:workflowId" element={<CreateAutomation />} />
+              <Route path="/credentials" element={<Credentials />} />
               <Route path="/organizations/create" element={<CreateOrganization />} />
               <Route path="/workflow-builder/:workflowId" element={<WorkflowBuilderPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
