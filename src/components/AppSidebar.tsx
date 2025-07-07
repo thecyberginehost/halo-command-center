@@ -31,25 +31,18 @@ const menuSections = [
     items: [
       { title: "Dashboard", icon: LayoutDashboard, path: "/" },
       { title: "Automations", icon: List, path: "/automations" },
-      { title: "Metrics", icon: BarChart, path: "/metrics" },
-      { title: "Insights", icon: BarChart, path: "/insights" },
-      { title: "Logs", icon: List, path: "/logs" },
     ]
   },
   {
     title: "AI ASSIST",
     items: [
       { title: "Resonant Directive", icon: Bell, path: "/ai-assist" },
-      { title: "Suggestions", icon: List, path: "/suggestions" },
-      { title: "AI Recommendations", icon: BarChart, path: "/ai-recommendations" },
     ]
   },
   {
     title: "SETTINGS",
     items: [
-      { title: "User Management", icon: Users, path: "/settings/users" },
       { title: "Credentials", icon: Key, path: "/credentials" },
-      { title: "System Config", icon: Settings, path: "/settings/system" },
     ]
   }
 ];
