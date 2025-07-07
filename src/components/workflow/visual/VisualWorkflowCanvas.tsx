@@ -20,7 +20,7 @@ import { VisualWorkflowNode, VisualWorkflowEdge } from '@/types/visualWorkflow';
 import { IntegrationNode } from '@/types/integrations';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { Save } from 'lucide-react';
+import { Save, Play } from 'lucide-react';
 
 interface VisualWorkflowCanvasProps {
   initialNodes?: VisualWorkflowNode[];
@@ -146,6 +146,62 @@ export function VisualWorkflowCanvas({
     setSelectedNodeId(node.id);
   }, []);
 
+  const handleSaveWorkflow = useCallback(() => {
+    if (!onSaveWorkflow) {
+      toast({
+        title: "Workflow Saved",
+        description: "Your visual workflow has been saved locally."
+      });
+      return;
+    }
+
+    try {
+      onSaveWorkflow();
+    } catch (error) {
+      toast({
+        title: "Save Failed",
+        description: "Failed to save workflow.",
+        variant: "destructive"
+      });
+    }
+  }, [onSaveWorkflow, toast]);
+
+  const handleExecuteWorkflow = useCallback(async () => {
+    if (nodes.length === 0) {
+      toast({
+        title: "No Workflow",
+        description: "Please add some nodes to execute the workflow.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const { WorkflowExecutionService } = await import('@/services/workflowExecution');
+      const executionService = new WorkflowExecutionService();
+      
+      const executionId = await executionService.executeVisualWorkflow(
+        'visual-workflow-' + Date.now(),
+        nodes,
+        edges,
+        { trigger: 'manual', timestamp: new Date().toISOString() }
+      );
+
+      toast({
+        title: "Workflow Started",
+        description: `Workflow execution started with ID: ${executionId}`
+      });
+
+    } catch (error) {
+      console.error('Failed to execute workflow:', error);
+      toast({
+        title: "Execution Failed",
+        description: "Failed to start workflow execution.",
+        variant: "destructive"
+      });
+    }
+  }, [nodes, edges, toast]);
+
   // Notify parent of workflow changes
   React.useEffect(() => {
     onWorkflowChange?.(nodes, edges);
@@ -160,15 +216,16 @@ export function VisualWorkflowCanvas({
 
       {/* Main Canvas */}
       <div className="flex-1 relative" ref={reactFlowWrapper}>
-        {/* Save Button */}
-        {onSaveWorkflow && (
-          <div className="absolute top-4 right-4 z-10">
-            <Button onClick={onSaveWorkflow} size="sm">
-              <Save className="h-4 w-4 mr-2" />
-              Save Workflow
-            </Button>
-          </div>
-        )}
+        {/* Action Buttons */}
+        <div className="absolute top-4 right-4 z-10 flex space-x-2">
+          <Button onClick={handleSaveWorkflow} size="sm" variant="outline">
+            <Save className="h-4 w-4 mr-2" />
+            Save
+          </Button>
+          <Button onClick={handleExecuteWorkflow} size="sm">
+            Execute Workflow
+          </Button>
+        </div>
         
         <ReactFlow
           nodes={nodes}

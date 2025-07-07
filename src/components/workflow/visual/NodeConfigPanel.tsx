@@ -44,9 +44,47 @@ export function NodeConfigPanel({ node, onConfigChange, onClose }: NodeConfigPan
     onClose();
   };
 
-  const handleTest = () => {
-    // TODO: Implement node testing
-    console.log('Testing node with config:', config);
+  const handleTest = async () => {
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      
+      const { data, error } = await supabase.functions.invoke('execute-integration', {
+        body: {
+          integration: node.data.integration.id,
+          config,
+          context: {
+            workflowId: 'test-workflow',
+            stepId: node.id,
+            input: { test: true },
+            credentials: {},
+            previousStepOutputs: {}
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      console.log('Test result:', data);
+      
+      // Show success/error feedback
+      const { toast } = await import('@/hooks/use-toast');
+      toast({
+        title: data.success ? "Test Successful" : "Test Failed",
+        description: data.success 
+          ? `Integration executed successfully: ${data.logs?.join(', ')}` 
+          : `Error: ${data.error}`,
+        variant: data.success ? "default" : "destructive"
+      });
+      
+    } catch (error) {
+      console.error('Test failed:', error);
+      const { toast } = await import('@/hooks/use-toast');
+      toast({
+        title: "Test Failed",
+        description: `Could not test integration: ${error.message}`,
+        variant: "destructive"
+      });
+    }
   };
 
   const renderField = (field: IntegrationField) => {

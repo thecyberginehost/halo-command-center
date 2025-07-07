@@ -92,7 +92,7 @@ export class WorkflowExecutionService {
         throw new Error(`Integration not found for step type: ${step.type}`);
       }
 
-      // Call the appropriate edge function based on integration
+      // Call the integration execution engine
       const { data, error } = await supabase.functions.invoke('execute-integration', {
         body: {
           integration: integration.id,
@@ -105,9 +105,9 @@ export class WorkflowExecutionService {
       if (error) throw error;
 
       return {
-        success: true,
-        output: data,
-        logs: [`Step ${step.id} executed successfully`]
+        success: data.success,
+        output: data.output,
+        logs: data.logs || [`Step ${step.id} executed`]
       };
 
     } catch (error) {
@@ -116,6 +116,87 @@ export class WorkflowExecutionService {
         error: error.message,
         logs: [`Step ${step.id} failed: ${error.message}`]
       };
+    }
+  }
+
+  // New method to execute visual workflows
+  async executeVisualWorkflow(workflowId: string, nodes: any[], edges: any[], triggerData: Record<string, any>): Promise<string> {
+    try {
+      // Convert visual workflow to traditional workflow steps
+      const steps = nodes.filter(node => node.data.integration.type !== 'trigger').map(node => ({
+        id: node.id,
+        type: node.data.integration.id,
+        title: node.data.integration.name,
+        description: node.data.integration.description,
+        config: node.data.config,
+        position: node.position,
+        connections: edges.filter(edge => edge.source === node.id).map(edge => edge.target)
+      }));
+
+      // Start execution
+      const { data: execution, error } = await supabase
+        .from('workflow_executions')
+        .insert({
+          workflow_id: workflowId,
+          tenant_id: 'default-tenant', // TODO: Get from context
+          status: 'running',
+          input: triggerData,
+          started_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Execute steps in background
+      this.executeVisualStepsInBackground(execution.id, steps, triggerData);
+
+      return execution.id;
+    } catch (error) {
+      console.error('Failed to start visual workflow execution:', error);
+      throw error;
+    }
+  }
+
+  private async executeVisualStepsInBackground(
+    executionId: string,
+    steps: any[],
+    triggerData: Record<string, any>
+  ) {
+    try {
+      let previousOutputs: Record<string, any> = { trigger: triggerData };
+
+      for (const step of steps) {
+        try {
+          await this.updateExecutionStatus(executionId, 'running', step.id);
+          
+          const result = await this.executeStep(step, {
+            workflowId: executionId,
+            stepId: step.id,
+            input: triggerData,
+            credentials: {},
+            previousStepOutputs: previousOutputs
+          });
+
+          if (!result.success) {
+            throw new Error(result.error || 'Step execution failed');
+          }
+
+          previousOutputs[step.id] = result.output;
+          await this.logStepExecution(executionId, step.id, 'info', result);
+
+        } catch (error) {
+          await this.logStepExecution(executionId, step.id, 'error', { error: error.message });
+          await this.updateExecutionStatus(executionId, 'failed');
+          return;
+        }
+      }
+
+      await this.updateExecutionStatus(executionId, 'completed', undefined, previousOutputs);
+
+    } catch (error) {
+      console.error('Visual workflow execution failed:', error);
+      await this.updateExecutionStatus(executionId, 'failed');
     }
   }
 
