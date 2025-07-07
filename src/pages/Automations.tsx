@@ -1,6 +1,7 @@
 import Layout from '../components/Layout';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, Upload } from 'lucide-react';
+import { AutomationImportExportService } from '@/services/automationImportExport';
 import { useWorkflows } from '@/hooks/useWorkflows';
 import { useTenant } from '@/contexts/TenantContext';
 import { useToast } from '@/hooks/use-toast';
@@ -62,6 +63,48 @@ const Automations = () => {
     navigate(`/automations/create/${workflow.id}`);
   };
 
+  const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !currentTenant) return;
+
+    const validation = AutomationImportExportService.validateImportFile(file);
+    if (!validation.valid) {
+      toast({
+        title: "Invalid File",
+        description: validation.error,
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const result = await AutomationImportExportService.importWorkflow(file, currentTenant.id);
+      
+      if (result.success && result.workflow) {
+        toast({
+          title: "Import Successful",
+          description: `"${result.workflow.name}" has been imported successfully.`
+        });
+        refreshWorkflows();
+      } else {
+        toast({
+          title: "Import Failed",
+          description: result.error || "Failed to import automation",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Import Failed",
+        description: "An unexpected error occurred during import",
+        variant: "destructive"
+      });
+    }
+
+    // Clear the input
+    event.target.value = '';
+  };
+
   return (
     <Layout pageTitle="Automations">
       <div className="mb-8">
@@ -74,13 +117,34 @@ const Automations = () => {
               Manage and monitor your workflow automations for {currentTenant?.name}
             </p>
           </div>
-          <Button 
-            className="bg-accent hover:bg-accent/90 text-accent-foreground"
-            onClick={handleCreateAutomation}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Create Automation
-          </Button>
+          <div className="flex gap-2">
+            <div className="relative">
+              <input
+                type="file"
+                accept=".json"
+                onChange={handleImport}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                id="import-file"
+              />
+              <Button 
+                variant="outline"
+                className="cursor-pointer"
+                asChild
+              >
+                <label htmlFor="import-file" className="cursor-pointer flex items-center">
+                  <Upload className="h-4 w-4 mr-2" />
+                  Import
+                </label>
+              </Button>
+            </div>
+            <Button 
+              className="bg-accent hover:bg-accent/90 text-accent-foreground"
+              onClick={handleCreateAutomation}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Create Automation
+            </Button>
+          </div>
         </div>
       </div>
       
@@ -98,13 +162,34 @@ const Automations = () => {
           <p className="text-muted-foreground mb-4">
             Get started by creating your first workflow automation
           </p>
-          <Button 
-            className="bg-accent hover:bg-accent/90 text-accent-foreground"
-            onClick={handleCreateAutomation}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Create Automation
-          </Button>
+          <div className="flex gap-2">
+            <div className="relative">
+              <input
+                type="file"
+                accept=".json"
+                onChange={handleImport}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                id="import-file-empty"
+              />
+              <Button 
+                variant="outline"
+                className="cursor-pointer"
+                asChild
+              >
+                <label htmlFor="import-file-empty" className="cursor-pointer flex items-center">
+                  <Upload className="h-4 w-4 mr-2" />
+                  Import
+                </label>
+              </Button>
+            </div>
+            <Button 
+              className="bg-accent hover:bg-accent/90 text-accent-foreground"
+              onClick={handleCreateAutomation}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Create Automation
+            </Button>
+          </div>
         </div>
       ) : (
         <div className="space-y-4">

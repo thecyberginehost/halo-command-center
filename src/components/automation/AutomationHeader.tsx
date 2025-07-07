@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { WorkflowRecord } from '@/types/tenant';
@@ -17,6 +17,7 @@ interface AutomationHeaderProps {
   setWorkflowName: (name: string) => void;
   isDeveloperMode: boolean;
   setIsDeveloperMode: (enabled: boolean) => void;
+  onExport?: () => void;
 }
 
 export function AutomationHeader({
@@ -24,7 +25,8 @@ export function AutomationHeader({
   workflowName,
   setWorkflowName,
   isDeveloperMode,
-  setIsDeveloperMode
+  setIsDeveloperMode,
+  onExport
 }: AutomationHeaderProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -117,6 +119,12 @@ export function AutomationHeader({
             Developer Mode
           </Label>
         </div>
+        {workflow && onExport && (
+          <Button variant="outline" size="sm" onClick={onExport}>
+            <Download className="h-4 w-4 mr-2" />
+            Export
+          </Button>
+        )}
       </div>
     </header>
   );

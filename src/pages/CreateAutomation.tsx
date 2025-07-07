@@ -12,6 +12,7 @@ import { VisualModeCanvas } from '@/components/automation/VisualModeCanvas';
 import { StepSelectorModal } from '@/components/automation/StepSelectorModal';
 import { ResonantDirectiveChat } from '@/components/automation/ResonantDirectiveChat';
 import { FloatingChatButton } from '@/components/automation/FloatingChatButton';
+import { AutomationImportExportService } from '@/services/automationImportExport';
 
 const CreateAutomation = () => {
   const navigate = useNavigate();
@@ -106,6 +107,24 @@ async function executeAutomation(input) {
     }, 1000);
   };
 
+  const handleExport = async () => {
+    if (!workflow) return;
+    
+    try {
+      await AutomationImportExportService.exportWorkflow(workflow);
+      toast({
+        title: "Export Successful",
+        description: `"${workflow.name}" has been exported to your downloads.`
+      });
+    } catch (error) {
+      toast({
+        title: "Export Failed", 
+        description: "Failed to export automation.",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <div className="flex min-h-screen w-full">
       <AppSidebar />
@@ -116,6 +135,7 @@ async function executeAutomation(input) {
           setWorkflowName={setWorkflowName}
           isDeveloperMode={isDeveloperMode}
           setIsDeveloperMode={setIsDeveloperMode}
+          onExport={handleExport}
         />
 
         <div className={`flex-1 transition-all duration-300 ${isChatOpen ? 'mr-96' : ''}`}>
