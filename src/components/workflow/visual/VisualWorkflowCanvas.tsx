@@ -30,7 +30,32 @@ interface VisualWorkflowCanvasProps {
 }
 
 const nodeTypes = {
-  integrationNode: BaseWorkflowNode,
+  integrationNode: (props: any) => (
+    <BaseWorkflowNode 
+      {...props} 
+      onConfigClick={(nodeId: string) => {
+        const canvasElement = document.querySelector('.react-flow-canvas');
+        if (canvasElement) {
+          const event = new CustomEvent('nodeConfigClick', { detail: { nodeId } });
+          canvasElement.dispatchEvent(event);
+        }
+      }}
+      onDuplicate={(nodeId: string) => {
+        const canvasElement = document.querySelector('.react-flow-canvas');
+        if (canvasElement) {
+          const event = new CustomEvent('nodeDuplicate', { detail: { nodeId } });
+          canvasElement.dispatchEvent(event);
+        }
+      }}
+      onDelete={(nodeId: string) => {
+        const canvasElement = document.querySelector('.react-flow-canvas');
+        if (canvasElement) {
+          const event = new CustomEvent('nodeDelete', { detail: { nodeId } });
+          canvasElement.dispatchEvent(event);
+        }
+      }}
+    />
+  ),
 };
 
 export function VisualWorkflowCanvas({ 
@@ -146,6 +171,54 @@ export function VisualWorkflowCanvas({
     setSelectedNodeId(node.id);
   }, []);
 
+  const handleDuplicateNode = useCallback((nodeId: string) => {
+    const nodeToDuplicate = nodes.find(node => node.id === nodeId);
+    if (!nodeToDuplicate) return;
+
+    const newNode: VisualWorkflowNode = {
+      ...nodeToDuplicate,
+      id: `${nodeToDuplicate.data.integration.id}-${Date.now()}`,
+      position: {
+        x: nodeToDuplicate.position.x + 150,
+        y: nodeToDuplicate.position.y + 50,
+      },
+      data: {
+        ...nodeToDuplicate.data,
+        isConfigured: false, // Reset configuration status
+      },
+    };
+
+    setNodes(prev => [...prev, newNode]);
+    
+    toast({
+      title: "Node Duplicated",
+      description: `${nodeToDuplicate.data.integration.name} node has been duplicated`,
+    });
+  }, [nodes, setNodes, toast]);
+
+  const handleDeleteNode = useCallback((nodeId: string) => {
+    const nodeToDelete = nodes.find(node => node.id === nodeId);
+    if (!nodeToDelete) return;
+
+    // Remove the node
+    setNodes(prev => prev.filter(node => node.id !== nodeId));
+    
+    // Remove connected edges
+    setEdges(prev => prev.filter(edge => 
+      edge.source !== nodeId && edge.target !== nodeId
+    ));
+    
+    // Close config panel if this node is selected
+    if (selectedNodeId === nodeId) {
+      setSelectedNodeId(null);
+    }
+    
+    toast({
+      title: "Node Deleted",
+      description: `${nodeToDelete.data.integration.name} node has been deleted`,
+    });
+  }, [nodes, setNodes, setEdges, selectedNodeId, toast]);
+
   const handleSaveWorkflow = useCallback(() => {
     if (!onSaveWorkflow) {
       toast({
@@ -207,6 +280,34 @@ export function VisualWorkflowCanvas({
     onWorkflowChange?.(nodes, edges);
   }, [nodes, edges, onWorkflowChange]);
 
+  // Handle custom events from nodes
+  React.useEffect(() => {
+    const handleNodeConfigClick = (event: CustomEvent) => {
+      setSelectedNodeId(event.detail.nodeId);
+    };
+
+    const handleNodeDuplicate = (event: CustomEvent) => {
+      handleDuplicateNode(event.detail.nodeId);
+    };
+
+    const handleNodeDelete = (event: CustomEvent) => {
+      handleDeleteNode(event.detail.nodeId);
+    };
+
+    const canvasElement = document.querySelector('.react-flow-canvas');
+    if (canvasElement) {
+      canvasElement.addEventListener('nodeConfigClick', handleNodeConfigClick as EventListener);
+      canvasElement.addEventListener('nodeDuplicate', handleNodeDuplicate as EventListener);
+      canvasElement.addEventListener('nodeDelete', handleNodeDelete as EventListener);
+
+      return () => {
+        canvasElement.removeEventListener('nodeConfigClick', handleNodeConfigClick as EventListener);
+        canvasElement.removeEventListener('nodeDuplicate', handleNodeDuplicate as EventListener);
+        canvasElement.removeEventListener('nodeDelete', handleNodeDelete as EventListener);
+      };
+    }
+  }, [handleDuplicateNode, handleDeleteNode]);
+
   return (
     <div className="flex h-full">
       {/* Node Palette */}
@@ -239,7 +340,7 @@ export function VisualWorkflowCanvas({
           nodeTypes={nodeTypes}
           fitView
           fitViewOptions={{ padding: 0.2 }}
-          className="bg-background"
+          className="bg-background react-flow-canvas"
           connectionLineStyle={{ stroke: 'hsl(var(--primary))', strokeWidth: 2 }}
           defaultEdgeOptions={{
             style: { stroke: 'hsl(var(--primary))', strokeWidth: 2 },

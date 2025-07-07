@@ -5,16 +5,21 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Settings, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { VisualWorkflowNode } from '@/types/visualWorkflow';
+import { NodeContextMenu } from './NodeContextMenu';
 
 interface BaseWorkflowNodeProps extends NodeProps<VisualWorkflowNode> {
   onConfigClick?: (nodeId: string) => void;
+  onDuplicate?: (nodeId: string) => void;
+  onDelete?: (nodeId: string) => void;
 }
 
 export const BaseWorkflowNode = memo(({ 
   data, 
   id, 
   selected, 
-  onConfigClick 
+  onConfigClick,
+  onDuplicate,
+  onDelete 
 }: BaseWorkflowNodeProps) => {
   const { integration, config, label, isConfigured, hasError, errorMessage } = data;
   const Icon = integration.icon;
@@ -38,10 +43,14 @@ export const BaseWorkflowNode = memo(({
   };
 
   return (
-    <Card 
-      className="min-w-[120px] max-w-[160px] shadow-md transition-all duration-200 hover:shadow-lg"
-      style={nodeStyle}
+    <NodeContextMenu
+      onDuplicate={() => onDuplicate?.(id)}
+      onDelete={() => onDelete?.(id)}
     >
+      <Card 
+        className="min-w-[120px] max-w-[160px] shadow-md transition-all duration-200 hover:shadow-lg"
+        style={nodeStyle}
+      >
       <div className="p-2">
         {/* Node Header */}
         <div className="flex items-center justify-between mb-1">
@@ -108,6 +117,7 @@ export const BaseWorkflowNode = memo(({
         style={{ right: -8 }}
       />
     </Card>
+    </NodeContextMenu>
   );
 });
 
