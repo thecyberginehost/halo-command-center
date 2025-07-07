@@ -38,8 +38,13 @@ const ResonantDirective = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [aiChatService] = useState(() => new AIChatService());
   const [showWelcomePopup, setShowWelcomePopup] = useState(false);
+  const [showReminderNotification, setShowReminderNotification] = useState(false);
 
-  // Initialize with welcome message and show popup on "login"
+  // Check if user has seen welcome popup this session
+  const hasSeenWelcome = sessionStorage.getItem('resonant-directive-welcome-shown');
+  const lastReminderTime = localStorage.getItem('resonant-directive-last-reminder');
+
+  // Initialize with welcome message and manage popup display
   useEffect(() => {
     const welcomeMessage: Message = {
       id: 1,
@@ -49,11 +54,41 @@ const ResonantDirective = () => {
     };
     setMessages([welcomeMessage]);
     
-    // Show welcome popup after a brief delay to simulate login
-    setTimeout(() => {
-      setShowWelcomePopup(true);
-    }, 1000);
-  }, []);
+    // Show welcome popup only if not seen this session
+    if (!hasSeenWelcome) {
+      setTimeout(() => {
+        setShowWelcomePopup(true);
+      }, 1000);
+    }
+  }, [hasSeenWelcome]);
+
+  // Set up reminder notification system
+  useEffect(() => {
+    const currentTime = Date.now();
+    const lastReminder = lastReminderTime ? parseInt(lastReminderTime) : 0;
+    const timeSinceLastReminder = currentTime - lastReminder;
+    
+    // Show reminder if it's been more than 30 minutes since last reminder
+    // and user has already seen the welcome popup
+    if (hasSeenWelcome && timeSinceLastReminder > 30 * 60 * 1000) {
+      const reminderTimer = setTimeout(() => {
+        setShowReminderNotification(true);
+        localStorage.setItem('resonant-directive-last-reminder', currentTime.toString());
+        
+        // Auto-hide reminder after 10 seconds
+        setTimeout(() => {
+          setShowReminderNotification(false);
+        }, 10000);
+      }, 5 * 60 * 1000); // Show reminder after 5 minutes of activity
+      
+      return () => clearTimeout(reminderTimer);
+    }
+  }, [hasSeenWelcome, lastReminderTime]);
+
+  const handleWelcomeClose = () => {
+    setShowWelcomePopup(false);
+    sessionStorage.setItem('resonant-directive-welcome-shown', 'true');
+  };
 
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
@@ -291,7 +326,7 @@ const ResonantDirective = () => {
         <div className="fixed bottom-32 right-4 z-50 animate-fade-in">
           <div className="relative bg-gradient-to-br from-primary to-secondary text-white p-4 rounded-lg shadow-2xl max-w-sm border border-accent/30">
             <Button
-              onClick={() => setShowWelcomePopup(false)}
+              onClick={handleWelcomeClose}
               size="icon"
               variant="ghost"
               className="absolute -top-2 -right-2 w-6 h-6 bg-accent hover:bg-accent/90 text-white rounded-full"
@@ -305,6 +340,26 @@ const ResonantDirective = () => {
               </p>
             </div>
             <div className="absolute -bottom-2 right-8 w-0 h-0 border-l-[8px] border-r-[8px] border-t-[8px] border-l-transparent border-r-transparent border-t-secondary"></div>
+          </div>
+        </div>
+      )}
+
+      {/* Subtle Reminder Notification */}
+      {showReminderNotification && (
+        <div className="fixed bottom-32 right-20 z-40 animate-fade-in">
+          <div className="bg-secondary/90 backdrop-blur-sm text-white px-3 py-2 rounded-lg shadow-lg max-w-xs border border-accent/20">
+            <div className="flex items-center space-x-2">
+              <MessageCircle className="h-3 w-3 text-accent" />
+              <p className="text-xs">Need help with automation? I'm here to assist!</p>
+              <Button
+                onClick={() => setShowReminderNotification(false)}
+                size="icon"
+                variant="ghost"
+                className="w-4 h-4 text-white/70 hover:text-white ml-1"
+              >
+                <X className="h-2 w-2" />
+              </Button>
+            </div>
           </div>
         </div>
       )}
