@@ -179,8 +179,8 @@ export function VisualWorkflowCanvas({
       ...nodeToDuplicate,
       id: `${nodeToDuplicate.data.integration.id}-${Date.now()}`,
       position: {
-        x: nodeToDuplicate.position.x + 150,
-        y: nodeToDuplicate.position.y + 50,
+        x: nodeToDuplicate.position.x + 120,
+        y: nodeToDuplicate.position.y + 40,
       },
       data: {
         ...nodeToDuplicate.data,
@@ -339,7 +339,8 @@ export function VisualWorkflowCanvas({
           onNodeClick={handleNodeClick}
           nodeTypes={nodeTypes}
           fitView
-          fitViewOptions={{ padding: 0.2 }}
+          fitViewOptions={{ padding: 0.3 }}
+          defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
           className="bg-background react-flow-canvas"
           connectionLineStyle={{ stroke: 'hsl(var(--primary))', strokeWidth: 2 }}
           defaultEdgeOptions={{
