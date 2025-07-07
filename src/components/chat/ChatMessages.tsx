@@ -21,69 +21,114 @@ const ChatMessages = ({ messages, isLoading }: ChatMessagesProps) => {
 
   // Function to render message text with clickable links
   const renderMessageWithLinks = (text: string) => {
-    // Single comprehensive pattern that handles all link formats
-    const linkPattern = /(\[CLICK TO GO TO [^\]]+\]\(([^)]+)\)|CLICK TO GO TO ([A-Z]+)|Go to (\/[^\s)]+))/g;
+    console.log('Processing text:', text); // Debug log
     
-    return text.split(linkPattern).map((part, index) => {
-      if (!part) return '';
+    // Look for different link patterns in order of specificity
+    const parts = [];
+    let remainingText = text;
+    let index = 0;
+    
+    // Pattern 1: Markdown-style links [CLICK TO GO TO X](/path)
+    const markdownPattern = /\[CLICK TO GO TO [^\]]+\]\([^)]+\)/g;
+    let markdownMatch;
+    
+    while ((markdownMatch = markdownPattern.exec(remainingText)) !== null) {
+      // Add text before the match
+      if (markdownMatch.index > 0) {
+        parts.push({
+          type: 'text',
+          content: remainingText.substring(0, markdownMatch.index),
+          key: index++
+        });
+      }
       
-      // Handle proper markdown-style links [text](/path)
-      const markdownMatch = part.match(/^\[CLICK TO GO TO [^\]]+\]\(([^)]+)\)$/);
-      if (markdownMatch) {
-        const path = markdownMatch[1];
+      // Add the link
+      const linkMatch = markdownMatch[0].match(/\[([^\]]+)\]\(([^)]+)\)/);
+      if (linkMatch) {
+        const [, linkText, path] = linkMatch;
+        parts.push({
+          type: 'link',
+          content: linkText,
+          path: path,
+          key: index++
+        });
+      }
+      
+      remainingText = remainingText.substring(markdownMatch.index + markdownMatch[0].length);
+      markdownPattern.lastIndex = 0; // Reset regex
+    }
+    
+    // Pattern 2: Simple text like "CLICK TO GO TO AUTOMATIONS"
+    const simplePattern = /CLICK TO GO TO ([A-Z]+)/g;
+    let tempText = remainingText;
+    let simpleMatch;
+    
+    while ((simpleMatch = simplePattern.exec(tempText)) !== null) {
+      // Add text before the match
+      if (simpleMatch.index > 0) {
+        parts.push({
+          type: 'text',
+          content: tempText.substring(0, simpleMatch.index),
+          key: index++
+        });
+      }
+      
+      const pageName = simpleMatch[1];
+      let path = '/';
+      
+      switch (pageName) {
+        case 'AUTOMATIONS':
+          path = '/automations';
+          break;
+        case 'DASHBOARD':
+          path = '/';
+          break;
+        default:
+          path = `/${pageName.toLowerCase()}`;
+      }
+      
+      parts.push({
+        type: 'link',
+        content: `Go to ${pageName.charAt(0) + pageName.slice(1).toLowerCase()}`,
+        path: path,
+        key: index++
+      });
+      
+      tempText = tempText.substring(simpleMatch.index + simpleMatch[0].length);
+      simplePattern.lastIndex = 0; // Reset regex
+    }
+    
+    // Add any remaining text
+    if (tempText.length > 0) {
+      parts.push({
+        type: 'text',
+        content: tempText,
+        key: index++
+      });
+    } else if (remainingText.length > 0 && parts.length === 0) {
+      // If no patterns matched, just return the original text
+      parts.push({
+        type: 'text',
+        content: remainingText,
+        key: index++
+      });
+    }
+    
+    console.log('Parsed parts:', parts); // Debug log
+    
+    return parts.map((part) => {
+      if (part.type === 'link') {
         return (
           <button
-            key={index}
-            onClick={() => navigate(path)}
+            key={part.key}
+            onClick={() => navigate(part.path)}
             className="text-blue-600 hover:text-blue-800 underline font-medium mx-1 cursor-pointer"
           >
-            Go to {path === '/automations' ? 'Automations' : path === '/' ? 'Dashboard' : path}
+            {part.content}
           </button>
         );
       }
-      
-      // Handle malformed AI responses like "CLICK TO GO TO AUTOMATIONS"
-      const simpleMatch = part.match(/^CLICK TO GO TO ([A-Z]+)$/);
-      if (simpleMatch) {
-        const pageName = simpleMatch[1];
-        let path = '/';
-        
-        switch (pageName) {
-          case 'AUTOMATIONS':
-            path = '/automations';
-            break;
-          case 'DASHBOARD':
-            path = '/';
-            break;
-          default:
-            path = `/${pageName.toLowerCase()}`;
-        }
-        
-        return (
-          <button
-            key={index}
-            onClick={() => navigate(path)}
-            className="text-blue-600 hover:text-blue-800 underline font-medium mx-1 cursor-pointer"
-          >
-            Go to {pageName.charAt(0) + pageName.slice(1).toLowerCase()}
-          </button>
-        );
-      }
-      
-      // Handle direct path links like "/automations"
-      if (part.startsWith('/')) {
-        return (
-          <button
-            key={index}
-            onClick={() => navigate(part)}
-            className="text-blue-600 hover:text-blue-800 underline font-medium mx-1 cursor-pointer"
-          >
-            Go to {part === '/automations' ? 'Automations' : part === '/' ? 'Dashboard' : part}
-          </button>
-        );
-      }
-      
-      return part;
+      return part.content;
     });
   };
 
