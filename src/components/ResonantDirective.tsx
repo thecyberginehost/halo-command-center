@@ -1,14 +1,12 @@
-
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
@@ -26,7 +24,12 @@ interface Message {
   timestamp: string;
 }
 
-const ResonantDirective = () => {
+interface ResonantDirectiveProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const ResonantDirective = ({ isOpen, onClose }: ResonantDirectiveProps) => {
   const location = useLocation();
   const { workflows } = useWorkflows();
   const { currentTenant } = useTenant();
@@ -55,12 +58,12 @@ const ResonantDirective = () => {
     setMessages([welcomeMessage]);
     
     // Show welcome popup only if not seen this session
-    if (!hasSeenWelcome) {
+    if (!hasSeenWelcome && isOpen) {
       setTimeout(() => {
         setShowWelcomePopup(true);
       }, 1000);
     }
-  }, [hasSeenWelcome]);
+  }, [hasSeenWelcome, isOpen]);
 
   // Set up reminder notification system
   useEffect(() => {
@@ -70,7 +73,7 @@ const ResonantDirective = () => {
     
     // Show reminder if it's been more than 30 minutes since last reminder
     // and user has already seen the welcome popup
-    if (hasSeenWelcome && timeSinceLastReminder > 30 * 60 * 1000) {
+    if (hasSeenWelcome && timeSinceLastReminder > 30 * 60 * 1000 && !isOpen) {
       const reminderTimer = setTimeout(() => {
         setShowReminderNotification(true);
         localStorage.setItem('resonant-directive-last-reminder', currentTime.toString());
@@ -83,7 +86,7 @@ const ResonantDirective = () => {
       
       return () => clearTimeout(reminderTimer);
     }
-  }, [hasSeenWelcome, lastReminderTime]);
+  }, [hasSeenWelcome, lastReminderTime, isOpen]);
 
   const handleWelcomeClose = () => {
     setShowWelcomePopup(false);
@@ -203,35 +206,19 @@ const ResonantDirective = () => {
 
   return (
     <>
-      {/* Floating Chat Button */}
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button 
-            className="fixed bottom-8 right-6 w-20 h-20 rounded-full shadow-2xl z-50 transition-all duration-300 bg-primary hover:bg-primary/90 hover:scale-105 overflow-hidden"
-            size="icon"
-            style={{ position: 'fixed', bottom: '2rem', right: '1.5rem' }}
-          >
-            {/* Rotating stars background */}
-            <div className="absolute inset-0 animate-rotate-stars opacity-70">
-              <div className="absolute top-3 left-3 w-1 h-1 bg-white rounded-full shadow-[0_0_6px_white]"></div>
-              <div className="absolute top-5 right-4 w-0.5 h-0.5 bg-white rounded-full shadow-[0_0_4px_white]"></div>
-              <div className="absolute bottom-4 left-5 w-0.5 h-0.5 bg-white rounded-full shadow-[0_0_4px_white]"></div>
-              <div className="absolute bottom-3 right-3 w-1 h-1 bg-white rounded-full shadow-[0_0_6px_white]"></div>
-              <div className="absolute top-1/2 left-1/2 w-0.5 h-0.5 bg-white rounded-full shadow-[0_0_4px_white] -translate-x-1/2 -translate-y-1/2"></div>
-              <div className="absolute top-6 left-1/2 w-0.5 h-0.5 bg-white rounded-full shadow-[0_0_4px_white] -translate-x-1/2"></div>
-            </div>
-            <MessageCircle className="h-8 w-8 text-white relative z-10" />
-          </Button>
-        </DialogTrigger>
-        
-        <DialogContent className="fixed bottom-24 right-6 top-auto left-auto translate-x-0 translate-y-0 max-w-md h-96 flex flex-col p-0 bg-gradient-to-br from-white to-gray-50 border-2 border-halo-primary/10 shadow-2xl">
-          <DialogHeader className="p-4 border-b bg-gradient-to-r from-halo-primary to-halo-secondary text-white rounded-t-lg">
-            <DialogTitle className="flex items-center space-x-2">
+      {/* Sidebar Chat */}
+      <Sheet open={isOpen} onOpenChange={onClose}>
+        <SheetContent 
+          side="right" 
+          className="w-96 h-full flex flex-col p-0 bg-gradient-to-br from-white to-gray-50 border-l-2 border-halo-primary/10"
+        >
+          <SheetHeader className="p-4 border-b bg-gradient-to-r from-halo-primary to-halo-secondary text-white">
+            <SheetTitle className="flex items-center space-x-2 text-white">
               <MessageCircle className="h-5 w-5" />
               <span>Resonant Directive</span>
-            </DialogTitle>
-            <p className="text-xs text-gray-200">Need help optimizing workflows?</p>
-          </DialogHeader>
+            </SheetTitle>
+            <p className="text-xs text-gray-200">Your AI automation assistant</p>
+          </SheetHeader>
           
           {/* Chat Messages */}
           <ScrollArea className="flex-1 p-4 bg-gradient-to-b from-gray-50/50 to-white">
@@ -318,12 +305,12 @@ const ResonantDirective = () => {
               </Button>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
 
-      {/* Welcome Popup */}
-      {showWelcomePopup && (
-        <div className="fixed bottom-32 right-4 z-50 animate-fade-in">
+      {/* Welcome Popup - only shows when sidebar opens for first time */}
+      {showWelcomePopup && isOpen && (
+        <div className="fixed top-20 right-8 z-50 animate-fade-in">
           <div className="relative bg-gradient-to-br from-primary to-secondary text-white p-4 rounded-lg shadow-2xl max-w-sm border border-accent/30">
             <Button
               onClick={handleWelcomeClose}
@@ -344,9 +331,9 @@ const ResonantDirective = () => {
         </div>
       )}
 
-      {/* Subtle Reminder Notification */}
-      {showReminderNotification && (
-        <div className="fixed bottom-32 right-20 z-40 animate-fade-in">
+      {/* Subtle Reminder Notification - only shows when sidebar is closed */}
+      {showReminderNotification && !isOpen && (
+        <div className="fixed bottom-8 right-8 z-40 animate-fade-in">
           <div className="bg-secondary/90 backdrop-blur-sm text-white px-3 py-2 rounded-lg shadow-lg max-w-xs border border-accent/20">
             <div className="flex items-center space-x-2">
               <MessageCircle className="h-3 w-3 text-accent" />

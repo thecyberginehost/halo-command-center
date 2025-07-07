@@ -1,5 +1,5 @@
 
-import { Bell, ChevronDown, User } from 'lucide-react';
+import { Bell, ChevronDown, User, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -12,7 +12,11 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { TenantSelector } from './TenantSelector';
 
-const Header = () => {
+interface HeaderProps {
+  onChatToggle?: () => void;
+}
+
+const Header = ({ onChatToggle }: HeaderProps) => {
   return (
     <header className="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 shadow-sm">
       {/* Left - Logo */}
@@ -32,6 +36,16 @@ const Header = () => {
       <div className="flex items-center space-x-4">
         {/* Tenant Selector */}
         <TenantSelector />
+        
+        {/* Resonant Directive Chat */}
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={onChatToggle}
+          className="relative hover:bg-halo-primary/10"
+        >
+          <MessageCircle className="h-5 w-5 text-halo-primary" />
+        </Button>
         
         {/* Notifications */}
         <Button variant="ghost" size="sm" className="relative">

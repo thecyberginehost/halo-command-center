@@ -1,11 +1,8 @@
 
-import Header from '../components/Header';
-import { AppSidebar } from '../components/AppSidebar';
-import { SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
+import Layout from '../components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Activity, CheckCircle, AlertTriangle, TrendingUp } from 'lucide-react';
-import ResonantDirective from '../components/ResonantDirective';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { useWorkflows } from '@/hooks/useWorkflows';
 import { useTenant } from '@/contexts/TenantContext';
@@ -24,17 +21,7 @@ const Index = () => {
   }
 
   return (
-    <div className="flex min-h-screen w-full">
-      <AppSidebar />
-      <SidebarInset className="bg-background">
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-          <SidebarTrigger className="-ml-1" />
-          <div className="ml-auto">
-            <Header />
-          </div>
-        </header>
-        
-        <main className="flex-1 p-4 md:p-6 overflow-y-auto">
+    <Layout>
           {/* Welcome Section */}
           <div className="mb-8">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
@@ -136,12 +123,7 @@ const Index = () => {
               )}
             </CardContent>
           </Card>
-        </main>
-      </SidebarInset>
-      
-      {/* Floating AI Assistant - positioned relative to viewport */}
-      <ResonantDirective />
-    </div>
+    </Layout>
   );
 };
 
