@@ -58,17 +58,19 @@ const ResonantDirective = ({ isOpen, onClose }: ResonantDirectiveProps) => {
   return (
     <>
       {/* Sidebar Chat */}
-      <Sheet open={isOpen} onOpenChange={onClose}>
+      <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
         <SheetContent 
           side="right" 
           className="w-96 h-full flex flex-col p-0 bg-gradient-to-br from-white to-gray-50 border-l-2 border-halo-primary/10"
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
         >
-          <SheetHeader className="p-4 border-b bg-gradient-to-r from-halo-primary to-halo-secondary text-white">
-            <SheetTitle className="flex items-center space-x-2 text-white">
-              <MessageCircle className="h-5 w-5" />
-              <span>Resonant Directive</span>
+          <SheetHeader className="p-4 border-b bg-gradient-to-r from-halo-primary to-halo-secondary">
+            <SheetTitle className="flex items-center space-x-2 text-white font-semibold">
+              <MessageCircle className="h-5 w-5 text-white" />
+              <span className="text-white">Resonant Directive</span>
             </SheetTitle>
-            <p className="text-xs text-gray-200">Your AI automation assistant</p>
+            <p className="text-xs text-white/90 font-medium">Your AI automation assistant</p>
           </SheetHeader>
           
           <ChatMessages messages={messages} isLoading={isLoading} />
