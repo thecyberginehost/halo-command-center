@@ -63,7 +63,7 @@ const Layout = ({ children }: LayoutProps) => {
   return (
     <div className="flex min-h-screen w-full">
       <AppSidebar />
-      <SidebarInset className={`bg-background transition-all duration-300 ${isChatOpen ? 'lg:mr-96' : ''}`}>
+      <SidebarInset className="bg-background transition-all duration-300">
         <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger className="-ml-1" />
           <div className="ml-auto">
@@ -76,77 +76,40 @@ const Layout = ({ children }: LayoutProps) => {
         </main>
       </SidebarInset>
       
-      {/* Chat Sidebar - Responsive layout */}
+      {/* Chat Sidebar - Part of flex layout */}
       {isChatOpen && (
-        <>
-          {/* Mobile: Full screen overlay */}
-          <div className="lg:hidden fixed inset-0 z-50 bg-white flex flex-col">
-            {/* Header */}
-            <div className="flex-shrink-0 p-4 border-b bg-gradient-to-r from-halo-primary to-halo-secondary">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <div className="h-5 w-5 text-white">💬</div>
-                  <span className="text-white font-semibold">Resonant Directive</span>
-                </div>
-                <button
-                  onClick={handleChatClose}
-                  className="text-black hover:text-gray-700 p-1 rounded-sm hover:bg-white/20 transition-colors"
-                >
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+        <div className="w-96 bg-gradient-to-br from-white to-gray-50 border-l-2 border-halo-primary/10 shadow-2xl flex flex-col max-h-screen">
+          {/* Header */}
+          <div className="flex-shrink-0 p-4 border-b bg-gradient-to-r from-halo-primary to-halo-secondary">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <div className="h-5 w-5 text-white">💬</div>
+                <span className="text-white font-semibold">Resonant Directive</span>
               </div>
-              <p className="text-xs text-white/90 font-medium mt-1">Your AI automation assistant</p>
+              <button
+                onClick={handleChatClose}
+                className="text-black hover:text-gray-700 p-1 rounded-sm hover:bg-white/20 transition-colors"
+              >
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
-            
-            {/* Chat Content - Mobile */}
-            <div className="flex-1 flex flex-col min-h-0">
-              <ChatMessages messages={messages} isLoading={isLoading} />
-              <ChatInput
-                inputValue={inputValue}
-                setInputValue={setInputValue}
-                isLoading={isLoading}
-                onSendMessage={onSendMessage}
-                onCreateWorkflow={handleCreateWorkflow}
-              />
-            </div>
+            <p className="text-xs text-white/90 font-medium mt-1">Your AI automation assistant</p>
           </div>
-
-          {/* Desktop: Side panel */}
-          <div className="hidden lg:flex w-96 bg-gradient-to-br from-white to-gray-50 border-l-2 border-halo-primary/10 shadow-2xl flex-col max-h-screen">
-            {/* Header - Desktop */}
-            <div className="flex-shrink-0 p-4 border-b bg-gradient-to-r from-halo-primary to-halo-secondary">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <div className="h-5 w-5 text-white">💬</div>
-                  <span className="text-white font-semibold">Resonant Directive</span>
-                </div>
-                <button
-                  onClick={handleChatClose}
-                  className="text-black hover:text-gray-700 p-1 rounded-sm hover:bg-white/20 transition-colors"
-                >
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              <p className="text-xs text-white/90 font-medium mt-1">Your AI automation assistant</p>
-            </div>
-            
-            {/* Chat Content - Desktop */}
-            <div className="flex-1 flex flex-col min-h-0">
-              <ChatMessages messages={messages} isLoading={isLoading} />
-              <ChatInput
-                inputValue={inputValue}
-                setInputValue={setInputValue}
-                isLoading={isLoading}
-                onSendMessage={onSendMessage}
-                onCreateWorkflow={handleCreateWorkflow}
-              />
-            </div>
+          
+          {/* Chat Content - This will take remaining space */}
+          <div className="flex-1 flex flex-col min-h-0">
+            <ChatMessages messages={messages} isLoading={isLoading} />
+            <ChatInput
+              inputValue={inputValue}
+              setInputValue={setInputValue}
+              isLoading={isLoading}
+              onSendMessage={onSendMessage}
+              onCreateWorkflow={handleCreateWorkflow}
+            />
           </div>
-        </>
+        </div>
       )}
       
       {/* Welcome Popup - only shows when sidebar opens for first time */}

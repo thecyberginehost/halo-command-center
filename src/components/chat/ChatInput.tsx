@@ -24,28 +24,27 @@ const ChatInput = ({
           onClick={onCreateWorkflow}
           size="sm" 
           variant="outline"
-          className="text-xs h-7 flex-1 sm:flex-none"
+          className="text-xs h-7"
         >
           <Wand2 className="h-3 w-3 mr-1" />
-          <span className="hidden sm:inline">Create Workflow</span>
-          <span className="sm:hidden">Create</span>
+          Create Workflow
         </Button>
         <Button 
           size="sm" 
           variant="outline"
-          className="text-xs h-7 flex-1 sm:flex-none"
+          className="text-xs h-7"
         >
           <Settings className="h-3 w-3 mr-1" />
-          <span className="hidden sm:inline">System Status</span>
-          <span className="sm:hidden">Status</span>
+          System Status
         </Button>
       </div>
 
+      {/* Input Area */}
       <div className="flex space-x-2">
         <Input
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
-          placeholder="Ask about automation..."
+          placeholder="Ask about automation or say 'create workflow'..."
           onKeyPress={(e) => e.key === 'Enter' && !isLoading && onSendMessage()}
           disabled={isLoading}
           className="flex-1 border-gray-300 focus:border-halo-accent focus:ring-halo-accent/20 bg-white/80 backdrop-blur-sm shadow-sm placeholder:text-gray-400"
