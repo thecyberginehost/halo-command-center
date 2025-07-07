@@ -145,7 +145,7 @@ WORKFLOW STATISTICS:
             if (foundWorkflows && foundWorkflows.length > 0) {
               searchResults += `\nFOUND WORKFLOWS:\n`;
               foundWorkflows.forEach(workflow => {
-                searchResults += `- "${workflow.name}" (${workflow.status}) - Link: /automations (search for "${workflow.name}")\n`;
+                searchResults += `- "${workflow.name}" (${workflow.status}) - [CLICK TO GO TO AUTOMATIONS](/automations)\n`;
                 if (workflow.description) {
                   searchResults += `  Description: ${workflow.description.substring(0, 100)}...\n`;
                 }

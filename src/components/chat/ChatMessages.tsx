@@ -21,17 +21,34 @@ const ChatMessages = ({ messages, isLoading }: ChatMessagesProps) => {
 
   // Function to render message text with clickable links
   const renderMessageWithLinks = (text: string) => {
-    // Pattern to match navigation instructions like "Link: /automations"
-    const linkPattern = /Link: (\/[^\s)]+)/g;
+    // Pattern to match both formats: "Link: /path" and "[CLICK TO GO TO X](/path)"
+    const linkPattern = /(\[CLICK TO GO TO [^\]]+\]\(([^)]+)\)|Link: (\/[^\s)]+))/g;
     const parts = text.split(linkPattern);
     
     return parts.map((part, index) => {
-      if (part.startsWith('/')) {
+      // Handle markdown-style links [text](/path)
+      if (part && part.match(/\[CLICK TO GO TO [^\]]+\]\(([^)]+)\)/)) {
+        const match = part.match(/\[([^\]]+)\]\(([^)]+)\)/);
+        if (match) {
+          const [, linkText, path] = match;
+          return (
+            <button
+              key={index}
+              onClick={() => navigate(path)}
+              className="text-blue-600 hover:text-blue-800 underline font-medium mx-1 cursor-pointer"
+            >
+              {linkText}
+            </button>
+          );
+        }
+      }
+      // Handle "Link: /path" format
+      if (part && part.startsWith('/')) {
         return (
           <button
             key={index}
             onClick={() => navigate(part)}
-            className="text-blue-600 hover:text-blue-800 underline font-medium mx-1"
+            className="text-blue-600 hover:text-blue-800 underline font-medium mx-1 cursor-pointer"
           >
             Go to {part === '/automations' ? 'Automations' : part}
           </button>
