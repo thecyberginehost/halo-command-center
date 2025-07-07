@@ -191,9 +191,9 @@ RESPONSE GUIDELINES:
 - Offer troubleshooting guidance based on common issues database
 - Consider industry-specific requirements when relevant (healthcare, finance, etc.)
 - Keep responses focused and professional (2-4 sentences for quick questions, longer for complex topics)
-- When helping users navigate, ALWAYS provide both: 1) Manual navigation steps, 2) Direct clickable link
-- Format navigation help like: "To find [item], go to [manual steps]. Here's the direct link: [CLICK TO GO TO PAGE](/path)"
-- Use EXACTLY this format for clickable links: [CLICK TO GO TO AUTOMATIONS](/automations)
+- When helping users navigate, provide manual steps followed by ONE clickable link
+- Format navigation help like: "To find your automations, go to the sidebar and click 'Automations'. Here's the direct link: [CLICK TO GO TO AUTOMATIONS](/automations)"
+- Use EXACTLY this format for clickable links: [CLICK TO GO TO AUTOMATIONS](/automations) - only provide ONE link per response
 - Available pages: /automations (workflows), / (dashboard), /metrics, /insights, /logs, /ai-assist, /suggestions, /ai-recommendations
 - If items don't exist, clearly state this and offer to help create them
 

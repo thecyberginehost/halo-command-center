@@ -24,16 +24,51 @@ export const useChatState = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [aiChatService] = useState(() => new AIChatService());
 
-  // Initialize with welcome message
+  // Load conversation history from localStorage on mount
   useEffect(() => {
-    const welcomeMessage: Message = {
-      id: 1,
-      text: "Hello! I'm Resonant Directive, your AI automation assistant. I can help you create workflows, optimize automations, and provide insights. What would you like to work on today?",
-      sender: 'ai',
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
-    setMessages([welcomeMessage]);
+    const savedMessages = localStorage.getItem('halo-chat-messages');
+    const savedHistory = localStorage.getItem('halo-chat-conversation-history');
+    
+    if (savedMessages) {
+      try {
+        const parsedMessages = JSON.parse(savedMessages);
+        setMessages(parsedMessages);
+      } catch (error) {
+        console.error('Error loading saved messages:', error);
+      }
+    } else {
+      // Initialize with welcome message only if no saved messages
+      const welcomeMessage: Message = {
+        id: 1,
+        text: "Hello! I'm Resonant Directive, your AI automation assistant. I can help you create workflows, optimize automations, and provide insights. What would you like to work on today?",
+        sender: 'ai',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      setMessages([welcomeMessage]);
+    }
+
+    if (savedHistory) {
+      try {
+        const parsedHistory = JSON.parse(savedHistory);
+        setConversationHistory(parsedHistory);
+      } catch (error) {
+        console.error('Error loading saved conversation history:', error);
+      }
+    }
   }, []);
+
+  // Save to localStorage whenever messages or conversation history changes
+  useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem('halo-chat-messages', JSON.stringify(messages));
+    }
+  }, [messages]);
+
+  useEffect(() => {
+    if (conversationHistory.length > 0) {
+      localStorage.setItem('halo-chat-conversation-history', JSON.stringify(conversationHistory));
+    }
+  }, [conversationHistory]);
 
   const handleSendMessage = async (onWorkflowCreate?: () => void) => {
     if (!inputValue.trim() || isLoading) return;
