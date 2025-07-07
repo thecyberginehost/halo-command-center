@@ -84,12 +84,12 @@ const Layout = ({ children }: LayoutProps) => {
           <div className="flex-shrink-0 p-4 border-b bg-gradient-to-r from-halo-primary to-halo-secondary">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <div className="h-5 w-5 text-white">💬</div>
-                <span className="text-white font-semibold">Resonant Directive</span>
+                <div className="h-5 w-5 text-foreground">💬</div>
+                <span className="text-foreground font-semibold">Resonant Directive</span>
               </div>
               <button
                 onClick={handleChatClose}
-                className="text-white hover:text-gray-200 p-1 rounded-sm hover:bg-white/20 transition-colors"
+                className="text-foreground hover:text-muted-foreground p-1 rounded-sm hover:bg-black/10 transition-colors"
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -97,10 +97,10 @@ const Layout = ({ children }: LayoutProps) => {
               </button>
             </div>
             <div className="flex items-center justify-between mt-1">
-              <p className="text-xs text-white/90 font-medium">Your AI automation assistant</p>
+              <p className="text-xs text-foreground/90 font-medium">Your AI automation assistant</p>
               <button
                 onClick={clearChatHistory}
-                className="text-xs text-white/70 hover:text-white/90 hover:bg-white/10 px-2 py-1 rounded transition-colors"
+                className="text-xs text-foreground/70 hover:text-foreground/90 hover:bg-black/10 px-2 py-1 rounded transition-colors"
               >
                 Clear Chat
               </button>
