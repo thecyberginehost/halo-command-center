@@ -2,6 +2,7 @@
 import { Loader2 } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { MessageFormatter } from './MessageFormatter';
 
 interface Message {
   id: number;
@@ -114,7 +115,7 @@ const ChatMessages = ({ messages, isLoading }: ChatMessagesProps) => {
                   : 'bg-white text-halo-text border border-gray-200 rounded-bl-sm'
               }`}
             >
-              <div>{renderMessageWithLinks(message.text)}</div>
+              <MessageFormatter content={message.text} />
               <p className={`text-xs mt-1 ${
                 message.sender === 'user' ? 'text-white/70' : 'text-gray-500'
               }`}>

@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { X } from 'lucide-react';
+import { MessageFormatter } from '@/components/chat/MessageFormatter';
 
 interface ChatMessage {
   role: string;
@@ -65,7 +66,7 @@ export function ResonantDirectiveChat({
                     : 'bg-muted text-foreground'
                 }`}
               >
-                <p className="text-sm">{message.content}</p>
+                <MessageFormatter content={message.content} />
               </div>
             </div>
           ))}
