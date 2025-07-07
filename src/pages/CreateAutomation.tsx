@@ -125,6 +125,34 @@ async function executeAutomation(input) {
     }
   };
 
+  const handleSaveWorkflow = async () => {
+    if (!workflow || !currentTenant) return;
+    
+    try {
+      const { error } = await supabase
+        .from('workflows')
+        .update({
+          name: workflowName,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', workflow.id)
+        .eq('tenant_id', currentTenant.id);
+
+      if (error) throw error;
+      
+      toast({
+        title: "Workflow Saved",
+        description: "Your visual workflow has been saved successfully."
+      });
+    } catch (error) {
+      toast({
+        title: "Save Failed",
+        description: "Failed to save workflow.",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <div className="flex min-h-screen w-full">
       <AppSidebar />
@@ -149,6 +177,7 @@ async function executeAutomation(input) {
             ) : (
               <VisualModeCanvas
                 onAddStepClick={() => setShowStepSelector(true)}
+                onSaveWorkflow={handleSaveWorkflow}
               />
             )}
 

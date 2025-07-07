@@ -10,6 +10,7 @@ import {
   Controls,
   MiniMap,
   Connection,
+  useReactFlow,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { BaseWorkflowNode } from './BaseWorkflowNode';
@@ -18,11 +19,14 @@ import { NodeConfigPanel } from './NodeConfigPanel';
 import { VisualWorkflowNode, VisualWorkflowEdge } from '@/types/visualWorkflow';
 import { IntegrationNode } from '@/types/integrations';
 import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { Save } from 'lucide-react';
 
 interface VisualWorkflowCanvasProps {
   initialNodes?: VisualWorkflowNode[];
   initialEdges?: VisualWorkflowEdge[];
   onWorkflowChange?: (nodes: VisualWorkflowNode[], edges: VisualWorkflowEdge[]) => void;
+  onSaveWorkflow?: () => void;
 }
 
 const nodeTypes = {
@@ -32,7 +36,8 @@ const nodeTypes = {
 export function VisualWorkflowCanvas({ 
   initialNodes = [], 
   initialEdges = [],
-  onWorkflowChange 
+  onWorkflowChange,
+  onSaveWorkflow 
 }: VisualWorkflowCanvasProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState<VisualWorkflowNode>(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState<VisualWorkflowEdge>(initialEdges);
@@ -104,10 +109,16 @@ export function VisualWorkflowCanvas({
       id: `${connection.source}-${connection.target}`,
       type: 'smoothstep',
       animated: true,
+      style: { stroke: 'hsl(var(--primary))', strokeWidth: 2 },
     };
 
     setEdges(prev => addEdge(edge, prev));
-  }, [setEdges]);
+    
+    toast({
+      title: "Connection Created",
+      description: "Nodes have been connected successfully",
+    });
+  }, [setEdges, toast]);
 
   const handleNodeConfigChange = useCallback((nodeId: string, config: Record<string, any>) => {
     setNodes(prev => prev.map(node => 
@@ -149,6 +160,16 @@ export function VisualWorkflowCanvas({
 
       {/* Main Canvas */}
       <div className="flex-1 relative" ref={reactFlowWrapper}>
+        {/* Save Button */}
+        {onSaveWorkflow && (
+          <div className="absolute top-4 right-4 z-10">
+            <Button onClick={onSaveWorkflow} size="sm">
+              <Save className="h-4 w-4 mr-2" />
+              Save Workflow
+            </Button>
+          </div>
+        )}
+        
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -162,15 +183,21 @@ export function VisualWorkflowCanvas({
           fitView
           fitViewOptions={{ padding: 0.2 }}
           className="bg-background"
+          connectionLineStyle={{ stroke: 'hsl(var(--primary))', strokeWidth: 2 }}
+          defaultEdgeOptions={{
+            style: { stroke: 'hsl(var(--primary))', strokeWidth: 2 },
+            type: 'smoothstep',
+          }}
         >
           <Background />
           <Controls />
           <MiniMap 
-            nodeStrokeWidth={3}
+            nodeStrokeWidth={2}
             nodeColor={(node) => {
               const workflowNode = node as VisualWorkflowNode;
               return workflowNode.data.integration.color;
             }}
+            className="bg-background"
           />
         </ReactFlow>
 

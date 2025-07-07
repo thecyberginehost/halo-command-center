@@ -39,43 +39,38 @@ export const BaseWorkflowNode = memo(({
 
   return (
     <Card 
-      className="min-w-[200px] shadow-lg transition-all duration-200 hover:shadow-xl"
+      className="min-w-[120px] max-w-[160px] shadow-md transition-all duration-200 hover:shadow-lg"
       style={nodeStyle}
     >
-      <div className="p-4">
+      <div className="p-2">
         {/* Node Header */}
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center space-x-2">
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center space-x-1">
             <div 
-              className="p-1 rounded flex items-center justify-center"
+              className="p-1 rounded-sm flex items-center justify-center"
               style={{ backgroundColor: integration.color + '20' }}
             >
               {Icon && (
                 <Icon 
-                  className="h-4 w-4" 
+                  className="h-3 w-3" 
                   style={{ color: integration.color }}
                 />
               )}
             </div>
-            <span className="font-medium text-sm text-foreground">{label}</span>
+            <span className="font-medium text-xs text-foreground truncate">{label}</span>
           </div>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => onConfigClick?.(id)}
-            className={`h-6 w-6 p-0 ${getStatusColor()}`}
+            className={`h-4 w-4 p-0 ${getStatusColor()}`}
           >
             {getStatusIcon()}
           </Button>
         </div>
 
-        {/* Node Description */}
-        <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
-          {integration.description}
-        </p>
-
         {/* Status Badge */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-center">
           <Badge 
             variant={integration.type === 'trigger' ? 'default' : 'secondary'}
             className="text-xs"
@@ -83,7 +78,7 @@ export const BaseWorkflowNode = memo(({
             {integration.type}
           </Badge>
           {hasError && (
-            <Badge variant="destructive" className="text-xs">
+            <Badge variant="destructive" className="text-xs ml-1">
               Error
             </Badge>
           )}
@@ -91,7 +86,7 @@ export const BaseWorkflowNode = memo(({
 
         {/* Error Message */}
         {hasError && errorMessage && (
-          <p className="text-xs text-destructive mt-2">{errorMessage}</p>
+          <p className="text-xs text-destructive mt-1 line-clamp-1">{errorMessage}</p>
         )}
       </div>
 
@@ -100,7 +95,8 @@ export const BaseWorkflowNode = memo(({
         <Handle
           type="target"
           position={Position.Left}
-          className="w-3 h-3 bg-primary border-2 border-background"
+          className="w-4 h-4 bg-primary border-2 border-background rounded-full hover:scale-125 transition-transform"
+          style={{ left: -8 }}
         />
       )}
 
@@ -108,7 +104,8 @@ export const BaseWorkflowNode = memo(({
       <Handle
         type="source"
         position={Position.Right}
-        className="w-3 h-3 bg-primary border-2 border-background"
+        className="w-4 h-4 bg-primary border-2 border-background rounded-full hover:scale-125 transition-transform"
+        style={{ right: -8 }}
       />
     </Card>
   );
