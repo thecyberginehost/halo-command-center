@@ -167,11 +167,19 @@ export const useChatState = () => {
     }
   };
 
+  const clearChatHistory = () => {
+    setMessages([]);
+    setConversationHistory([]);
+    localStorage.removeItem('halo-chat-messages');
+    localStorage.removeItem('halo-chat-conversation-history');
+  };
+
   return {
     messages,
     inputValue,
     setInputValue,
     isLoading,
-    handleSendMessage
+    handleSendMessage,
+    clearChatHistory
   };
 };

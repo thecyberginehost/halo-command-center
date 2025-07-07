@@ -10,6 +10,7 @@ import WelcomePopup from './chat/WelcomePopup';
 import ReminderNotification from './chat/ReminderNotification';
 import WorkflowBuilder from './WorkflowBuilder';
 import { useChat } from '@/contexts/ChatContext';
+import { Trash2 } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -24,7 +25,8 @@ const Layout = ({ children }: LayoutProps) => {
     inputValue,
     setInputValue,
     isLoading,
-    handleSendMessage
+    handleSendMessage,
+    clearChatHistory
   } = useChatState();
 
   const {
@@ -86,14 +88,23 @@ const Layout = ({ children }: LayoutProps) => {
                 <div className="h-5 w-5 text-white">💬</div>
                 <span className="text-white font-semibold">Resonant Directive</span>
               </div>
-              <button
-                onClick={handleChatClose}
-                className="text-black hover:text-gray-700 p-1 rounded-sm hover:bg-white/20 transition-colors"
-              >
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={clearChatHistory}
+                  className="text-white hover:text-gray-200 p-1 rounded-sm hover:bg-white/20 transition-colors"
+                  title="Clear chat history"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={handleChatClose}
+                  className="text-white hover:text-gray-200 p-1 rounded-sm hover:bg-white/20 transition-colors"
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
             </div>
             <p className="text-xs text-white/90 font-medium mt-1">Your AI automation assistant</p>
           </div>
