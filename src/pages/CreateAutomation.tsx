@@ -23,7 +23,7 @@ const CreateAutomation = () => {
   const [workflowName, setWorkflowName] = useState('My Automation');
   const [isDeveloperMode, setIsDeveloperMode] = useState(false);
   const [showStepSelector, setShowStepSelector] = useState(false);
-  const [isChatOpen, setIsChatOpen] = useState(true);
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const [scriptCode, setScriptCode] = useState(`// Automation Script
 // This will be executed when your automation runs
 
