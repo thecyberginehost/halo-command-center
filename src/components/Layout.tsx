@@ -63,7 +63,7 @@ const Layout = ({ children }: LayoutProps) => {
   return (
     <div className="flex min-h-screen w-full">
       <AppSidebar />
-      <SidebarInset className={`bg-background transition-all duration-300 ${isChatOpen ? 'mr-96' : ''}`}>
+      <SidebarInset className="bg-background transition-all duration-300">
         <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger className="-ml-1" />
           <div className="ml-auto">
@@ -76,9 +76,9 @@ const Layout = ({ children }: LayoutProps) => {
         </main>
       </SidebarInset>
       
-      {/* Chat Sidebar - Fixed position */}
+      {/* Chat Sidebar - Part of flex layout */}
       {isChatOpen && (
-        <div className="fixed top-0 right-0 h-full w-96 bg-gradient-to-br from-white to-gray-50 border-l-2 border-halo-primary/10 shadow-2xl z-40 flex flex-col max-h-screen">
+        <div className="w-96 bg-gradient-to-br from-white to-gray-50 border-l-2 border-halo-primary/10 shadow-2xl flex flex-col max-h-screen">
           {/* Header */}
           <div className="flex-shrink-0 p-4 border-b bg-gradient-to-r from-halo-primary to-halo-secondary">
             <div className="flex items-center justify-between">
