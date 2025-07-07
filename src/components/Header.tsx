@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { TenantSelector } from './TenantSelector';
 
 const Header = () => {
   return (
@@ -27,8 +28,11 @@ const Header = () => {
         <h1 className="text-lg font-semibold text-halo-text">Automation Dashboard</h1>
       </div>
 
-      {/* Right - Notifications & Profile */}
+      {/* Right - Tenant Selector, Notifications & Profile */}
       <div className="flex items-center space-x-4">
+        {/* Tenant Selector */}
+        <TenantSelector />
+        
         {/* Notifications */}
         <Button variant="ghost" size="sm" className="relative">
           <Bell className="h-5 w-5 text-halo-textSecondary" />
