@@ -14,9 +14,10 @@ import { TenantSelector } from './TenantSelector';
 
 interface HeaderProps {
   onChatToggle?: () => void;
+  pageTitle?: string;
 }
 
-const Header = ({ onChatToggle }: HeaderProps) => {
+const Header = ({ onChatToggle, pageTitle = "Dashboard" }: HeaderProps) => {
   return (
     <header className="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 shadow-sm">
       {/* Left - Logo */}
@@ -29,7 +30,7 @@ const Header = ({ onChatToggle }: HeaderProps) => {
 
       {/* Center - Page Title */}
       <div className="flex-1 text-center">
-        <h1 className="text-lg font-semibold text-halo-text">Automation Dashboard</h1>
+        <h1 className="text-lg font-semibold text-halo-text">{pageTitle}</h1>
       </div>
 
       {/* Right - Tenant Selector, Notifications & Profile */}

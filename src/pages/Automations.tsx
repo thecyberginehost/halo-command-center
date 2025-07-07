@@ -11,8 +11,10 @@ import { WorkflowRecord } from '@/types/tenant';
 import { AutomationCard } from '@/components/automations/AutomationCard';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 const Automations = () => {
+  usePageTitle('Automations');
   const { workflows, loading, error, refreshWorkflows } = useWorkflows();
   const { currentTenant } = useTenant();
   const { toast } = useToast();
@@ -61,7 +63,7 @@ const Automations = () => {
   };
 
   return (
-    <Layout>
+    <Layout pageTitle="Automations">
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
           <div>

@@ -6,8 +6,10 @@ import { Activity, CheckCircle, AlertTriangle, TrendingUp } from 'lucide-react';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { useWorkflows } from '@/hooks/useWorkflows';
 import { useTenant } from '@/contexts/TenantContext';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 const Index = () => {
+  usePageTitle('Dashboard');
   const { stats, loading: statsLoading } = useDashboardStats();
   const { workflows, loading: workflowsLoading } = useWorkflows();
   const { currentTenant, loading: tenantLoading } = useTenant();
@@ -21,7 +23,7 @@ const Index = () => {
   }
 
   return (
-    <Layout>
+    <Layout pageTitle="Dashboard">
           {/* Welcome Section */}
           <div className="mb-8">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">

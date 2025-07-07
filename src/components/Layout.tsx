@@ -13,9 +13,10 @@ import { useChat } from '@/contexts/ChatContext';
 
 interface LayoutProps {
   children: React.ReactNode;
+  pageTitle?: string;
 }
 
-const Layout = ({ children }: LayoutProps) => {
+const Layout = ({ children, pageTitle = "Dashboard" }: LayoutProps) => {
   const { isChatOpen, toggleChat, setIsChatOpen } = useChat();
   const [showWorkflowBuilder, setShowWorkflowBuilder] = useState(false);
 
@@ -68,7 +69,7 @@ const Layout = ({ children }: LayoutProps) => {
         <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger className="-ml-1" />
           <div className="ml-auto">
-            <Header onChatToggle={handleChatToggle} />
+            <Header onChatToggle={handleChatToggle} pageTitle={pageTitle} />
           </div>
         </header>
         
