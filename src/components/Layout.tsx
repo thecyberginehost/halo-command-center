@@ -78,9 +78,9 @@ const Layout = ({ children }: LayoutProps) => {
       
       {/* Chat Sidebar - Fixed position */}
       {isChatOpen && (
-        <div className="fixed top-0 right-0 h-full w-96 bg-gradient-to-br from-white to-gray-50 border-l-2 border-halo-primary/10 shadow-2xl z-40 flex flex-col">
+        <div className="fixed top-0 right-0 h-full w-96 bg-gradient-to-br from-white to-gray-50 border-l-2 border-halo-primary/10 shadow-2xl z-40 flex flex-col max-h-screen">
           {/* Header */}
-          <div className="p-4 border-b bg-gradient-to-r from-halo-primary to-halo-secondary">
+          <div className="flex-shrink-0 p-4 border-b bg-gradient-to-r from-halo-primary to-halo-secondary">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <div className="h-5 w-5 text-white">💬</div>
@@ -98,8 +98,8 @@ const Layout = ({ children }: LayoutProps) => {
             <p className="text-xs text-white/90 font-medium mt-1">Your AI automation assistant</p>
           </div>
           
-          {/* Chat Content */}
-          <div className="flex-1 flex flex-col">
+          {/* Chat Content - This will take remaining space */}
+          <div className="flex-1 flex flex-col min-h-0">
             <ChatMessages messages={messages} isLoading={isLoading} />
             <ChatInput
               inputValue={inputValue}

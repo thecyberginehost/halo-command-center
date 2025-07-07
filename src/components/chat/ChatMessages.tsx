@@ -1,4 +1,3 @@
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Loader2 } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 
@@ -15,16 +14,21 @@ interface ChatMessagesProps {
 }
 
 const ChatMessages = ({ messages, isLoading }: ChatMessagesProps) => {
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
   }, [messages, isLoading]);
 
   return (
-    <ScrollArea className="flex-1 p-4 bg-gradient-to-b from-gray-50/50 to-white" ref={scrollAreaRef}>
+    <div 
+      ref={messagesContainerRef}
+      className="flex-1 p-4 bg-gradient-to-b from-gray-50/50 to-white overflow-y-auto min-h-0"
+    >
       <div className="space-y-4">
         {messages.map((message) => (
           <div
@@ -63,7 +67,7 @@ const ChatMessages = ({ messages, isLoading }: ChatMessagesProps) => {
         {/* Invisible div for auto-scrolling */}
         <div ref={messagesEndRef} />
       </div>
-    </ScrollArea>
+    </div>
   );
 };
 
