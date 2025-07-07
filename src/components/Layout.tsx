@@ -76,9 +76,9 @@ const Layout = ({ children }: LayoutProps) => {
         </main>
       </SidebarInset>
       
-      {/* Chat Sidebar - Part of flex layout */}
+      {/* Chat Sidebar - Responsive */}
       {isChatOpen && (
-        <div className="w-96 bg-gradient-to-br from-white to-gray-50 border-l-2 border-halo-primary/10 shadow-2xl flex flex-col max-h-screen">
+        <div className="fixed inset-y-0 right-0 z-30 w-full bg-gradient-to-br from-white to-gray-50 border-l-2 border-halo-primary/10 shadow-2xl flex flex-col md:relative md:w-80 lg:w-96 xl:w-96">
           {/* Header */}
           <div className="flex-shrink-0 p-4 border-b bg-gradient-to-r from-halo-primary to-halo-secondary">
             <div className="flex items-center justify-between">
