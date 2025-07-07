@@ -72,7 +72,12 @@ export function AutomationHeader({
       </Button>
       
       <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-        <span>Automations</span>
+        <button
+          onClick={() => navigate('/automations')}
+          className="hover:text-primary transition-colors cursor-pointer"
+        >
+          Automations
+        </button>
         <span>/</span>
         {isEditingName ? (
           <div className="flex items-center space-x-2">

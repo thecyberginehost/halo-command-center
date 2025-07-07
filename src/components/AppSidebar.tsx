@@ -61,8 +61,12 @@ export function AppSidebar() {
     <Sidebar className="bg-sidebar">
       <SidebarHeader className="p-4">
         <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">H</span>
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
+            <img 
+              src="https://ai-stream-solutions.s3.us-east-1.amazonaws.com/halo.png" 
+              alt="HALO Logo" 
+              className="w-full h-full object-contain"
+            />
           </div>
           <div>
             <h2 className="text-white font-bold text-lg">HALO</h2>
