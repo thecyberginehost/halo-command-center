@@ -25,8 +25,8 @@ const ChatMessages = ({ messages, isLoading }: ChatMessagesProps) => {
             <div
               className={`max-w-[80%] p-3 rounded-lg text-sm shadow-sm ${
                 message.sender === 'user'
-                  ? 'bg-gradient-to-r from-halo-accent to-halo-accent/90 text-white'
-                  : 'bg-white text-halo-text border border-gray-200'
+                  ? 'bg-blue-500 text-white rounded-br-sm'
+                  : 'bg-white text-halo-text border border-gray-200 rounded-bl-sm'
               }`}
             >
               <p>{message.text}</p>
