@@ -108,10 +108,31 @@ export function VisualWorkflowCanvas({
   }, []);
 
   const addNodeFromIntegration = useCallback((integration: IntegrationNode, position: { x: number; y: number }) => {
+    // Calculate smart position based on existing nodes
+    const calculateSmartPosition = (): { x: number; y: number } => {
+      if (nodes.length === 0) {
+        return { x: 100, y: 100 };
+      }
+      
+      // Find the rightmost node
+      const rightmostNode = nodes.reduce((prev, current) => 
+        (prev.position.x > current.position.x) ? prev : current
+      );
+      
+      return {
+        x: rightmostNode.position.x + 200, // Add 200px spacing
+        y: rightmostNode.position.y
+      };
+    };
+
+    const smartPosition = position.x === 100 && position.y === 100 
+      ? calculateSmartPosition() 
+      : position;
+
     const newNode: VisualWorkflowNode = {
       id: `${integration.id}-${Date.now()}`,
       type: 'integrationNode',
-      position,
+      position: smartPosition,
       data: {
         integration,
         config: {},
@@ -122,11 +143,19 @@ export function VisualWorkflowCanvas({
 
     setNodes(prev => [...prev, newNode]);
     
+    // Auto-fit view after adding node
+    setTimeout(() => {
+      const reactFlowInstance = (window as any).reactFlowInstance;
+      if (reactFlowInstance && reactFlowInstance.fitView) {
+        reactFlowInstance.fitView({ padding: 0.1 });
+      }
+    }, 100);
+    
     toast({
       title: "Node Added",
       description: `${integration.name} node added to workflow`,
     });
-  }, [setNodes, toast]);
+  }, [setNodes, toast, nodes]);
 
   const onConnect = useCallback((connection: Connection) => {
     const edge: VisualWorkflowEdge = {
@@ -339,13 +368,17 @@ export function VisualWorkflowCanvas({
           onNodeClick={handleNodeClick}
           nodeTypes={nodeTypes}
           fitView
-          fitViewOptions={{ padding: 0.3 }}
+          fitViewOptions={{ padding: 0.2 }}
           defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
           className="bg-background react-flow-canvas"
           connectionLineStyle={{ stroke: 'hsl(var(--primary))', strokeWidth: 2 }}
           defaultEdgeOptions={{
             style: { stroke: 'hsl(var(--primary))', strokeWidth: 2 },
             type: 'smoothstep',
+          }}
+          onInit={(reactFlowInstance) => {
+            // Store reference for auto-zoom functionality
+            (window as any).reactFlowInstance = reactFlowInstance;
           }}
         >
           <Background />

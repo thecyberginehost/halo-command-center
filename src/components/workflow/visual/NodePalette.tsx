@@ -46,8 +46,6 @@ export function NodePalette({ onAddNode }: NodePaletteProps) {
   };
 
   const handleDragStart = (e: React.DragEvent, integration: IntegrationNode) => {
-    e.preventDefault();
-    e.stopPropagation();
     e.dataTransfer.setData('application/reactflow', JSON.stringify(integration));
     e.dataTransfer.effectAllowed = 'move';
   };
@@ -60,9 +58,7 @@ export function NodePalette({ onAddNode }: NodePaletteProps) {
         draggable
         onDragStart={(e) => handleDragStart(e, integration)}
         className="flex items-center space-x-3 p-3 border rounded-lg cursor-grab hover:bg-accent/50 transition-colors"
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
+        onClick={() => {
           onAddNode(integration, { x: 100, y: 100 });
         }}
       >

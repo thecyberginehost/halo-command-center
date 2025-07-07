@@ -54,21 +54,21 @@ export class CredentialsService {
   }
 
   async createCredential(tenantId: string, credential: CreateCredentialRequest): Promise<TenantCredential> {
-    const { data, error } = await supabase
-      .from('tenant_credentials')
-      .insert({
-        tenant_id: tenantId,
-        ...credential
-      })
-      .select()
-      .single();
+    // Use the encryption edge function for secure storage
+    const { data, error } = await supabase.functions.invoke('encrypt-credentials', {
+      body: {
+        action: 'encrypt',
+        data: credential,
+        tenantId
+      }
+    });
 
     if (error) {
       console.error('Failed to create credential:', error);
       throw error;
     }
 
-    return data;
+    return data.data;
   }
 
   async updateCredential(credentialId: string, updates: Partial<CreateCredentialRequest>): Promise<TenantCredential> {

@@ -35,7 +35,7 @@ async function getCredentialForTenant(tenantId: string, credentialName: string):
   try {
     const { data, error } = await supabase
       .from('tenant_credentials')
-      .select('credentials, service_type')
+      .select('id, credentials, service_type')
       .eq('tenant_id', tenantId)
       .eq('name', credentialName)
       .eq('is_active', true)
@@ -46,7 +46,21 @@ async function getCredentialForTenant(tenantId: string, credentialName: string):
       return null;
     }
 
-    return data.credentials as Record<string, string>;
+    // Decrypt the credentials using the encryption edge function
+    const { data: decryptedData, error: decryptError } = await supabase.functions.invoke('encrypt-credentials', {
+      body: {
+        action: 'decrypt',
+        data: { credentialId: data.id },
+        tenantId
+      }
+    });
+
+    if (decryptError) {
+      console.error('Failed to decrypt credential:', decryptError);
+      return null;
+    }
+
+    return decryptedData.data.credentials as Record<string, string>;
   } catch (error) {
     console.error('Error getting credential:', error);
     return null;
@@ -58,7 +72,7 @@ async function executeAIIntegration(integration: string, config: Record<string, 
   
   try {
     // Get tenant credentials instead of environment variables
-    const tenantId = context.tenantId || 'default-tenant';
+    const tenantId = context.tenantId || context.workflowId?.split('-')[0] || 'default-tenant';
     const credentialName = config.credential;
     
     if (!credentialName) {
