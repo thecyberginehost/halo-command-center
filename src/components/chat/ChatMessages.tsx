@@ -21,12 +21,12 @@ const ChatMessages = ({ messages, isLoading }: ChatMessagesProps) => {
 
   // Function to render message text with clickable links
   const renderMessageWithLinks = (text: string) => {
-    // Pattern to match both formats: "Link: /path" and "[CLICK TO GO TO X](/path)"
-    const linkPattern = /(\[CLICK TO GO TO [^\]]+\]\(([^)]+)\)|Link: (\/[^\s)]+))/g;
+    // Enhanced pattern to catch malformed AI responses and proper markdown links
+    const linkPattern = /(\[CLICK TO GO TO [^\]]+\]\(([^)]+)\)|CLICK TO GO TO [A-Z]+|Link: (\/[^\s)]+))/g;
     const parts = text.split(linkPattern);
     
     return parts.map((part, index) => {
-      // Handle markdown-style links [text](/path)
+      // Handle proper markdown-style links [text](/path)
       if (part && part.match(/\[CLICK TO GO TO [^\]]+\]\(([^)]+)\)/)) {
         const match = part.match(/\[([^\]]+)\]\(([^)]+)\)/);
         if (match) {
@@ -42,6 +42,33 @@ const ChatMessages = ({ messages, isLoading }: ChatMessagesProps) => {
           );
         }
       }
+      // Handle malformed AI responses like "CLICK TO GO TO AUTOMATIONS"
+      if (part && part.match(/^CLICK TO GO TO [A-Z]+$/)) {
+        const pageName = part.replace('CLICK TO GO TO ', '');
+        let path = '/';
+        
+        // Map page names to correct paths
+        switch (pageName) {
+          case 'AUTOMATIONS':
+            path = '/automations';
+            break;
+          case 'DASHBOARD':
+            path = '/';
+            break;
+          default:
+            path = `/${pageName.toLowerCase()}`;
+        }
+        
+        return (
+          <button
+            key={index}
+            onClick={() => navigate(path)}
+            className="text-blue-600 hover:text-blue-800 underline font-medium mx-1 cursor-pointer"
+          >
+            {part}
+          </button>
+        );
+      }
       // Handle "Link: /path" format
       if (part && part.startsWith('/')) {
         return (
@@ -50,7 +77,7 @@ const ChatMessages = ({ messages, isLoading }: ChatMessagesProps) => {
             onClick={() => navigate(part)}
             className="text-blue-600 hover:text-blue-800 underline font-medium mx-1 cursor-pointer"
           >
-            Go to {part === '/automations' ? 'Automations' : part}
+            Go to {part === '/automations' ? 'Automations' : part === '/' ? 'Dashboard' : part}
           </button>
         );
       }
