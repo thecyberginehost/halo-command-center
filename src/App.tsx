@@ -9,6 +9,7 @@ import { ChatProvider } from "@/contexts/ChatContext";
 import Index from "./pages/Index";
 import Automations from "./pages/Automations";
 import CreateAutomation from "./pages/CreateAutomation";
+import CreateOrganization from "./pages/CreateOrganization";
 import WorkflowBuilderPage from "./pages/WorkflowBuilderPage";
 import NotFound from "./pages/NotFound";
 
@@ -28,6 +29,7 @@ const App = () => (
               <Route path="/automations" element={<Automations />} />
               <Route path="/automations/create" element={<CreateAutomation />} />
               <Route path="/automations/create/:workflowId" element={<CreateAutomation />} />
+              <Route path="/organizations/create" element={<CreateOrganization />} />
               <Route path="/workflow-builder/:workflowId" element={<WorkflowBuilderPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

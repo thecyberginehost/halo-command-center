@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Building2 } from 'lucide-react';
+import { Building2, Plus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useTenant } from '@/contexts/TenantContext';
 import { Tenant } from '@/types/tenant';
+import { useNavigate } from 'react-router-dom';
 
 export function TenantSelector() {
+  const navigate = useNavigate();
   const { currentTenant, setCurrentTenant } = useTenant();
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,8 +36,13 @@ export function TenantSelector() {
     fetchTenants();
   }, []);
 
-  const handleTenantChange = (tenantId: string) => {
-    const selectedTenant = tenants.find(t => t.id === tenantId);
+  const handleTenantChange = (value: string) => {
+    if (value === 'create-new') {
+      navigate('/organizations/create');
+      return;
+    }
+    
+    const selectedTenant = tenants.find(t => t.id === value);
     if (selectedTenant) {
       setCurrentTenant(selectedTenant);
     }
@@ -60,13 +67,13 @@ export function TenantSelector() {
   }
 
   return (
-    <div className="flex items-center space-x-2">
-      <Building2 className="h-4 w-4 text-muted-foreground" />
+    <div className="flex items-center space-x-2 w-full max-w-sm">
+      <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
       <Select 
         value={currentTenant?.id || ''} 
         onValueChange={handleTenantChange}
       >
-        <SelectTrigger className="w-48 h-8 text-sm">
+        <SelectTrigger className="w-full h-8 text-sm">
           <SelectValue placeholder="Select organization" />
         </SelectTrigger>
         <SelectContent>
@@ -75,6 +82,12 @@ export function TenantSelector() {
               {tenant.name}
             </SelectItem>
           ))}
+          <SelectItem value="create-new" className="text-primary font-medium">
+            <div className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              Create Organization
+            </div>
+          </SelectItem>
         </SelectContent>
       </Select>
     </div>

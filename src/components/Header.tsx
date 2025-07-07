@@ -20,23 +20,21 @@ interface HeaderProps {
 const Header = ({ onChatToggle, pageTitle = "Dashboard" }: HeaderProps) => {
   return (
     <header className="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 shadow-sm">
-      {/* Left - Logo */}
-      <div className="flex items-center space-x-3">
+      {/* Left - Logo and Page Title */}
+      <div className="flex items-center space-x-6">
         <div className="w-8 h-8 bg-halo-primary rounded-lg flex items-center justify-center">
           <div className="w-4 h-4 bg-halo-accent rounded-sm"></div>
         </div>
-      </div>
-
-      {/* Center - Page Title */}
-      <div className="flex-1 text-center">
         <h1 className="text-lg font-semibold text-halo-text">{pageTitle}</h1>
       </div>
 
-      {/* Right - Tenant Selector, Notifications & Profile */}
-      <div className="flex items-center space-x-4">
-        {/* Tenant Selector */}
+      {/* Center - Tenant Selector */}
+      <div className="flex-1 flex justify-center max-w-md">
         <TenantSelector />
-        
+      </div>
+
+      {/* Right - Chat, Notifications & Profile */}
+      <div className="flex items-center space-x-4">
         {/* Resonant Directive Chat */}
         <Button 
           variant="ghost" 
