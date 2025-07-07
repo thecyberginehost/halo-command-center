@@ -25,7 +25,6 @@ const Header = ({ onChatToggle, pageTitle = "Dashboard" }: HeaderProps) => {
         <div className="w-8 h-8 bg-halo-primary rounded-lg flex items-center justify-center">
           <div className="w-4 h-4 bg-halo-accent rounded-sm"></div>
         </div>
-        <span className="text-xl font-bold text-halo-primary">HALO</span>
       </div>
 
       {/* Center - Page Title */}
