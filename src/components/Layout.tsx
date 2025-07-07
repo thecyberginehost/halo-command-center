@@ -9,13 +9,14 @@ import ChatInput from './chat/ChatInput';
 import WelcomePopup from './chat/WelcomePopup';
 import ReminderNotification from './chat/ReminderNotification';
 import WorkflowBuilder from './WorkflowBuilder';
+import { useChat } from '@/contexts/ChatContext';
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
 const Layout = ({ children }: LayoutProps) => {
-  const [isChatOpen, setIsChatOpen] = useState(false);
+  const { isChatOpen, toggleChat, setIsChatOpen } = useChat();
   const [showWorkflowBuilder, setShowWorkflowBuilder] = useState(false);
 
   const {
@@ -34,7 +35,7 @@ const Layout = ({ children }: LayoutProps) => {
   } = useNotifications(isChatOpen);
 
   const handleChatToggle = () => {
-    setIsChatOpen(!isChatOpen);
+    toggleChat();
   };
 
   const handleChatClose = () => {
@@ -87,7 +88,7 @@ const Layout = ({ children }: LayoutProps) => {
               </div>
               <button
                 onClick={handleChatClose}
-                className="text-white/70 hover:text-white p-1 rounded-sm hover:bg-white/10 transition-colors"
+                className="text-black hover:text-gray-700 p-1 rounded-sm hover:bg-white/20 transition-colors"
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
