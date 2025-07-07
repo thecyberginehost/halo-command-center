@@ -1,3 +1,4 @@
+
 import { Loader2 } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -21,122 +22,78 @@ const ChatMessages = ({ messages, isLoading }: ChatMessagesProps) => {
 
   // Function to render message text with clickable links
   const renderMessageWithLinks = (text: string) => {
-    console.log('Processing text:', text); // Debug log
-    
-    // Look for different link patterns in order of specificity
+    // Look for markdown-style links [text](path)
+    const markdownLinkPattern = /\[([^\]]+)\]\(([^)]+)\)/g;
     const parts = [];
-    let remainingText = text;
-    let index = 0;
-    
-    // Pattern 1: Markdown-style links [CLICK TO GO TO X](/path)
-    const markdownPattern = /\[CLICK TO GO TO [^\]]+\]\([^)]+\)/g;
-    let markdownMatch;
-    
-    while ((markdownMatch = markdownPattern.exec(remainingText)) !== null) {
-      // Add text before the match
-      if (markdownMatch.index > 0) {
+    let lastIndex = 0;
+    let match;
+
+    while ((match = markdownLinkPattern.exec(text)) !== null) {
+      // Add text before the link
+      if (match.index > lastIndex) {
         parts.push({
           type: 'text',
-          content: remainingText.substring(0, markdownMatch.index),
-          key: index++
+          content: text.substring(lastIndex, match.index),
+          key: parts.length
         });
       }
-      
+
       // Add the link
-      const linkMatch = markdownMatch[0].match(/\[([^\]]+)\]\(([^)]+)\)/);
-      if (linkMatch) {
-        const [, linkText, path] = linkMatch;
-        parts.push({
-          type: 'link',
-          content: linkText,
-          path: path,
-          key: index++
-        });
-      }
-      
-      remainingText = remainingText.substring(markdownMatch.index + markdownMatch[0].length);
-      markdownPattern.lastIndex = 0; // Reset regex
-    }
-    
-    // Pattern 2: Simple text like "CLICK TO GO TO AUTOMATIONS"
-    const simplePattern = /CLICK TO GO TO ([A-Z]+)/g;
-    let tempText = remainingText;
-    let simpleMatch;
-    
-    while ((simpleMatch = simplePattern.exec(tempText)) !== null) {
-      // Add text before the match
-      if (simpleMatch.index > 0) {
-        parts.push({
-          type: 'text',
-          content: tempText.substring(0, simpleMatch.index),
-          key: index++
-        });
-      }
-      
-      const pageName = simpleMatch[1];
-      let path = '/';
-      
-      switch (pageName) {
-        case 'AUTOMATIONS':
-          path = '/automations';
-          break;
-        case 'DASHBOARD':
-          path = '/';
-          break;
-        default:
-          path = `/${pageName.toLowerCase()}`;
-      }
-      
       parts.push({
         type: 'link',
-        content: `Go to ${pageName.charAt(0) + pageName.slice(1).toLowerCase()}`,
-        path: path,
-        key: index++
+        content: match[1], // Link text
+        path: match[2],    // Link path
+        key: parts.length
       });
-      
-      tempText = tempText.substring(simpleMatch.index + simpleMatch[0].length);
-      simplePattern.lastIndex = 0; // Reset regex
+
+      lastIndex = match.index + match[0].length;
     }
-    
-    // Add any remaining text
-    if (tempText.length > 0) {
+
+    // Add remaining text after the last link
+    if (lastIndex < text.length) {
       parts.push({
         type: 'text',
-        content: tempText,
-        key: index++
-      });
-    } else if (remainingText.length > 0 && parts.length === 0) {
-      // If no patterns matched, just return the original text
-      parts.push({
-        type: 'text',
-        content: remainingText,
-        key: index++
+        content: text.substring(lastIndex),
+        key: parts.length
       });
     }
-    
-    console.log('Parsed parts:', parts); // Debug log
-    
+
+    // If no links were found, return the original text
+    if (parts.length === 0) {
+      return text;
+    }
+
     return parts.map((part) => {
       if (part.type === 'link') {
         return (
           <button
             key={part.key}
             onClick={() => navigate(part.path)}
-            className="text-blue-600 hover:text-blue-800 underline font-medium mx-1 cursor-pointer"
+            className="text-blue-600 hover:text-blue-800 underline font-medium cursor-pointer"
           >
             {part.content}
           </button>
         );
       }
-      return part.content;
+      return <span key={part.key}>{part.content}</span>;
     });
   };
 
-  // Auto-scroll to bottom when new messages arrive
+  // Auto-scroll to bottom when new messages arrive or loading state changes
   useEffect(() => {
-    if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
-    }
+    const scrollToBottom = () => {
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'end'
+        });
+      }
+    };
+
+    // Use a small delay to ensure DOM has updated
+    const timeoutId = setTimeout(scrollToBottom, 100);
+    
+    return () => clearTimeout(timeoutId);
   }, [messages, isLoading]);
 
   return (
