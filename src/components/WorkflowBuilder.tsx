@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -6,6 +6,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { 
   Wand2, 
   Play, 
@@ -43,9 +45,12 @@ import { Workflow, WorkflowStep } from '@/types/workflow';
 import { WorkflowAIService } from '@/services/workflowAI';
 import { useToast } from '@/hooks/use-toast';
 import { useTenant } from '@/contexts/TenantContext';
+import { WorkflowRecord } from '@/types/tenant';
+import { supabase } from '@/integrations/supabase/client';
 
 interface WorkflowBuilderProps {
   onClose: () => void;
+  initialWorkflow?: WorkflowRecord;
 }
 
 const stepIcons = {
@@ -64,7 +69,7 @@ const stepColors = {
   utility: 'bg-purple-500'
 };
 
-const WorkflowBuilder = ({ onClose }: WorkflowBuilderProps) => {
+const WorkflowBuilder = ({ onClose, initialWorkflow }: WorkflowBuilderProps) => {
   const [prompt, setPrompt] = useState('');
   const [workflow, setWorkflow] = useState<Workflow | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -75,8 +80,32 @@ const WorkflowBuilder = ({ onClose }: WorkflowBuilderProps) => {
     reliability_score?: string;
     maintenance_requirements?: string;
   } | null>(null);
+  const [isDeveloperMode, setIsDeveloperMode] = useState(false);
+  const [customCode, setCustomCode] = useState('');
   const { toast } = useToast();
   const { currentTenant } = useTenant();
+
+  // Initialize workflow from database record if provided
+  useEffect(() => {
+    if (initialWorkflow) {
+      const workflowSteps = Array.isArray(initialWorkflow.steps) 
+        ? initialWorkflow.steps as WorkflowStep[]
+        : [];
+      
+      setWorkflow({
+        id: initialWorkflow.id,
+        name: initialWorkflow.name,
+        description: initialWorkflow.description || '',
+        status: initialWorkflow.status === 'active' ? 'active' : 'draft',
+        steps: workflowSteps,
+        createdAt: initialWorkflow.created_at,
+        updatedAt: initialWorkflow.updated_at,
+        createdBy: initialWorkflow.created_by || 'current-user',
+        executionCount: initialWorkflow.execution_count || 0,
+        lastExecuted: initialWorkflow.last_executed || undefined
+      });
+    }
+  }, [initialWorkflow]);
 
   // Drag and drop sensors
   const sensors = useSensors(
@@ -226,9 +255,21 @@ const WorkflowBuilder = ({ onClose }: WorkflowBuilderProps) => {
               <p className="text-sm text-halo-textSecondary">Powered by o3 reasoning for advanced automation logic</p>
             </div>
         </div>
-        <Button variant="outline" onClick={onClose}>
-          Close
-        </Button>
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="developer-mode"
+              checked={isDeveloperMode}
+              onCheckedChange={setIsDeveloperMode}
+            />
+            <Label htmlFor="developer-mode" className="text-sm font-medium">
+              Developer Mode
+            </Label>
+          </div>
+          <Button variant="outline" onClick={onClose}>
+            Close
+          </Button>
+        </div>
       </div>
 
       <div className="flex-1 flex overflow-hidden">
@@ -339,31 +380,69 @@ const WorkflowBuilder = ({ onClose }: WorkflowBuilderProps) => {
                 </div>
               </div>
 
-              <ScrollArea className="flex-1">
-                <DndContext 
-                  sensors={sensors}
-                  collisionDetection={closestCenter}
-                  onDragEnd={handleDragEnd}
-                >
-                  <SortableContext 
-                    items={workflow.steps.map(step => step.id)}
-                    strategy={verticalListSortingStrategy}
+              {isDeveloperMode ? (
+                /* Developer Mode - Custom Code Editor */
+                <div className="flex-1 flex flex-col">
+                  <div className="mb-4">
+                    <Label className="text-sm font-medium text-halo-text">Custom Workflow Code</Label>
+                    <p className="text-xs text-halo-textSecondary mt-1">
+                      Write custom JavaScript/TypeScript code for your automation workflow
+                    </p>
+                  </div>
+                  <Textarea
+                    value={customCode}
+                    onChange={(e) => setCustomCode(e.target.value)}
+                    placeholder={`// Example workflow code:
+async function executeWorkflow(data) {
+  // Step 1: Process incoming data
+  const processedData = await processInput(data);
+  
+  // Step 2: Send email notification
+  await sendEmail({
+    to: processedData.email,
+    subject: 'Welcome!',
+    body: 'Thank you for signing up!'
+  });
+  
+  // Step 3: Add to CRM
+  await addToCRM({
+    name: processedData.name,
+    email: processedData.email
+  });
+  
+  return { success: true };
+}`}
+                    className="flex-1 font-mono text-sm resize-none"
+                  />
+                </div>
+              ) : (
+                /* Regular Mode - Drag & Drop Interface */
+                <ScrollArea className="flex-1">
+                  <DndContext 
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
                   >
-                    <div className="space-y-4">
-                      {workflow.steps.map((step, index) => (
-                        <div key={step.id}>
-                          <SortableWorkflowStep step={step} index={index} />
-                          {index < workflow.steps.length - 1 && (
-                            <div className="flex justify-center py-2">
-                              <div className="w-px h-8 bg-gray-300" />
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </SortableContext>
-                </DndContext>
-              </ScrollArea>
+                    <SortableContext 
+                      items={workflow.steps.map(step => step.id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <div className="space-y-4">
+                        {workflow.steps.map((step, index) => (
+                          <div key={step.id}>
+                            <SortableWorkflowStep step={step} index={index} />
+                            {index < workflow.steps.length - 1 && (
+                              <div className="flex justify-center py-2">
+                                <div className="w-px h-8 bg-gray-300" />
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </SortableContext>
+                  </DndContext>
+                </ScrollArea>
+              )}
             </div>
           ) : (
             <div className="h-full flex items-center justify-center">
@@ -372,8 +451,15 @@ const WorkflowBuilder = ({ onClose }: WorkflowBuilderProps) => {
                   <Wand2 className="h-8 w-8 text-gray-400" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-medium text-halo-text">No Workflow Generated</h3>
-                  <p className="text-halo-textSecondary">Describe your automation to get started</p>
+                  <h3 className="text-lg font-medium text-halo-text">
+                    {isDeveloperMode ? 'No Custom Code' : 'No Workflow Generated'}
+                  </h3>
+                  <p className="text-halo-textSecondary">
+                    {isDeveloperMode 
+                      ? 'Describe your automation to generate custom code' 
+                      : 'Describe your automation to get started'
+                    }
+                  </p>
                 </div>
               </div>
             </div>

@@ -12,12 +12,19 @@ import { WorkflowDeleteDialog } from '@/components/WorkflowDeleteDialog';
 import { WorkflowStatusToggle } from '@/components/WorkflowStatusToggle';
 import { WorkflowRecord } from '@/types/tenant';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Automations = () => {
   const { workflows, loading, error, refreshWorkflows } = useWorkflows();
   const { currentTenant } = useTenant();
+  const navigate = useNavigate();
   const [editingWorkflow, setEditingWorkflow] = useState<WorkflowRecord | null>(null);
   const [deletingWorkflow, setDeletingWorkflow] = useState<WorkflowRecord | null>(null);
+
+  const handleWorkflowCreated = (workflowId: string) => {
+    refreshWorkflows();
+    navigate(`/workflow-builder/${workflowId}`);
+  };
 
   const formatLastExecuted = (lastExecuted: string | null) => {
     if (!lastExecuted) return 'Never';
@@ -43,7 +50,7 @@ const Automations = () => {
               Manage and monitor your workflow automations for {currentTenant?.name}
             </p>
           </div>
-          <WorkflowCreateModal onWorkflowCreated={refreshWorkflows} />
+          <WorkflowCreateModal onWorkflowCreated={handleWorkflowCreated} />
         </div>
       </div>
       
@@ -61,7 +68,7 @@ const Automations = () => {
           <p className="text-muted-foreground mb-4">
             Get started by creating your first workflow automation
           </p>
-          <WorkflowCreateModal onWorkflowCreated={refreshWorkflows} />
+          <WorkflowCreateModal onWorkflowCreated={handleWorkflowCreated} />
         </div>
       ) : (
         <div className="space-y-4">

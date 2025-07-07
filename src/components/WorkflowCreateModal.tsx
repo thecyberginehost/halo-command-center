@@ -11,7 +11,7 @@ import { useTenant } from '@/contexts/TenantContext';
 import { useToast } from '@/hooks/use-toast';
 
 interface WorkflowCreateModalProps {
-  onWorkflowCreated?: () => void;
+  onWorkflowCreated?: (workflowId: string) => void;
 }
 
 export function WorkflowCreateModal({ onWorkflowCreated }: WorkflowCreateModalProps) {
@@ -79,7 +79,7 @@ export function WorkflowCreateModal({ onWorkflowCreated }: WorkflowCreateModalPr
       });
 
       setOpen(false);
-      onWorkflowCreated?.();
+      onWorkflowCreated?.(data.id);
 
     } catch (error) {
       console.error('Error creating workflow:', error);
