@@ -21,33 +21,33 @@ const ChatMessages = ({ messages, isLoading }: ChatMessagesProps) => {
 
   // Function to render message text with clickable links
   const renderMessageWithLinks = (text: string) => {
-    // Enhanced pattern to catch malformed AI responses and proper markdown links
-    const linkPattern = /(\[CLICK TO GO TO [^\]]+\]\(([^)]+)\)|CLICK TO GO TO [A-Z]+|Link: (\/[^\s)]+))/g;
-    const parts = text.split(linkPattern);
+    // Single comprehensive pattern that handles all link formats
+    const linkPattern = /(\[CLICK TO GO TO [^\]]+\]\(([^)]+)\)|CLICK TO GO TO ([A-Z]+)|Go to (\/[^\s)]+))/g;
     
-    return parts.map((part, index) => {
+    return text.split(linkPattern).map((part, index) => {
+      if (!part) return '';
+      
       // Handle proper markdown-style links [text](/path)
-      if (part && part.match(/\[CLICK TO GO TO [^\]]+\]\(([^)]+)\)/)) {
-        const match = part.match(/\[([^\]]+)\]\(([^)]+)\)/);
-        if (match) {
-          const [, linkText, path] = match;
-          return (
-            <button
-              key={index}
-              onClick={() => navigate(path)}
-              className="text-blue-600 hover:text-blue-800 underline font-medium mx-1 cursor-pointer"
-            >
-              {linkText}
-            </button>
-          );
-        }
+      const markdownMatch = part.match(/^\[CLICK TO GO TO [^\]]+\]\(([^)]+)\)$/);
+      if (markdownMatch) {
+        const path = markdownMatch[1];
+        return (
+          <button
+            key={index}
+            onClick={() => navigate(path)}
+            className="text-blue-600 hover:text-blue-800 underline font-medium mx-1 cursor-pointer"
+          >
+            Go to {path === '/automations' ? 'Automations' : path === '/' ? 'Dashboard' : path}
+          </button>
+        );
       }
+      
       // Handle malformed AI responses like "CLICK TO GO TO AUTOMATIONS"
-      if (part && part.match(/^CLICK TO GO TO [A-Z]+$/)) {
-        const pageName = part.replace('CLICK TO GO TO ', '');
+      const simpleMatch = part.match(/^CLICK TO GO TO ([A-Z]+)$/);
+      if (simpleMatch) {
+        const pageName = simpleMatch[1];
         let path = '/';
         
-        // Map page names to correct paths
         switch (pageName) {
           case 'AUTOMATIONS':
             path = '/automations';
@@ -65,12 +65,13 @@ const ChatMessages = ({ messages, isLoading }: ChatMessagesProps) => {
             onClick={() => navigate(path)}
             className="text-blue-600 hover:text-blue-800 underline font-medium mx-1 cursor-pointer"
           >
-            {part}
+            Go to {pageName.charAt(0) + pageName.slice(1).toLowerCase()}
           </button>
         );
       }
-      // Handle "Link: /path" format
-      if (part && part.startsWith('/')) {
+      
+      // Handle direct path links like "/automations"
+      if (part.startsWith('/')) {
         return (
           <button
             key={index}
@@ -81,6 +82,7 @@ const ChatMessages = ({ messages, isLoading }: ChatMessagesProps) => {
           </button>
         );
       }
+      
       return part;
     });
   };
