@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Settings, MoreVertical, Copy, Trash2, Plus } from 'lucide-react';
+import { MoreVertical, Copy, Trash2, Plus, Share, FolderOpen, Archive, Edit } from 'lucide-react';
 import { useWorkflows } from '@/hooks/useWorkflows';
 import { useTenant } from '@/contexts/TenantContext';
 import { useToast } from '@/hooks/use-toast';
@@ -71,6 +71,10 @@ const Automations = () => {
     return `${diffInDays} days ago`;
   };
 
+  const handleCardClick = (workflow: WorkflowRecord) => {
+    navigate(`/automations/create/${workflow.id}`);
+  };
+
   return (
     <Layout>
       <div className="mb-8">
@@ -118,76 +122,71 @@ const Automations = () => {
       ) : (
         <div className="space-y-4">
           {workflows.map((workflow) => (
-            <Card key={workflow.id}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-                <div className="space-y-1 flex-1">
-                  <CardTitle className="text-lg font-semibold">
-                    {workflow.name}
-                  </CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    {workflow.description || 'No description provided'}
-                  </p>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Badge 
-                    variant={workflow.status === 'active' ? 'default' : 'secondary'}
-                  >
-                    {workflow.status || 'draft'}
-                  </Badge>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => setEditingWorkflow(workflow)}>
-                        <Settings className="h-4 w-4 mr-2" />
-                        Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Copy className="h-4 w-4 mr-2" />
-                        Duplicate
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => setDeletingWorkflow(workflow)}
-                        className="text-destructive focus:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-6">
-                    <div className="text-sm">
-                      <span className="text-muted-foreground">Executions:</span>
-                      <span className="ml-1 font-medium">{workflow.execution_count || 0}</span>
-                    </div>
-                    <div className="text-sm">
-                      <span className="text-muted-foreground">Last run:</span>
-                      <span className="ml-1 font-medium">{formatLastExecuted(workflow.last_executed)}</span>
+            <Card 
+              key={workflow.id} 
+              className="cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => handleCardClick(workflow)}
+            >
+              <div className="p-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg mb-1">{workflow.name}</h3>
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <span>Last updated just now</span>
+                      <span>|</span>
+                      <span>Created {new Date(workflow.created_at).toLocaleDateString()}</span>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => setEditingWorkflow(workflow)}
-                    >
-                      <Settings className="h-4 w-4 mr-2" />
-                      Configure
-                    </Button>
+                  <div className="flex items-center gap-2">
                     <WorkflowStatusToggle 
                       workflow={workflow}
                       onStatusChanged={refreshWorkflows}
                     />
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                        <Button variant="ghost" size="sm">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingWorkflow(workflow);
+                        }}>
+                          <Edit className="h-4 w-4 mr-2" />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+                          <Share className="h-4 w-4 mr-2" />
+                          Share...
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+                          <Copy className="h-4 w-4 mr-2" />
+                          Duplicate
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+                          <FolderOpen className="h-4 w-4 mr-2" />
+                          Move
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+                          <Archive className="h-4 w-4 mr-2" />
+                          Archive
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeletingWorkflow(workflow);
+                          }}
+                          className="text-destructive focus:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
-              </CardContent>
+              </div>
             </Card>
           ))}
         </div>
