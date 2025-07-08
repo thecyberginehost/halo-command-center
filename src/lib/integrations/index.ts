@@ -29,6 +29,7 @@ import { googleSheetsIntegration, googleCalendarIntegration, notionIntegration, 
 import { githubIntegration, jiraIntegration, trelloIntegration, asanaIntegration } from './developerIntegrations';
 import { googleAnalyticsIntegration, mixpanelIntegration, segmentIntegration } from './analyticsIntegrations';
 import { stripeIntegration, paypalIntegration } from './paymentIntegrations';
+import { routerIntegration, iteratorIntegration, aggregatorIntegration } from './flowControlIntegrations';
 
 export const allIntegrations: IntegrationNode[] = [
   // Triggers
@@ -72,12 +73,15 @@ export const allIntegrations: IntegrationNode[] = [
   
   // Payment
   stripeIntegration, paypalIntegration,
+  
+  // Flow Control
+  routerIntegration, iteratorIntegration, aggregatorIntegration,
 ];
 
 export const integrationsByCategory: Record<IntegrationCategory, IntegrationNode[]> = {
   communication: [gmailIntegration, sesIntegration, sendgridIntegration, slackIntegration],
   crm: [salesforceIntegration, hubspotIntegration, pipedriveIntegration],
-  webhook: [webhookTrigger, httpRequestAction, conditionIntegration, delayIntegration, loopIntegration, errorHandlerIntegration],
+  webhook: [webhookTrigger, httpRequestAction, conditionIntegration, delayIntegration, loopIntegration, errorHandlerIntegration, routerIntegration, iteratorIntegration, aggregatorIntegration],
   database: [postgresqlIntegration, mysqlIntegration, mongodbIntegration, redisIntegration, dataTransformIntegration, dataValidationIntegration, dataStorageIntegration, jsonProcessorIntegration, calculatorIntegration],
   file_storage: [googleDriveIntegration, awsS3Integration, dropboxIntegration],
   ai: [openaiAgentIntegration, claudeAgentIntegration, openaiLLMIntegration, claudeLLMIntegration, aiToolIntegration],

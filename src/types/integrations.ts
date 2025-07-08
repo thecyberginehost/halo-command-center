@@ -48,7 +48,7 @@ export interface IntegrationField {
 }
 
 export interface IntegrationNode extends BaseIntegration {
-  type: 'trigger' | 'action' | 'condition' | 'delay' | 'data_transform' | 'logic';
+  type: 'trigger' | 'action' | 'condition' | 'delay' | 'data_transform' | 'logic' | 'router' | 'iterator' | 'aggregator';
   fields: IntegrationField[];
   endpoints: IntegrationEndpoint[];
 }

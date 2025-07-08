@@ -14,7 +14,7 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { BaseWorkflowNode } from './BaseWorkflowNode';
-import { NodePalette } from './NodePalette';
+import { BottomNodeToolbar } from './BottomNodeToolbar';
 import { NodeConfigPanel } from './NodeConfigPanel';
 import { VisualWorkflowNode, VisualWorkflowEdge } from '@/types/visualWorkflow';
 import { IntegrationNode } from '@/types/integrations';
@@ -338,14 +338,9 @@ export function VisualWorkflowCanvas({
   }, [handleDuplicateNode, handleDeleteNode]);
 
   return (
-    <div className="flex h-full">
-      {/* Node Palette */}
-      <div className="w-80 border-r bg-background">
-        <NodePalette onAddNode={addNodeFromIntegration} />
-      </div>
-
-      {/* Main Canvas */}
-      <div className="flex-1 relative" ref={reactFlowWrapper}>
+    <div className="relative w-full h-full">
+      {/* Main Canvas - Fixed size to prevent resizing */}
+      <div className="absolute inset-0" ref={reactFlowWrapper}>
         {/* Action Buttons */}
         <div className="absolute top-4 right-4 z-10 flex space-x-2">
           <Button onClick={handleSaveWorkflow} size="sm" variant="outline">
@@ -370,7 +365,7 @@ export function VisualWorkflowCanvas({
           fitView
           fitViewOptions={{ padding: 0.2 }}
           defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
-          className="bg-background react-flow-canvas"
+          className="w-full h-full bg-background react-flow-canvas"
           connectionLineStyle={{ stroke: 'hsl(var(--primary))', strokeWidth: 2 }}
           defaultEdgeOptions={{
             style: { stroke: 'hsl(var(--primary))', strokeWidth: 2 },
@@ -401,16 +396,19 @@ export function VisualWorkflowCanvas({
                 Start building your workflow
               </h3>
               <p className="text-sm text-muted-foreground">
-                Drag nodes from the palette or click on them to add to your canvas
+                Use the toolbar below to add nodes to your canvas
               </p>
             </div>
           </div>
         )}
       </div>
 
-      {/* Configuration Panel */}
+      {/* Bottom Node Toolbar */}
+      <BottomNodeToolbar onAddNode={addNodeFromIntegration} />
+
+      {/* Configuration Panel - Right slide-out */}
       {selectedNode && (
-        <div className="w-96 border-l bg-background">
+        <div className="fixed top-0 right-0 h-full w-96 bg-background border-l shadow-lg z-40 animate-slide-in-right">
           <NodeConfigPanel
             node={selectedNode}
             onConfigChange={handleNodeConfigChange}
