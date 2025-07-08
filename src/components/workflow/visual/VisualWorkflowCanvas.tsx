@@ -340,7 +340,7 @@ export function VisualWorkflowCanvas({
   return (
     <div className="relative w-full h-full overflow-hidden">
       {/* Main Canvas - Ensure React Flow is visible */}
-      <div className="absolute inset-0 z-10" ref={reactFlowWrapper}>
+      <div className="absolute inset-0 z-10 w-full h-full" ref={reactFlowWrapper}>
         {/* Action Buttons */}
         <div className="absolute top-4 right-4 z-20 flex space-x-2">
           <Button onClick={handleSaveWorkflow} size="sm" variant="outline">
@@ -366,6 +366,7 @@ export function VisualWorkflowCanvas({
           fitViewOptions={{ padding: 0.2 }}
           defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
           className="w-full h-full bg-background react-flow-canvas"
+          style={{ width: '100%', height: '100%' }}
           connectionLineStyle={{ stroke: 'hsl(var(--primary))', strokeWidth: 2 }}
           defaultEdgeOptions={{
             style: { stroke: 'hsl(var(--primary))', strokeWidth: 2 },

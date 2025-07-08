@@ -220,21 +220,21 @@ export function BottomNodeToolbar({ onAddNode }: BottomNodeToolbarProps) {
                   <PopoverContent 
                     side="top" 
                     align="start" 
-                    className="w-80 p-0 mb-2"
-                    sideOffset={12}
-                  >
-                    <div className="p-3 border-b">
-                      <h4 className="font-semibold text-sm flex items-center gap-2">
-                        <Icon className="h-4 w-4" style={{ color: group.color }} />
-                        {group.label}
-                      </h4>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {integrations.length} of {totalIntegrations.length} integration{totalIntegrations.length !== 1 ? 's' : ''}
-                        {searchTerm && integrations.length !== totalIntegrations.length && ' (filtered)'}
-                      </p>
-                    </div>
-                    <ScrollArea className="max-h-72">
-                      <div className="p-2 space-y-1">
+                     className="w-80 p-0 mb-2"
+                     sideOffset={12}
+                   >
+                     <div className="p-3 border-b">
+                       <h4 className="font-semibold text-sm flex items-center gap-2">
+                         <Icon className="h-4 w-4" style={{ color: group.color }} />
+                         {group.label}
+                       </h4>
+                       <p className="text-xs text-muted-foreground mt-1">
+                         {integrations.length} of {totalIntegrations.length} integration{totalIntegrations.length !== 1 ? 's' : ''}
+                         {searchTerm && integrations.length !== totalIntegrations.length && ' (filtered)'}
+                       </p>
+                     </div>
+                     <ScrollArea className="max-h-64 overflow-y-auto">
+                       <div className="p-2 space-y-1">
                         {integrations.length > 0 ? (
                           integrations.map((integration) => (
                             <NodeItem key={integration.id} integration={integration} />
