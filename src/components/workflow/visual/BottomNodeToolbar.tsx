@@ -180,16 +180,16 @@ export function BottomNodeToolbar({ onAddNode }: BottomNodeToolbarProps) {
   const hasSearchResults = searchTerm && globalSearchResults.length > 0;
 
   return (
-    <Card className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 bg-background/95 backdrop-blur-sm border shadow-lg max-w-4xl">
-      <div className="flex items-center gap-2 p-2">
+    <Card className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 bg-background/95 backdrop-blur-sm border shadow-lg max-w-3xl mx-4">
+      <div className="flex items-center gap-1.5 p-2 overflow-hidden">
         {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+        <div className="relative flex-shrink-0">
+          <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
           <Input
-            placeholder="Search nodes..."
+            placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-8 w-48 h-8 text-sm"
+            className="pl-7 w-36 h-7 text-xs"
           />
           
           {/* Global Search Results Dropdown */}
@@ -215,8 +215,8 @@ export function BottomNodeToolbar({ onAddNode }: BottomNodeToolbarProps) {
           )}
         </div>
 
-        {/* Node Type Buttons - More compact */}
-        <div className="flex items-center gap-1">
+        {/* Node Type Buttons - Ultra compact with horizontal scroll */}
+        <div className="flex items-center gap-1 overflow-x-auto max-w-full">
           {nodeTypeGroups.map((group) => {
             const integrations = getFilteredIntegrationsForGroup(group);
             const totalIntegrations = getIntegrationsForGroup(group);
@@ -234,7 +234,7 @@ export function BottomNodeToolbar({ onAddNode }: BottomNodeToolbarProps) {
                   <Button
                     variant="outline"
                     size="sm"
-                    className={`flex items-center gap-1.5 h-8 px-2.5 text-xs ${
+                    className={`flex items-center gap-1 h-7 px-2 text-xs flex-shrink-0 ${
                       openPopover === group.id ? 'bg-primary/10 border-primary/20' : ''
                     }`}
                     style={{ 
@@ -242,11 +242,11 @@ export function BottomNodeToolbar({ onAddNode }: BottomNodeToolbarProps) {
                     }}
                   >
                     <Icon 
-                      className="h-3.5 w-3.5" 
+                      className="h-3 w-3" 
                       style={{ color: group.color }}
                     />
-                    <span className="font-medium">{group.label}</span>
-                    <Plus className="h-3 w-3 opacity-60" />
+                    <span className="font-medium text-xs hidden sm:inline">{group.label}</span>
+                    <Plus className="h-2.5 w-2.5 opacity-60" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent 
