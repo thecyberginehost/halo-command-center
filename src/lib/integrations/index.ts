@@ -44,9 +44,52 @@ import {
   calculatorIntegration 
 } from './dataIntegrations';
 import { scheduleTrigger, emailTrigger, formTrigger, fileUploadTrigger } from './triggerIntegrations';
-import { postgresqlIntegration, mysqlIntegration, mongodbIntegration, redisIntegration } from './databaseIntegrations';
-import { googleDriveIntegration, awsS3Integration, dropboxIntegration } from './fileStorageIntegrations';
-import { googleSheetsIntegration, googleCalendarIntegration, notionIntegration, airtableIntegration } from './productivityIntegrations';
+import { 
+  postgresqlCreateRecord, 
+  postgresqlReadRecords, 
+  postgresqlUpdateRecord, 
+  postgresqlDeleteRecord, 
+  postgresqlExecuteQuery,
+  mysqlCreateRecord, 
+  mysqlReadRecords, 
+  mysqlUpdateRecord, 
+  mysqlDeleteRecord, 
+  mysqlExecuteQuery,
+  mongodbCreateDocument, 
+  mongodbFindDocuments, 
+  mongodbUpdateDocument, 
+  mongodbDeleteDocument,
+  redisIntegration 
+} from './databaseIntegrations';
+import { 
+  googleDriveUploadFile, 
+  googleDriveDownloadFile, 
+  googleDriveListFiles, 
+  googleDriveDeleteFile, 
+  googleDriveCreateFolder, 
+  googleDriveShareFile,
+  awsS3UploadObject, 
+  awsS3DownloadObject, 
+  awsS3ListObjects, 
+  awsS3DeleteObject, 
+  awsS3GeneratePresignedUrl,
+  dropboxIntegration 
+} from './fileStorageIntegrations';
+import { 
+  googleSheetsReadRow, 
+  googleSheetsWriteRow, 
+  googleSheetsAppendRow, 
+  googleSheetsCreateSheet, 
+  googleSheetsClearRange,
+  googleCalendarIntegration, 
+  notionCreatePage, 
+  notionUpdatePage, 
+  notionCreateDatabaseEntry, 
+  notionQueryDatabase,
+  airtableCreateRecord, 
+  airtableGetRecords, 
+  airtableUpdateRecord 
+} from './productivityIntegrations';
 import { githubIntegration, jiraIntegration, trelloIntegration, asanaIntegration } from './developerIntegrations';
 import { googleAnalyticsIntegration, mixpanelIntegration, segmentIntegration } from './analyticsIntegrations';
 import { stripeIntegration, paypalIntegration } from './paymentIntegrations';
@@ -80,13 +123,18 @@ export const allIntegrations: IntegrationNode[] = [
   dataTransformIntegration, dataValidationIntegration, dataStorageIntegration, jsonProcessorIntegration, calculatorIntegration,
   
   // Database Integrations
-  postgresqlIntegration, mysqlIntegration, mongodbIntegration, redisIntegration,
+  postgresqlCreateRecord, postgresqlReadRecords, postgresqlUpdateRecord, postgresqlDeleteRecord, postgresqlExecuteQuery,
+  mysqlCreateRecord, mysqlReadRecords, mysqlUpdateRecord, mysqlDeleteRecord, mysqlExecuteQuery,
+  mongodbCreateDocument, mongodbFindDocuments, mongodbUpdateDocument, mongodbDeleteDocument, redisIntegration,
   
   // File Storage
-  googleDriveIntegration, awsS3Integration, dropboxIntegration,
+  googleDriveUploadFile, googleDriveDownloadFile, googleDriveListFiles, googleDriveDeleteFile, googleDriveCreateFolder, googleDriveShareFile,
+  awsS3UploadObject, awsS3DownloadObject, awsS3ListObjects, awsS3DeleteObject, awsS3GeneratePresignedUrl, dropboxIntegration,
   
   // Productivity Tools
-  googleSheetsIntegration, googleCalendarIntegration, notionIntegration, airtableIntegration,
+  googleSheetsReadRow, googleSheetsWriteRow, googleSheetsAppendRow, googleSheetsCreateSheet, googleSheetsClearRange,
+  googleCalendarIntegration, notionCreatePage, notionUpdatePage, notionCreateDatabaseEntry, notionQueryDatabase,
+  airtableCreateRecord, airtableGetRecords, airtableUpdateRecord,
   
   // Developer Tools
   githubIntegration, jiraIntegration, trelloIntegration, asanaIntegration,
@@ -105,12 +153,24 @@ export const integrationsByCategory: Record<IntegrationCategory, IntegrationNode
   communication: [gmailSendEmail, gmailSearchEmails, gmailDeleteEmail, gmailArchiveEmail, gmailReplyEmail, sesIntegration, sendgridIntegration, slackIntegration],
   crm: [salesforceCreateLead, salesforceCreateContact, salesforceUpdateContact, salesforceSearchContacts, salesforceCreateOpportunity, hubspotCreateContact, hubspotUpdateContact, hubspotCreateDeal, pipedriveCreatePerson, pipedriveCreateDeal, pipedriveUpdateDeal],
   webhook: [webhookTrigger, httpRequestAction, conditionIntegration, delayIntegration, loopIntegration, errorHandlerIntegration, routerIntegration, iteratorIntegration, aggregatorIntegration],
-  database: [postgresqlIntegration, mysqlIntegration, mongodbIntegration, redisIntegration, dataTransformIntegration, dataValidationIntegration, dataStorageIntegration, jsonProcessorIntegration, calculatorIntegration],
-  file_storage: [googleDriveIntegration, awsS3Integration, dropboxIntegration],
+  database: [
+    postgresqlCreateRecord, postgresqlReadRecords, postgresqlUpdateRecord, postgresqlDeleteRecord, postgresqlExecuteQuery,
+    mysqlCreateRecord, mysqlReadRecords, mysqlUpdateRecord, mysqlDeleteRecord, mysqlExecuteQuery,
+    mongodbCreateDocument, mongodbFindDocuments, mongodbUpdateDocument, mongodbDeleteDocument, redisIntegration,
+    dataTransformIntegration, dataValidationIntegration, dataStorageIntegration, jsonProcessorIntegration, calculatorIntegration
+  ],
+  file_storage: [
+    googleDriveUploadFile, googleDriveDownloadFile, googleDriveListFiles, googleDriveDeleteFile, googleDriveCreateFolder, googleDriveShareFile,
+    awsS3UploadObject, awsS3DownloadObject, awsS3ListObjects, awsS3DeleteObject, awsS3GeneratePresignedUrl, dropboxIntegration
+  ],
   ai: [openaiAgentIntegration, claudeAgentIntegration, openaiLLMIntegration, claudeLLMIntegration, aiToolIntegration],
   analytics: [googleAnalyticsIntegration, mixpanelIntegration, segmentIntegration],
   payment: [stripeIntegration, paypalIntegration],
-  productivity: [googleSheetsIntegration, googleCalendarIntegration, notionIntegration, airtableIntegration],
+  productivity: [
+    googleSheetsReadRow, googleSheetsWriteRow, googleSheetsAppendRow, googleSheetsCreateSheet, googleSheetsClearRange,
+    googleCalendarIntegration, notionCreatePage, notionUpdatePage, notionCreateDatabaseEntry, notionQueryDatabase,
+    airtableCreateRecord, airtableGetRecords, airtableUpdateRecord
+  ],
   developer_tools: [githubIntegration, jiraIntegration, trelloIntegration, asanaIntegration],
   triggers: [scheduleTrigger, emailTrigger, formTrigger, fileUploadTrigger, gmailNewEmailTrigger]
 };
