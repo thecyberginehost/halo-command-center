@@ -8,17 +8,24 @@ import { Bug, Play, BookOpen, Code, Lightbulb, Copy } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { getTemplateList, getTemplate } from '@/lib/workflow/templates';
 import { useState } from 'react';
+import { VisualModeCanvas } from './VisualModeCanvas';
 
 interface DeveloperModeEditorProps {
   scriptCode: string;
   setScriptCode: (code: string) => void;
   setChatMessages: React.Dispatch<React.SetStateAction<Array<{role: string; content: string}>>>;
+  onWorkflowChange?: (nodes: any[], edges: any[]) => void;
+  workflowNodes?: any[];
+  workflowEdges?: any[];
 }
 
 export function DeveloperModeEditor({ 
   scriptCode, 
   setScriptCode, 
-  setChatMessages 
+  setChatMessages,
+  onWorkflowChange,
+  workflowNodes = [],
+  workflowEdges = []
 }: DeveloperModeEditorProps) {
   const { toast } = useToast();
   const [selectedTemplate, setSelectedTemplate] = useState('');
@@ -34,10 +41,102 @@ export function DeveloperModeEditor({
 
   const handleRunScript = () => {
     console.log('Running script:', scriptCode);
+    
+    // Parse script and generate visual nodes
+    const generatedNodes = parseScriptToNodes(scriptCode);
+    const generatedEdges = generateEdgesFromNodes(generatedNodes);
+    
+    if (onWorkflowChange) {
+      onWorkflowChange(generatedNodes, generatedEdges);
+    }
+    
     toast({
-      title: "Script Execution",
-      description: "Script is running in test mode...",
+      title: "Script Tested",
+      description: `Generated ${generatedNodes.length} nodes from your code!`,
     });
+  };
+
+  const parseScriptToNodes = (code: string) => {
+    const nodes = [];
+    let nodeIndex = 0;
+    
+    // Simple parsing for common automation patterns
+    if (code.includes('sendEmail')) {
+      nodes.push({
+        id: `email-${nodeIndex++}`,
+        type: 'integrationNode',
+        position: { x: 100, y: 100 + (nodeIndex * 120) },
+        data: {
+          integration: {
+            id: 'email',
+            name: 'Send Email',
+            type: 'action',
+            color: '#3B82F6',
+            icon: () => null
+          },
+          config: {},
+          label: 'Send Email',
+          isConfigured: true,
+        }
+      });
+    }
+    
+    if (code.includes('makeHttpRequest') || code.includes('fetch')) {
+      nodes.push({
+        id: `http-${nodeIndex++}`,
+        type: 'integrationNode',
+        position: { x: 100, y: 100 + (nodeIndex * 120) },
+        data: {
+          integration: {
+            id: 'http',
+            name: 'HTTP Request',
+            type: 'action',
+            color: '#10B981',
+            icon: () => null
+          },
+          config: {},
+          label: 'HTTP Request',
+          isConfigured: true,
+        }
+      });
+    }
+    
+    if (code.includes('addToCRM')) {
+      nodes.push({
+        id: `crm-${nodeIndex++}`,
+        type: 'integrationNode',
+        position: { x: 100, y: 100 + (nodeIndex * 120) },
+        data: {
+          integration: {
+            id: 'crm',
+            name: 'Add to CRM',
+            type: 'action',
+            color: '#8B5CF6',
+            icon: () => null
+          },
+          config: {},
+          label: 'Add to CRM',
+          isConfigured: true,
+        }
+      });
+    }
+    
+    return nodes;
+  };
+
+  const generateEdgesFromNodes = (nodes: any[]) => {
+    const edges = [];
+    for (let i = 0; i < nodes.length - 1; i++) {
+      edges.push({
+        id: `edge-${i}`,
+        source: nodes[i].id,
+        target: nodes[i + 1].id,
+        type: 'smoothstep',
+        animated: true,
+        style: { stroke: 'hsl(var(--primary))', strokeWidth: 2 },
+      });
+    }
+    return edges;
   };
 
   const handleLoadTemplate = () => {
@@ -62,20 +161,22 @@ export function DeveloperModeEditor({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Developer Mode</h3>
-        <div className="flex space-x-2">
-          <Button variant="outline" onClick={handleDebugCode}>
-            <Bug className="h-4 w-4 mr-2" />
-            Debug Code
-          </Button>
-          <Button onClick={handleRunScript}>
-            <Play className="h-4 w-4 mr-2" />
-            Test Run
-          </Button>
+    <div className="h-full flex">
+      {/* Left side - Code Editor */}
+      <div className="w-1/2 p-4 border-r space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold">Code Editor</h3>
+          <div className="flex space-x-2">
+            <Button variant="outline" onClick={handleDebugCode}>
+              <Bug className="h-4 w-4 mr-2" />
+              Debug Code
+            </Button>
+            <Button onClick={handleRunScript}>
+              <Play className="h-4 w-4 mr-2" />
+              Test & Visualize
+            </Button>
+          </div>
         </div>
-      </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-4">
@@ -335,6 +436,40 @@ async function executeWorkflow({ input, context }) {
         <p>• Access input data via <code>input</code> parameter and context via <code>context</code></p>
         <p>• Return an object with <code>success</code>, <code>message</code>, and <code>data</code> properties</p>
         <p>• Use built-in functions like <code>sendEmail()</code>, <code>addToCRM()</code>, <code>makeHttpRequest()</code></p>
+      </div>
+      </div>
+
+      {/* Right side - Visual Workflow */}
+      <div className="w-1/2 p-4">
+        <div className="h-full flex flex-col">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">Visual Preview</h3>
+            <div className="text-sm text-muted-foreground">
+              {workflowNodes.length} nodes • {workflowEdges.length} connections
+            </div>
+          </div>
+          
+          <div className="flex-1 border rounded-lg bg-muted/20 relative overflow-hidden">
+            {workflowNodes.length > 0 ? (
+              <div className="absolute inset-0">
+                <VisualModeCanvas
+                  onAddStepClick={() => {}}
+                  onWorkflowChange={onWorkflowChange}
+                  initialNodes={workflowNodes}
+                  initialEdges={workflowEdges}
+                />
+              </div>
+            ) : (
+              <div className="h-full flex items-center justify-center text-muted-foreground">
+                <div className="text-center space-y-2">
+                  <Code className="h-8 w-8 mx-auto opacity-50" />
+                  <p className="text-sm">Write code and test to see visual nodes</p>
+                  <p className="text-xs">Functions like sendEmail(), makeHttpRequest() will create nodes</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

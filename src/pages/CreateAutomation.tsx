@@ -273,6 +273,9 @@ async function executeAutomation(input) {
                 scriptCode={scriptCode}
                 setScriptCode={setScriptCode}
                 setChatMessages={setChatMessages}
+                onWorkflowChange={handleWorkflowChange}
+                workflowNodes={workflowNodes}
+                workflowEdges={workflowEdges}
               />
             ) : (
               <VisualModeCanvas
