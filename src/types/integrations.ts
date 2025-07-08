@@ -72,7 +72,7 @@ export interface IntegrationEndpoint {
   id: string;
   name: string;
   description: string;
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
   path: string;
   parameters: Record<string, ConfigField>;
   responseSchema?: Record<string, any>;

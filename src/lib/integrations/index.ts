@@ -76,7 +76,26 @@ import {
   awsS3GeneratePresignedUrl,
   dropboxIntegration 
 } from './fileStorageIntegrations';
-import { googleSheetsIntegration, googleCalendarIntegration, notionIntegration, airtableIntegration } from './productivityIntegrations';
+import { 
+  googleSheetsReadRow, 
+  googleSheetsWriteRow, 
+  googleSheetsAppendRow, 
+  googleSheetsCreateSheet, 
+  googleSheetsClearRange,
+  googleCalendarCreateEvent, 
+  googleCalendarListEvents,
+  notionCreatePage, 
+  notionUpdatePage, 
+  notionCreateDatabaseEntry, 
+  notionQueryDatabase,
+  airtableCreateRecord, 
+  airtableGetRecords, 
+  airtableUpdateRecord,
+  googleSheetsIntegration, 
+  googleCalendarIntegration, 
+  notionIntegration, 
+  airtableIntegration 
+} from './productivityIntegrations';
 import { githubIntegration, jiraIntegration, trelloIntegration, asanaIntegration } from './developerIntegrations';
 import { googleAnalyticsIntegration, mixpanelIntegration, segmentIntegration } from './analyticsIntegrations';
 import { stripeIntegration, paypalIntegration } from './paymentIntegrations';
@@ -119,7 +138,10 @@ export const allIntegrations: IntegrationNode[] = [
   awsS3UploadObject, awsS3DownloadObject, awsS3ListObjects, awsS3DeleteObject, awsS3GeneratePresignedUrl, dropboxIntegration,
   
   // Productivity Tools
-  googleSheetsIntegration, googleCalendarIntegration, notionIntegration, airtableIntegration,
+  googleSheetsReadRow, googleSheetsWriteRow, googleSheetsAppendRow, googleSheetsCreateSheet, googleSheetsClearRange,
+  googleCalendarCreateEvent, googleCalendarListEvents,
+  notionCreatePage, notionUpdatePage, notionCreateDatabaseEntry, notionQueryDatabase,
+  airtableCreateRecord, airtableGetRecords, airtableUpdateRecord,
   
   // Developer Tools
   githubIntegration, jiraIntegration, trelloIntegration, asanaIntegration,
@@ -151,7 +173,12 @@ export const integrationsByCategory: Record<IntegrationCategory, IntegrationNode
   ai: [openaiAgentIntegration, claudeAgentIntegration, openaiLLMIntegration, claudeLLMIntegration, aiToolIntegration],
   analytics: [googleAnalyticsIntegration, mixpanelIntegration, segmentIntegration],
   payment: [stripeIntegration, paypalIntegration],
-  productivity: [googleSheetsIntegration, googleCalendarIntegration, notionIntegration, airtableIntegration],
+  productivity: [
+    googleSheetsReadRow, googleSheetsWriteRow, googleSheetsAppendRow, googleSheetsCreateSheet, googleSheetsClearRange,
+    googleCalendarCreateEvent, googleCalendarListEvents,
+    notionCreatePage, notionUpdatePage, notionCreateDatabaseEntry, notionQueryDatabase,
+    airtableCreateRecord, airtableGetRecords, airtableUpdateRecord
+  ],
   developer_tools: [githubIntegration, jiraIntegration, trelloIntegration, asanaIntegration],
   triggers: [scheduleTrigger, emailTrigger, formTrigger, fileUploadTrigger, gmailNewEmailTrigger]
 };
