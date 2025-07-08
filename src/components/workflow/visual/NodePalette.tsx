@@ -21,6 +21,9 @@ const categoryIcons: Record<IntegrationCategory, any> = {
   ai: Brain,
   analytics: BarChart,
   payment: CreditCard,
+  productivity: FileText,
+  developer_tools: Code,
+  triggers: Zap,
 };
 
 const categoryLabels: Record<IntegrationCategory, string> = {

@@ -22,20 +22,23 @@ import {
   jsonProcessorIntegration, 
   calculatorIntegration 
 } from './dataIntegrations';
+import { scheduleTrigger, emailTrigger, formTrigger, fileUploadTrigger } from './triggerIntegrations';
+import { postgresqlIntegration, mysqlIntegration, mongodbIntegration, redisIntegration } from './databaseIntegrations';
+import { googleDriveIntegration, awsS3Integration, dropboxIntegration } from './fileStorageIntegrations';
+import { googleSheetsIntegration, googleCalendarIntegration, notionIntegration, airtableIntegration } from './productivityIntegrations';
+import { githubIntegration, jiraIntegration, trelloIntegration, asanaIntegration } from './developerIntegrations';
+import { googleAnalyticsIntegration, mixpanelIntegration, segmentIntegration } from './analyticsIntegrations';
+import { stripeIntegration, paypalIntegration } from './paymentIntegrations';
 
 export const allIntegrations: IntegrationNode[] = [
   // Triggers
-  webhookTrigger,
+  webhookTrigger, scheduleTrigger, emailTrigger, formTrigger, fileUploadTrigger,
   
   // Email Actions
-  gmailIntegration,
-  sesIntegration,
-  sendgridIntegration,
+  gmailIntegration, sesIntegration, sendgridIntegration,
   
   // CRM Actions
-  salesforceIntegration,
-  hubspotIntegration,
-  pipedriveIntegration,
+  salesforceIntegration, hubspotIntegration, pipedriveIntegration,
   
   // Communication Actions
   slackIntegration,
@@ -44,35 +47,45 @@ export const allIntegrations: IntegrationNode[] = [
   httpRequestAction,
   
   // AI Actions
-  openaiAgentIntegration,
-  claudeAgentIntegration,
-  openaiLLMIntegration,
-  claudeLLMIntegration,
-  aiToolIntegration,
+  openaiAgentIntegration, claudeAgentIntegration, openaiLLMIntegration, claudeLLMIntegration, aiToolIntegration,
   
   // Logic Steps
-  conditionIntegration,
-  delayIntegration,
-  loopIntegration,
-  errorHandlerIntegration,
+  conditionIntegration, delayIntegration, loopIntegration, errorHandlerIntegration,
   
   // Data Processing Steps
-  dataTransformIntegration,
-  dataValidationIntegration,
-  dataStorageIntegration,
-  jsonProcessorIntegration,
-  calculatorIntegration,
+  dataTransformIntegration, dataValidationIntegration, dataStorageIntegration, jsonProcessorIntegration, calculatorIntegration,
+  
+  // Database Integrations
+  postgresqlIntegration, mysqlIntegration, mongodbIntegration, redisIntegration,
+  
+  // File Storage
+  googleDriveIntegration, awsS3Integration, dropboxIntegration,
+  
+  // Productivity Tools
+  googleSheetsIntegration, googleCalendarIntegration, notionIntegration, airtableIntegration,
+  
+  // Developer Tools
+  githubIntegration, jiraIntegration, trelloIntegration, asanaIntegration,
+  
+  // Analytics
+  googleAnalyticsIntegration, mixpanelIntegration, segmentIntegration,
+  
+  // Payment
+  stripeIntegration, paypalIntegration,
 ];
 
 export const integrationsByCategory: Record<IntegrationCategory, IntegrationNode[]> = {
   communication: [gmailIntegration, sesIntegration, sendgridIntegration, slackIntegration],
   crm: [salesforceIntegration, hubspotIntegration, pipedriveIntegration],
   webhook: [webhookTrigger, httpRequestAction, conditionIntegration, delayIntegration, loopIntegration, errorHandlerIntegration],
-  database: [dataTransformIntegration, dataValidationIntegration, dataStorageIntegration, jsonProcessorIntegration, calculatorIntegration],
-  file_storage: [],
+  database: [postgresqlIntegration, mysqlIntegration, mongodbIntegration, redisIntegration, dataTransformIntegration, dataValidationIntegration, dataStorageIntegration, jsonProcessorIntegration, calculatorIntegration],
+  file_storage: [googleDriveIntegration, awsS3Integration, dropboxIntegration],
   ai: [openaiAgentIntegration, claudeAgentIntegration, openaiLLMIntegration, claudeLLMIntegration, aiToolIntegration],
-  analytics: [],
-  payment: []
+  analytics: [googleAnalyticsIntegration, mixpanelIntegration, segmentIntegration],
+  payment: [stripeIntegration, paypalIntegration],
+  productivity: [googleSheetsIntegration, googleCalendarIntegration, notionIntegration, airtableIntegration],
+  developer_tools: [githubIntegration, jiraIntegration, trelloIntegration, asanaIntegration],
+  triggers: [scheduleTrigger, emailTrigger, formTrigger, fileUploadTrigger]
 };
 
 export const getIntegrationById = (id: string): IntegrationNode | undefined => {

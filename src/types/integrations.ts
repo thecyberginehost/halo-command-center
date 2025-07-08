@@ -31,7 +31,10 @@ export type IntegrationCategory =
   | 'webhook'
   | 'ai'
   | 'analytics'
-  | 'payment';
+  | 'payment'
+  | 'productivity'
+  | 'developer_tools'
+  | 'triggers';
 
 export interface IntegrationField {
   name: string;
