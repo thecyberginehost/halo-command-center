@@ -9,6 +9,19 @@ import {
   claudeLLMIntegration,
   aiToolIntegration 
 } from './aiIntegrations';
+import { 
+  conditionIntegration, 
+  delayIntegration, 
+  loopIntegration, 
+  errorHandlerIntegration 
+} from './logicIntegrations';
+import { 
+  dataTransformIntegration, 
+  dataValidationIntegration, 
+  dataStorageIntegration, 
+  jsonProcessorIntegration, 
+  calculatorIntegration 
+} from './dataIntegrations';
 
 export const allIntegrations: IntegrationNode[] = [
   // Triggers
@@ -36,13 +49,26 @@ export const allIntegrations: IntegrationNode[] = [
   openaiLLMIntegration,
   claudeLLMIntegration,
   aiToolIntegration,
+  
+  // Logic Steps
+  conditionIntegration,
+  delayIntegration,
+  loopIntegration,
+  errorHandlerIntegration,
+  
+  // Data Processing Steps
+  dataTransformIntegration,
+  dataValidationIntegration,
+  dataStorageIntegration,
+  jsonProcessorIntegration,
+  calculatorIntegration,
 ];
 
 export const integrationsByCategory: Record<IntegrationCategory, IntegrationNode[]> = {
   communication: [gmailIntegration, sesIntegration, sendgridIntegration, slackIntegration],
   crm: [salesforceIntegration, hubspotIntegration, pipedriveIntegration],
-  webhook: [webhookTrigger, httpRequestAction],
-  database: [],
+  webhook: [webhookTrigger, httpRequestAction, conditionIntegration, delayIntegration, loopIntegration, errorHandlerIntegration],
+  database: [dataTransformIntegration, dataValidationIntegration, dataStorageIntegration, jsonProcessorIntegration, calculatorIntegration],
   file_storage: [],
   ai: [openaiAgentIntegration, claudeAgentIntegration, openaiLLMIntegration, claudeLLMIntegration, aiToolIntegration],
   analytics: [],
@@ -53,7 +79,7 @@ export const getIntegrationById = (id: string): IntegrationNode | undefined => {
   return allIntegrations.find(integration => integration.id === id);
 };
 
-export const getIntegrationsByType = (type: 'trigger' | 'action'): IntegrationNode[] => {
+export const getIntegrationsByType = (type: 'trigger' | 'action' | 'condition' | 'delay' | 'data_transform' | 'logic'): IntegrationNode[] => {
   return allIntegrations.filter(integration => integration.type === type);
 };
 
@@ -69,3 +95,5 @@ export * from './emailIntegrations';
 export * from './crmIntegrations';
 export * from './webhookIntegrations';
 export * from './aiIntegrations';
+export * from './logicIntegrations';
+export * from './dataIntegrations';

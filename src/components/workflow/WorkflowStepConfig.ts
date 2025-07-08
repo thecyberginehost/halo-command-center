@@ -3,7 +3,9 @@ import {
   Play, 
   GitBranch, 
   Clock, 
-  Settings
+  Settings,
+  Database,
+  RepeatIcon
 } from 'lucide-react';
 
 export const stepIcons = {
@@ -11,7 +13,9 @@ export const stepIcons = {
   action: Play,
   condition: GitBranch,
   delay: Clock,
-  utility: Settings
+  utility: Settings,
+  logic: RepeatIcon,
+  data_transform: Database
 };
 
 export const stepColors = {
@@ -19,5 +23,7 @@ export const stepColors = {
   action: 'bg-halo-primary', 
   condition: 'bg-halo-secondary',
   delay: 'bg-gray-500',
-  utility: 'bg-purple-500'
+  utility: 'bg-purple-500',
+  logic: 'bg-violet-500',
+  data_transform: 'bg-blue-500'
 };

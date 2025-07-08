@@ -1,6 +1,6 @@
 export interface WorkflowStep {
   id: string;
-  type: 'trigger' | 'action' | 'condition' | 'delay' | 'utility';
+  type: 'trigger' | 'action' | 'condition' | 'delay' | 'utility' | 'logic' | 'data_transform';
   title: string;
   description: string;
   config: Record<string, any>;
