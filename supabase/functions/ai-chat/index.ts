@@ -322,18 +322,23 @@ REQUEST TYPE: ${requestType}`;
         'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
       },
-        body: JSON.stringify({
-          model: 'o3-2025-04-16',
-          messages: messages,
-          temperature: 0.7,
-          max_tokens: 1000,
-          presence_penalty: 0.1,
-          frequency_penalty: 0.1,
-        }),
+      body: JSON.stringify({
+        model: 'o3-2025-04-16',
+        messages: messages,
+        temperature: 0.7,
+        max_tokens: 1000,
+        presence_penalty: 0.1,
+        frequency_penalty: 0.1,
+      }),
     });
 
+    console.log('OpenAI response status:', response.status);
+    console.log('OpenAI response headers:', Object.fromEntries(response.headers.entries()));
+
     if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.statusText}`);
+      const errorText = await response.text();
+      console.error('OpenAI API Error:', response.status, errorText);
+      throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
