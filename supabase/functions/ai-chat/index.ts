@@ -319,14 +319,14 @@ REQUEST TYPE: ${requestType}`;
         'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: messages,
-        temperature: 0.7,
-        max_tokens: 500,
-        presence_penalty: 0.1,
-        frequency_penalty: 0.1,
-      }),
+        body: JSON.stringify({
+          model: 'o3-2025-04-16',
+          messages: messages,
+          temperature: 0.7,
+          max_tokens: 1000,
+          presence_penalty: 0.1,
+          frequency_penalty: 0.1,
+        }),
     });
 
     if (!response.ok) {
