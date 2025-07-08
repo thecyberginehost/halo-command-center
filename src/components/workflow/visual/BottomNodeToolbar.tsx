@@ -234,20 +234,20 @@ export function BottomNodeToolbar({ onAddNode }: BottomNodeToolbarProps) {
                        </p>
                      </div>
                      <ScrollArea className="max-h-64 overflow-y-auto">
-                       <div className="p-2 space-y-1">
-                        {integrations.length > 0 ? (
-                          integrations.map((integration) => (
-                            <NodeItem key={integration.id} integration={integration} />
-                          ))
-                        ) : (
-                          <div className="text-center py-6 text-muted-foreground">
-                            <Search className="h-8 w-8 mx-auto mb-2 opacity-40" />
-                            <p className="text-sm font-medium">No integrations found</p>
-                            <p className="text-xs">Try a different search term</p>
-                          </div>
-                        )}
-                      </div>
-                    </ScrollArea>
+                       <div className="p-2 space-y-1 max-h-60">
+                         {integrations.length > 0 ? (
+                           integrations.map((integration) => (
+                             <NodeItem key={integration.id} integration={integration} />
+                           ))
+                         ) : (
+                           <div className="text-center py-6 text-muted-foreground">
+                             <Search className="h-8 w-8 mx-auto mb-2 opacity-40" />
+                             <p className="text-sm font-medium">No integrations found</p>
+                             <p className="text-xs">Try a different search term</p>
+                           </div>
+                         )}
+                       </div>
+                     </ScrollArea>
                   </PopoverContent>
                 </Popover>
               );

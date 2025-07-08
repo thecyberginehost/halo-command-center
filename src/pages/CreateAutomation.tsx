@@ -156,7 +156,7 @@ async function executeAutomation(input) {
   return (
     <div className="flex min-h-screen w-full">
       <AppSidebar />
-      <SidebarInset className="flex-1">
+      <SidebarInset className="flex-1 flex flex-col">
         <AutomationHeader
           workflow={workflow}
           workflowName={workflowName}
@@ -164,10 +164,11 @@ async function executeAutomation(input) {
           isDeveloperMode={isDeveloperMode}
           setIsDeveloperMode={setIsDeveloperMode}
           onExport={handleExport}
+          onSave={handleSaveWorkflow}
         />
 
-        <div className={`flex-1 transition-all duration-300 ${isChatOpen ? 'mr-96' : ''}`}>
-          <div className="p-8 relative">
+        <div className={`flex-1 transition-all duration-300 ${isChatOpen ? 'mr-96' : ''} flex flex-col`}>
+          <div className="flex-1 relative">
             {isDeveloperMode ? (
               <DeveloperModeEditor
                 scriptCode={scriptCode}

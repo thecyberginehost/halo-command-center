@@ -6,5 +6,9 @@ interface VisualModeCanvasProps {
 }
 
 export function VisualModeCanvas({ onAddStepClick, onSaveWorkflow }: VisualModeCanvasProps) {
-  return <VisualWorkflowCanvas onSaveWorkflow={onSaveWorkflow} />;
+  return (
+    <div className="w-full h-full">
+      <VisualWorkflowCanvas onSaveWorkflow={onSaveWorkflow} />
+    </div>
+  );
 }
