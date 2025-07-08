@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, Zap, Send, Database, FileText, Brain, BarChart, CreditCard } from 'lucide-react';
+import { Search, Zap, Send, Database, FileText, Brain, BarChart, CreditCard, Code } from 'lucide-react';
 import { IntegrationNode, IntegrationCategory } from '@/types/integrations';
 import { integrationsByCategory } from '@/lib/integrations';
 
@@ -35,6 +35,9 @@ const categoryLabels: Record<IntegrationCategory, string> = {
   ai: 'AI & ML',
   analytics: 'Analytics',
   payment: 'Payments',
+  productivity: 'Productivity',
+  developer_tools: 'Dev Tools',
+  triggers: 'Triggers',
 };
 
 export function NodePalette({ onAddNode }: NodePaletteProps) {
