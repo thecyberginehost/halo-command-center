@@ -89,37 +89,7 @@ export function VisualWorkflowCanvas({
     [nodes, selectedNodeId]
   );
 
-  // Handle drag and drop from palette
-  const onDragOver = useCallback((event: React.DragEvent) => {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = 'move';
-  }, []);
-
-  const onDrop = useCallback((event: React.DragEvent) => {
-    event.preventDefault();
-
-    if (!reactFlowWrapper.current) return;
-
-    try {
-      const integrationData = event.dataTransfer.getData('application/reactflow');
-      const integration: IntegrationNode = JSON.parse(integrationData);
-      
-      const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
-      const position = {
-        x: event.clientX - reactFlowBounds.left - 100,
-        y: event.clientY - reactFlowBounds.top - 50,
-      };
-
-      addNodeFromIntegration(integration, position);
-    } catch (error) {
-      console.error('Error adding node:', error);
-      toast({
-        title: "Error",
-        description: "Failed to add node to canvas",
-        variant: "destructive"
-      });
-    }
-  }, []);
+  // Removed drag and drop handlers - now using click-to-add
 
   const addNodeFromIntegration = useCallback((integration: IntegrationNode, position: { x: number; y: number }) => {
     // Calculate smart position based on existing nodes
@@ -372,8 +342,6 @@ export function VisualWorkflowCanvas({
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
-          onDrop={onDrop}
-          onDragOver={onDragOver}
           onNodeClick={handleNodeClick}
           nodeTypes={nodeTypes}
           fitView

@@ -87,9 +87,11 @@ export function BottomNodeToolbar({ onAddNode }: BottomNodeToolbarProps) {
     );
   };
 
-  const handleDragStart = (e: React.DragEvent, integration: IntegrationNode) => {
-    e.dataTransfer.setData('application/reactflow', JSON.stringify(integration));
-    e.dataTransfer.effectAllowed = 'move';
+  // Remove drag functionality - just use click
+  const handleNodeClick = (integration: IntegrationNode) => {
+    onAddNode(integration, { x: 100, y: 100 }); // Default position
+    setOpenPopover(null);
+    setSearchTerm(''); // Clear search after adding
   };
 
   const NodeItem = ({ integration }: { integration: IntegrationNode }) => {
@@ -97,14 +99,8 @@ export function BottomNodeToolbar({ onAddNode }: BottomNodeToolbarProps) {
     
     return (
       <div
-        draggable
-        onDragStart={(e) => handleDragStart(e, integration)}
-        className="flex items-center space-x-3 p-2 rounded-lg cursor-grab hover:bg-accent/50 transition-colors border hover:border-primary/20"
-        onClick={() => {
-          onAddNode(integration, { x: 100, y: 100 });
-          setOpenPopover(null);
-          setSearchTerm(''); // Clear search after adding
-        }}
+        className="flex items-center space-x-3 p-2 rounded-lg cursor-pointer hover:bg-accent/50 transition-colors border hover:border-primary/20"
+        onClick={() => handleNodeClick(integration)}
       >
         <div 
           className="p-1.5 rounded flex items-center justify-center min-w-[28px] h-7"
@@ -258,7 +254,7 @@ export function BottomNodeToolbar({ onAddNode }: BottomNodeToolbarProps) {
 
           {/* Quick Help */}
           <div className="text-xs text-muted-foreground font-medium">
-            Drag to canvas
+            Click to add
           </div>
         </div>
       </Card>
