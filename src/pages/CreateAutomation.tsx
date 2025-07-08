@@ -102,7 +102,7 @@ async function executeAutomation(input) {
     setChatInput('');
     
     try {
-      const response = await fetch(`https://fa2c1194-766b-4677-957f-c1ca20f0d01e.supabase.co/functions/v1/ai-chat`, {
+      const response = await fetch(`https://xxltijgxrwhdudhzicel.supabase.co/functions/v1/ai-chat`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
