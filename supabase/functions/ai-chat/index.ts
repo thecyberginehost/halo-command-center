@@ -323,10 +323,10 @@ REQUEST TYPE: ${requestType}`;
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'o3',
+        model: 'gpt-4o',
         messages: messages,
         temperature: 0.7,
-        max_completion_tokens: 1000,
+        max_tokens: 1000,
         presence_penalty: 0.1,
         frequency_penalty: 0.1,
       }),
