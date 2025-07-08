@@ -1,5 +1,14 @@
 import { IntegrationNode, IntegrationCategory } from '@/types/integrations';
-import { gmailIntegration, sesIntegration, sendgridIntegration } from './emailIntegrations';
+import { 
+  gmailSendEmail, 
+  gmailSearchEmails, 
+  gmailDeleteEmail, 
+  gmailArchiveEmail, 
+  gmailReplyEmail, 
+  gmailNewEmailTrigger,
+  sesIntegration, 
+  sendgridIntegration 
+} from './emailIntegrations';
 import { salesforceIntegration, hubspotIntegration, pipedriveIntegration } from './crmIntegrations';
 import { webhookTrigger, httpRequestAction, slackIntegration } from './webhookIntegrations';
 import { 
@@ -33,10 +42,10 @@ import { routerIntegration, iteratorIntegration, aggregatorIntegration } from '.
 
 export const allIntegrations: IntegrationNode[] = [
   // Triggers
-  webhookTrigger, scheduleTrigger, emailTrigger, formTrigger, fileUploadTrigger,
+  webhookTrigger, scheduleTrigger, emailTrigger, formTrigger, fileUploadTrigger, gmailNewEmailTrigger,
   
   // Email Actions
-  gmailIntegration, sesIntegration, sendgridIntegration,
+  gmailSendEmail, gmailSearchEmails, gmailDeleteEmail, gmailArchiveEmail, gmailReplyEmail, sesIntegration, sendgridIntegration,
   
   // CRM Actions
   salesforceIntegration, hubspotIntegration, pipedriveIntegration,
@@ -79,7 +88,7 @@ export const allIntegrations: IntegrationNode[] = [
 ];
 
 export const integrationsByCategory: Record<IntegrationCategory, IntegrationNode[]> = {
-  communication: [gmailIntegration, sesIntegration, sendgridIntegration, slackIntegration],
+  communication: [gmailSendEmail, gmailSearchEmails, gmailDeleteEmail, gmailArchiveEmail, gmailReplyEmail, sesIntegration, sendgridIntegration, slackIntegration],
   crm: [salesforceIntegration, hubspotIntegration, pipedriveIntegration],
   webhook: [webhookTrigger, httpRequestAction, conditionIntegration, delayIntegration, loopIntegration, errorHandlerIntegration, routerIntegration, iteratorIntegration, aggregatorIntegration],
   database: [postgresqlIntegration, mysqlIntegration, mongodbIntegration, redisIntegration, dataTransformIntegration, dataValidationIntegration, dataStorageIntegration, jsonProcessorIntegration, calculatorIntegration],
@@ -89,7 +98,7 @@ export const integrationsByCategory: Record<IntegrationCategory, IntegrationNode
   payment: [stripeIntegration, paypalIntegration],
   productivity: [googleSheetsIntegration, googleCalendarIntegration, notionIntegration, airtableIntegration],
   developer_tools: [githubIntegration, jiraIntegration, trelloIntegration, asanaIntegration],
-  triggers: [scheduleTrigger, emailTrigger, formTrigger, fileUploadTrigger]
+  triggers: [scheduleTrigger, emailTrigger, formTrigger, fileUploadTrigger, gmailNewEmailTrigger]
 };
 
 export const getIntegrationById = (id: string): IntegrationNode | undefined => {
