@@ -21,6 +21,8 @@ const CreateAutomation = () => {
   const { toast } = useToast();
   
   const [workflow, setWorkflow] = useState<WorkflowRecord | null>(null);
+  const [workflowNodes, setWorkflowNodes] = useState<any[]>([]);
+  const [workflowEdges, setWorkflowEdges] = useState<any[]>([]);
   const [workflowName, setWorkflowName] = useState('My Automation');
   const [isDeveloperMode, setIsDeveloperMode] = useState(false);
   const [showStepSelector, setShowStepSelector] = useState(false);
@@ -129,10 +131,21 @@ async function executeAutomation(input) {
     if (!workflow || !currentTenant) return;
     
     try {
+      // Convert visual workflow to steps format
+      const steps = workflowNodes.map((node, index) => ({
+        id: node.id,
+        type: node.data.integration.type,
+        name: node.data.integration.name,
+        config: node.data.config || {},
+        position: { x: node.position.x, y: node.position.y },
+        order: index
+      }));
+
       const { error } = await supabase
         .from('workflows')
         .update({
           name: workflowName,
+          steps: steps,
           updated_at: new Date().toISOString()
         })
         .eq('id', workflow.id)
@@ -142,15 +155,21 @@ async function executeAutomation(input) {
       
       toast({
         title: "Workflow Saved",
-        description: "Your visual workflow has been saved successfully."
+        description: `Saved ${steps.length} workflow steps successfully.`
       });
     } catch (error) {
+      console.error('Save error:', error);
       toast({
         title: "Save Failed",
         description: "Failed to save workflow.",
         variant: "destructive"
       });
     }
+  };
+
+  const handleWorkflowChange = (nodes: any[], edges: any[]) => {
+    setWorkflowNodes(nodes);
+    setWorkflowEdges(edges);
   };
 
   return (
@@ -179,6 +198,7 @@ async function executeAutomation(input) {
               <VisualModeCanvas
                 onAddStepClick={() => setShowStepSelector(true)}
                 onSaveWorkflow={handleSaveWorkflow}
+                onWorkflowChange={handleWorkflowChange}
               />
             )}
 

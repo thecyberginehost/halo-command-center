@@ -47,57 +47,59 @@ export const BaseWorkflowNode = memo(({
       onDuplicate={() => onDuplicate?.(id)}
       onDelete={() => onDelete?.(id)}
     >
-      <Card 
-        className="min-w-[100px] max-w-[130px] shadow-md transition-all duration-200 hover:shadow-lg"
-        style={nodeStyle}
-      >
-        <div className="p-1.5">
-          {/* Node Header */}
-          <div className="flex items-center justify-between mb-1">
-            <div className="flex items-center space-x-1">
-              <div 
-                className="p-1 rounded-sm flex items-center justify-center"
-                style={{ backgroundColor: integration.color + '20' }}
-              >
-                {Icon && (
-                  <Icon 
-                    className="h-3 w-3" 
-                    style={{ color: integration.color }}
-                  />
-                )}
+      <div className="relative">
+        <Card 
+          className="min-w-[100px] max-w-[130px] shadow-md transition-all duration-200 hover:shadow-lg"
+          style={nodeStyle}
+        >
+          <div className="p-1.5">
+            {/* Node Header */}
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center space-x-1">
+                <div 
+                  className="p-1 rounded-sm flex items-center justify-center"
+                  style={{ backgroundColor: integration.color + '20' }}
+                >
+                  {Icon && (
+                    <Icon 
+                      className="h-3 w-3" 
+                      style={{ color: integration.color }}
+                    />
+                  )}
+                </div>
+                <span className="font-medium text-xs text-foreground truncate">{label}</span>
               </div>
-              <span className="font-medium text-xs text-foreground truncate">{label}</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onConfigClick?.(id)}
+                className={`h-3 w-3 p-0 ${getStatusColor()}`}
+              >
+                {getStatusIcon()}
+              </Button>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onConfigClick?.(id)}
-              className={`h-3 w-3 p-0 ${getStatusColor()}`}
-            >
-              {getStatusIcon()}
-            </Button>
-          </div>
 
-          {/* Status Badge */}
-          <div className="flex items-center justify-center">
-            <Badge 
-              variant={integration.type === 'trigger' ? 'default' : 'secondary'}
-              className="text-xs px-1 py-0"
-            >
-              {integration.type}
-            </Badge>
-            {hasError && (
-              <Badge variant="destructive" className="text-xs ml-1 px-1 py-0">
-                Error
+            {/* Status Badge */}
+            <div className="flex items-center justify-center">
+              <Badge 
+                variant={integration.type === 'trigger' ? 'default' : 'secondary'}
+                className="text-xs px-1 py-0"
+              >
+                {integration.type}
               </Badge>
+              {hasError && (
+                <Badge variant="destructive" className="text-xs ml-1 px-1 py-0">
+                  Error
+                </Badge>
+              )}
+            </div>
+
+            {/* Error Message */}
+            {hasError && errorMessage && (
+              <p className="text-xs text-destructive mt-1 line-clamp-1">{errorMessage}</p>
             )}
           </div>
-
-          {/* Error Message */}
-          {hasError && errorMessage && (
-            <p className="text-xs text-destructive mt-1 line-clamp-1">{errorMessage}</p>
-          )}
-        </div>
+        </Card>
 
         {/* Input Handle */}
         {integration.type !== 'trigger' && (
@@ -116,7 +118,7 @@ export const BaseWorkflowNode = memo(({
           className="w-3 h-3 bg-primary border-2 border-background rounded-full hover:scale-125 transition-transform"
           style={{ right: -6 }}
         />
-    </Card>
+      </div>
     </NodeContextMenu>
   );
 });
