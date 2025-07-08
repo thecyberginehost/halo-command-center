@@ -78,8 +78,8 @@ export function VisualWorkflowCanvas({
   onWorkflowChange,
   onSaveWorkflow 
 }: VisualWorkflowCanvasProps) {
-  const [nodes, setNodes, onNodesChange] = useNodesState<VisualWorkflowNode>(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<VisualWorkflowEdge>(initialEdges);
+  const [nodes, setNodes, onNodesChange] = useNodesState<VisualWorkflowNode>(initialNodes || []);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<VisualWorkflowEdge>(initialEdges || []);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -287,6 +287,19 @@ export function VisualWorkflowCanvas({
       });
     }
   }, [nodes, edges, toast]);
+
+  // Update nodes and edges when initial props change
+  React.useEffect(() => {
+    if (initialNodes && initialNodes.length > 0) {
+      setNodes(initialNodes);
+    }
+  }, [initialNodes, setNodes]);
+
+  React.useEffect(() => {
+    if (initialEdges && initialEdges.length > 0) {
+      setEdges(initialEdges);
+    }
+  }, [initialEdges, setEdges]);
 
   // Notify parent of workflow changes
   React.useEffect(() => {

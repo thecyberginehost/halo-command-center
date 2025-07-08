@@ -13,6 +13,14 @@ interface ChatRequest {
   context?: {
     currentPage?: string;
     workflowCount?: number;
+    currentWorkflow?: {
+      id: string;
+      name: string;
+      description?: string;
+      steps: any[];
+    };
+    currentWorkflowNodes?: any[];
+    currentWorkflowEdges?: any[];
     recentWorkflows?: Array<{
       id: string;
       name: string;
@@ -24,6 +32,7 @@ interface ChatRequest {
     role: 'user' | 'assistant';
     content: string;
   }>;
+  requestType?: 'chat' | 'build_workflow' | 'analyze_workflow' | 'suggest_optimization';
 }
 
 serve(async (req) => {
@@ -42,15 +51,36 @@ serve(async (req) => {
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-    const { message, tenantId, context, conversationHistory = [] }: ChatRequest = await req.json();
+    const { message, tenantId, context, conversationHistory = [], requestType = 'chat' }: ChatRequest = await req.json();
 
-    // Check if this is a search query
-    const isSearchQuery = message.toLowerCase().includes("find") || 
-                         message.toLowerCase().includes("search") || 
-                         message.toLowerCase().includes("locate") ||
-                         message.toLowerCase().includes("where is") ||
-                         message.toLowerCase().includes("can't find") ||
-                         message.toLowerCase().includes("cannot find");
+    // Detect workflow building intents
+    const isWorkflowRequest = requestType === 'build_workflow' || 
+                             message.toLowerCase().includes("create") ||
+                             message.toLowerCase().includes("build") ||
+                             message.toLowerCase().includes("make") ||
+                             message.toLowerCase().includes("add") ||
+                             message.toLowerCase().includes("workflow") ||
+                             message.toLowerCase().includes("automation") ||
+                             message.toLowerCase().includes("when") ||
+                             message.toLowerCase().includes("if") ||
+                             message.toLowerCase().includes("trigger");
+
+    // Get current workflow context for analysis
+    let currentWorkflowAnalysis = '';
+    if (context?.currentWorkflow) {
+      const workflow = context.currentWorkflow;
+      const nodeCount = context.currentWorkflowNodes?.length || 0;
+      const connectionCount = context.currentWorkflowEdges?.length || 0;
+      
+      currentWorkflowAnalysis = `
+CURRENT WORKFLOW ANALYSIS:
+- Name: ${workflow.name}
+- Description: ${workflow.description || 'No description'}
+- Nodes: ${nodeCount} (${context.currentWorkflowNodes?.map(n => n.data?.integration?.name).join(', ') || 'none'})
+- Connections: ${connectionCount}
+- Steps in database: ${Array.isArray(workflow.steps) ? workflow.steps.length : 0}
+`;
+    }
 
     // Get tenant-specific data for context
     let tenantContext = '';
@@ -168,44 +198,112 @@ WORKFLOW STATISTICS:
       }
     }
 
+    const isSearchQuery = message.toLowerCase().includes("find") || 
+                          message.toLowerCase().includes("search") || 
+                          message.toLowerCase().includes("locate") ||
+                          message.toLowerCase().includes("where is") ||
+                          message.toLowerCase().includes("can't find") ||
+                          message.toLowerCase().includes("cannot find");
+
     const pageContext = context?.currentPage ? `CURRENT PAGE: ${context.currentPage}\n` : '';
 
-    const systemPrompt = `You are Resonant Directive, the AI automation assistant for HALO - a professional automation platform for MASP (Managed Automation Service Provider) certified professionals.
+    const systemPrompt = `You are Resonant Directive, the advanced AI workflow builder for HALO - superior to make.com's AI builder in every way.
 
 ${systemKnowledge}
 
 CURRENT SESSION CONTEXT:
-${tenantContext}${pageContext}${workflowStats}${searchResults}
+${tenantContext}${pageContext}${workflowStats}${currentWorkflowAnalysis}${searchResults}
 
 PERSONALITY & ROLE:
-- Expert automation engineer with deep knowledge of HALO platform capabilities
-- Proactive in identifying automation opportunities and optimization potential
-- Professional consultant tone suitable for enterprise MASP providers
-- Comprehensive understanding of multi-tenant architecture and client management
-- Expert in integration ecosystem and workflow design patterns
+- Master automation architect with comprehensive knowledge of HALO platform
+- Expert at analyzing existing workflows and building new ones from natural language
+- Can generate complete workflow nodes with proper configurations
+- Proactive in suggesting optimizations and best practices
+- Professional consultant for MASP providers managing enterprise automation
+- Deep understanding of integration patterns, triggers, and data flow
+
+WORKFLOW BUILDING CAPABILITIES:
+- Generate complete workflow JSON with nodes and connections based on user prompts
+- Analyze existing workflows to understand their purpose and suggest improvements
+- Recommend optimal integration sequences and data transformations
+- Create complex branching logic and error handling patterns
+- Suggest trigger conditions and scheduling configurations
+
+AVAILABLE INTEGRATIONS (for building workflows):
+- Triggers: webhook, form_submit, schedule, email_received, file_upload
+- Communication: email, slack, teams, sms, discord
+- CRM: salesforce, hubspot, pipedrive, airtable
+- Database: mysql, postgresql, mongodb, supabase
+- File Storage: google_drive, dropbox, aws_s3, sharepoint
+- AI & ML: openai, anthropic, azure_cognitive, google_ai
+- Analytics: google_analytics, mixpanel, amplitude
+- Payments: stripe, paypal, square
+- Productivity: google_sheets, microsoft_office, notion, trello
+- Developer Tools: github, gitlab, jenkins, docker
+
+WORKFLOW BUILDING INSTRUCTIONS:
+When user requests workflow creation, respond with:
+1. A clear explanation of what the workflow will do
+2. **IMPORTANT**: Include a JSON structure with this EXACT format:
+
+\`\`\`json
+{
+  "action": "build_workflow",
+  "nodes": [
+    {
+      "id": "node_1",
+      "type": "trigger",
+      "integration": "webhook",
+      "name": "Form Submission",
+      "position": { "x": 100, "y": 100 },
+      "config": {
+        "webhook_url": "auto-generated",
+        "method": "POST"
+      }
+    },
+    {
+      "id": "node_2", 
+      "type": "action",
+      "integration": "email",
+      "name": "Send Welcome Email",
+      "position": { "x": 300, "y": 100 },
+      "config": {
+        "to": "{{form.email}}",
+        "subject": "Welcome!",
+        "template": "welcome_template"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "source": "node_1",
+      "target": "node_2"
+    }
+  ]
+}
+\`\`\`
 
 RESPONSE GUIDELINES:
-- Provide specific, actionable advice based on HALO's actual capabilities
-- Reference system knowledge when explaining platform features or limitations
-- Suggest workflows using available integrations and proven patterns
-- Offer troubleshooting guidance based on common issues database
-- Consider industry-specific requirements when relevant (healthcare, finance, etc.)
-- Keep responses focused and professional (2-4 sentences for quick questions, longer for complex topics)
-- When helping users navigate, provide manual steps followed by ONE clickable link
-- Format navigation help like: "To find your automations, go to the sidebar and click 'Automations'. Here's the direct link: [CLICK TO GO TO AUTOMATIONS](/automations)"
-- Use EXACTLY this format for clickable links: [CLICK TO GO TO AUTOMATIONS](/automations) - only provide ONE link per response
-- Available pages: /automations (workflows), / (dashboard), /metrics, /insights, /logs, /ai-assist, /suggestions, /ai-recommendations
-- If items don't exist, clearly state this and offer to help create them
+- Always provide specific, actionable workflow solutions
+- When building workflows, include the JSON structure AND explanation
+- Analyze current workflows and suggest specific improvements with examples
+- Reference available integrations when recommending solutions  
+- Consider error handling, data validation, and performance optimization
+- Provide step-by-step implementation guidance
+- Format navigation help like: "Here's the direct link: [CLICK TO GO TO AUTOMATIONS](/automations)"
+- Available pages: /automations, /, /credentials, /ai-assist, /docs
 
 CAPABILITIES I EXCEL AT:
-- Analyzing workflow performance using HALO's monitoring capabilities
-- Designing enterprise-grade automation workflows with proper error handling
-- Recommending optimal integration patterns from HALO's ecosystem
-- Troubleshooting automation issues using systematic problem-solving approaches
-- Providing MASP provider guidance for client management and billing optimization
-- Industry-specific automation advice (healthcare, financial, e-commerce compliance)
+- Building complete workflows from natural language descriptions
+- Analyzing workflow performance and suggesting optimizations
+- Designing enterprise-grade automation patterns with proper error handling
+- Recommending optimal integration combinations for specific use cases
+- Troubleshooting automation issues with systematic debugging approaches
+- MASP provider guidance for client automation strategies
 
-Current user context: ${context ? JSON.stringify(context) : 'General consultation mode'}`;
+Current user context: ${context ? JSON.stringify(context, null, 2) : 'General consultation mode'}
+
+REQUEST TYPE: ${requestType}`;
     
 
     // Build conversation messages
@@ -238,6 +336,17 @@ Current user context: ${context ? JSON.stringify(context) : 'General consultatio
     const data = await response.json();
     const assistantMessage = data.choices[0].message.content;
 
+    // Parse workflow building instructions
+    let workflowData = null;
+    const jsonMatch = assistantMessage.match(/```json\n([\s\S]*?)\n```/);
+    if (jsonMatch) {
+      try {
+        workflowData = JSON.parse(jsonMatch[1]);
+      } catch (e) {
+        console.log('Failed to parse workflow JSON:', e);
+      }
+    }
+
     // Log the conversation for analytics (optional)
     if (tenantId) {
       console.log(`Chat interaction for tenant ${tenantId}: ${message.substring(0, 50)}...`);
@@ -245,6 +354,7 @@ Current user context: ${context ? JSON.stringify(context) : 'General consultatio
 
     return new Response(JSON.stringify({ 
       message: assistantMessage,
+      workflowData: workflowData,
       context: {
         workflowCount: context?.workflowCount || 0,
         currentPage: context?.currentPage || 'unknown'
