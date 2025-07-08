@@ -29,33 +29,47 @@ interface VisualWorkflowCanvasProps {
   onSaveWorkflow?: () => void;
 }
 
-const nodeTypes = {
-  integrationNode: (props: any) => (
+// Create a proper component instead of inline function
+const IntegrationNodeComponent = (props: any) => {
+  const handleConfigClick = (nodeId: string) => {
+    const canvasElement = document.querySelector('.react-flow-canvas');
+    if (canvasElement) {
+      const event = new CustomEvent('nodeConfigClick', { detail: { nodeId } });
+      canvasElement.dispatchEvent(event);
+    }
+  };
+
+  const handleDuplicate = (nodeId: string) => {
+    const canvasElement = document.querySelector('.react-flow-canvas');
+    if (canvasElement) {
+      const event = new CustomEvent('nodeDuplicate', { detail: { nodeId } });
+      canvasElement.dispatchEvent(event);
+    }
+  };
+
+  const handleDelete = (nodeId: string) => {
+    const canvasElement = document.querySelector('.react-flow-canvas');
+    if (canvasElement) {
+      const event = new CustomEvent('nodeDelete', { detail: { nodeId } });
+      canvasElement.dispatchEvent(event);
+    }
+  };
+
+  return (
     <BaseWorkflowNode 
       {...props} 
-      onConfigClick={(nodeId: string) => {
-        const canvasElement = document.querySelector('.react-flow-canvas');
-        if (canvasElement) {
-          const event = new CustomEvent('nodeConfigClick', { detail: { nodeId } });
-          canvasElement.dispatchEvent(event);
-        }
-      }}
-      onDuplicate={(nodeId: string) => {
-        const canvasElement = document.querySelector('.react-flow-canvas');
-        if (canvasElement) {
-          const event = new CustomEvent('nodeDuplicate', { detail: { nodeId } });
-          canvasElement.dispatchEvent(event);
-        }
-      }}
-      onDelete={(nodeId: string) => {
-        const canvasElement = document.querySelector('.react-flow-canvas');
-        if (canvasElement) {
-          const event = new CustomEvent('nodeDelete', { detail: { nodeId } });
-          canvasElement.dispatchEvent(event);
-        }
-      }}
+      onConfigClick={handleConfigClick}
+      onDuplicate={handleDuplicate}
+      onDelete={handleDelete}
     />
-  ),
+  );
+};
+
+// Add display name for React DevTools
+IntegrationNodeComponent.displayName = 'IntegrationNodeComponent';
+
+const nodeTypes = {
+  integrationNode: IntegrationNodeComponent,
 };
 
 export function VisualWorkflowCanvas({ 
