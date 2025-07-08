@@ -117,12 +117,7 @@ export function NodePalette({ onAddNode }: NodePaletteProps) {
     <Card className="w-80 h-full flex flex-col bg-background/95 backdrop-blur-sm border shadow-lg">
       {/* Header */}
       <div className="p-4 border-b bg-muted/30">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold text-lg text-foreground">Node Library</h3>
-          <Badge variant="outline" className="text-xs">
-            {Object.values(integrationsByCategory).flat().length} nodes
-          </Badge>
-        </div>
+        <h3 className="font-semibold text-lg text-foreground mb-3">Node Library</h3>
         
         {/* Search */}
         <div className="relative">
@@ -139,47 +134,25 @@ export function NodePalette({ onAddNode }: NodePaletteProps) {
       {/* Content */}
       <ScrollArea className="flex-1">
         <Tabs defaultValue={availableCategories[0]?.[0]} className="p-4">
-          {/* Category tabs - compact grid */}
-          <TabsList className="grid grid-cols-3 gap-1 h-auto mb-4 bg-muted/50">
-            {availableCategories.slice(0, 6).map(([category, label]) => {
-              const Icon = categoryIcons[category as IntegrationCategory];
-              const count = integrationsByCategory[category as IntegrationCategory]?.length || 0;
-              
-              return (
-                <TabsTrigger 
-                  key={category} 
-                  value={category}
-                  className="flex flex-col gap-1 h-auto py-2 px-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
-                >
-                  <Icon className="h-4 w-4" />
-                  <span className="text-xs font-medium truncate">{label}</span>
-                  <span className="text-xs text-muted-foreground">({count})</span>
-                </TabsTrigger>
-              );
-            })}
-          </TabsList>
-
-          {/* Additional categories if any */}
-          {availableCategories.length > 6 && (
-            <TabsList className="grid grid-cols-3 gap-1 h-auto mb-4 bg-muted/50">
-              {availableCategories.slice(6).map(([category, label]) => {
+          {/* Category tabs - clean horizontal scroll */}
+          <div className="mb-4">
+            <TabsList className="inline-flex h-9 items-center justify-start rounded-lg bg-muted p-1 text-muted-foreground w-full overflow-x-auto">
+              {availableCategories.map(([category, label]) => {
                 const Icon = categoryIcons[category as IntegrationCategory];
-                const count = integrationsByCategory[category as IntegrationCategory]?.length || 0;
                 
                 return (
                   <TabsTrigger 
                     key={category} 
                     value={category}
-                    className="flex flex-col gap-1 h-auto py-2 px-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary"
+                    className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm gap-2"
                   >
                     <Icon className="h-4 w-4" />
-                    <span className="text-xs font-medium truncate">{label}</span>
-                    <span className="text-xs text-muted-foreground">({count})</span>
+                    <span>{label}</span>
                   </TabsTrigger>
                 );
               })}
             </TabsList>
-          )}
+          </div>
 
           {/* Node grids for each category */}
           {availableCategories.map(([category, label]) => {
@@ -189,7 +162,7 @@ export function NodePalette({ onAddNode }: NodePaletteProps) {
 
             return (
               <TabsContent key={category} value={category} className="mt-0">
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-2">
                   {integrations.map((integration) => (
                     <NodeCard key={integration.id} integration={integration} />
                   ))}
@@ -197,9 +170,10 @@ export function NodePalette({ onAddNode }: NodePaletteProps) {
                 
                 {/* Empty state for search */}
                 {searchTerm && integrations.length === 0 && (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Search className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">No integrations found in {label}</p>
+                  <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                    <Search className="h-8 w-8 mb-3 opacity-40" />
+                    <p className="text-sm font-medium mb-1">No integrations found</p>
+                    <p className="text-xs">Try a different search term</p>
                   </div>
                 )}
               </TabsContent>
@@ -209,9 +183,9 @@ export function NodePalette({ onAddNode }: NodePaletteProps) {
       </ScrollArea>
 
       {/* Footer tip */}
-      <div className="p-3 border-t bg-muted/20">
-        <p className="text-xs text-muted-foreground text-center">
-          Drag & drop or click to add nodes
+      <div className="px-4 py-3 border-t bg-muted/10">
+        <p className="text-xs text-muted-foreground text-center font-medium">
+          Drag & drop nodes onto the canvas
         </p>
       </div>
     </Card>
