@@ -8,7 +8,8 @@ import {
   Bell,
   User,
   ChevronUp,
-  Key
+  Key,
+  BookOpen
 } from 'lucide-react';
 import {
   Sidebar,
@@ -43,6 +44,7 @@ const menuSections = [
     title: "SETTINGS",
     items: [
       { title: "Credentials", icon: Key, path: "/credentials" },
+      { title: "Documentation", icon: BookOpen, path: "/docs" },
     ]
   }
 ];
