@@ -132,7 +132,9 @@ async function executeAutomation(input) {
       }]);
 
       // If AI generated workflow data, apply it to the canvas
+      console.log('Checking for workflow data:', data.workflowData);
       if (data.workflowData && data.workflowData.action === 'build_workflow') {
+        console.log('Found workflow data, applying to canvas:', data.workflowData);
         handleAIWorkflowGeneration(data.workflowData);
       }
       
