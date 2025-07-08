@@ -323,7 +323,7 @@ REQUEST TYPE: ${requestType}`;
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'o3',
         messages: messages,
         temperature: 0.7,
         max_tokens: 1000,
