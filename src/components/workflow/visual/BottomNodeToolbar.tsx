@@ -4,8 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Search, Zap, Send, Database, FileText, Brain, BarChart, CreditCard, Code, GitBranch, RepeatIcon, Combine, Plus } from 'lucide-react';
+import { Search, Zap, Send, Database, FileText, Brain, BarChart, CreditCard, Code, GitBranch } from 'lucide-react';
 import { IntegrationNode, IntegrationCategory } from '@/types/integrations';
 import { integrationsByCategory } from '@/lib/integrations';
 
@@ -151,13 +150,13 @@ export function BottomNodeToolbar({ onAddNode }: BottomNodeToolbarProps) {
               {globalSearchResults.length} integration{globalSearchResults.length !== 1 ? 's' : ''} found
             </p>
           </div>
-          <ScrollArea className="max-h-64">
+          <div className="max-h-64 overflow-y-auto">
             <div className="p-2 space-y-1">
               {globalSearchResults.map((integration) => (
                 <NodeItem key={integration.id} integration={integration} />
               ))}
             </div>
-          </ScrollArea>
+          </div>
         </Card>
       )}
 
@@ -233,7 +232,7 @@ export function BottomNodeToolbar({ onAddNode }: BottomNodeToolbarProps) {
                          {searchTerm && integrations.length !== totalIntegrations.length && ' (filtered)'}
                        </p>
                      </div>
-                     <ScrollArea className="max-h-64 overflow-y-auto">
+                     <div className="max-h-64 overflow-y-auto">
                        <div className="p-2 space-y-1 max-h-60">
                          {integrations.length > 0 ? (
                            integrations.map((integration) => (
@@ -247,7 +246,7 @@ export function BottomNodeToolbar({ onAddNode }: BottomNodeToolbarProps) {
                            </div>
                          )}
                        </div>
-                     </ScrollArea>
+                     </div>
                   </PopoverContent>
                 </Popover>
               );
