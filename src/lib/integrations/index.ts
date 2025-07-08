@@ -9,7 +9,19 @@ import {
   sesIntegration, 
   sendgridIntegration 
 } from './emailIntegrations';
-import { salesforceIntegration, hubspotIntegration, pipedriveIntegration } from './crmIntegrations';
+import { 
+  salesforceCreateLead, 
+  salesforceCreateContact, 
+  salesforceUpdateContact, 
+  salesforceSearchContacts, 
+  salesforceCreateOpportunity,
+  hubspotCreateContact, 
+  hubspotUpdateContact, 
+  hubspotCreateDeal,
+  pipedriveCreatePerson, 
+  pipedriveCreateDeal, 
+  pipedriveUpdateDeal 
+} from './crmIntegrations';
 import { webhookTrigger, httpRequestAction, slackIntegration } from './webhookIntegrations';
 import { 
   openaiAgentIntegration, 
@@ -48,7 +60,9 @@ export const allIntegrations: IntegrationNode[] = [
   gmailSendEmail, gmailSearchEmails, gmailDeleteEmail, gmailArchiveEmail, gmailReplyEmail, sesIntegration, sendgridIntegration,
   
   // CRM Actions
-  salesforceIntegration, hubspotIntegration, pipedriveIntegration,
+  salesforceCreateLead, salesforceCreateContact, salesforceUpdateContact, salesforceSearchContacts, salesforceCreateOpportunity,
+  hubspotCreateContact, hubspotUpdateContact, hubspotCreateDeal,
+  pipedriveCreatePerson, pipedriveCreateDeal, pipedriveUpdateDeal,
   
   // Communication Actions
   slackIntegration,
@@ -89,7 +103,7 @@ export const allIntegrations: IntegrationNode[] = [
 
 export const integrationsByCategory: Record<IntegrationCategory, IntegrationNode[]> = {
   communication: [gmailSendEmail, gmailSearchEmails, gmailDeleteEmail, gmailArchiveEmail, gmailReplyEmail, sesIntegration, sendgridIntegration, slackIntegration],
-  crm: [salesforceIntegration, hubspotIntegration, pipedriveIntegration],
+  crm: [salesforceCreateLead, salesforceCreateContact, salesforceUpdateContact, salesforceSearchContacts, salesforceCreateOpportunity, hubspotCreateContact, hubspotUpdateContact, hubspotCreateDeal, pipedriveCreatePerson, pipedriveCreateDeal, pipedriveUpdateDeal],
   webhook: [webhookTrigger, httpRequestAction, conditionIntegration, delayIntegration, loopIntegration, errorHandlerIntegration, routerIntegration, iteratorIntegration, aggregatorIntegration],
   database: [postgresqlIntegration, mysqlIntegration, mongodbIntegration, redisIntegration, dataTransformIntegration, dataValidationIntegration, dataStorageIntegration, jsonProcessorIntegration, calculatorIntegration],
   file_storage: [googleDriveIntegration, awsS3Integration, dropboxIntegration],
