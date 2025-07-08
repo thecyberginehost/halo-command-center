@@ -53,7 +53,7 @@ serve(async (req) => {
 
     const { message, tenantId, context, conversationHistory = [], requestType = 'chat' }: ChatRequest = await req.json();
 
-    // Detect workflow building intents
+    // Detect workflow building intents and search queries first
     const isWorkflowRequest = requestType === 'build_workflow' || 
                              message.toLowerCase().includes("create") ||
                              message.toLowerCase().includes("build") ||
@@ -64,6 +64,13 @@ serve(async (req) => {
                              message.toLowerCase().includes("when") ||
                              message.toLowerCase().includes("if") ||
                              message.toLowerCase().includes("trigger");
+
+    const isSearchQuery = message.toLowerCase().includes("find") || 
+                          message.toLowerCase().includes("search") || 
+                          message.toLowerCase().includes("locate") ||
+                          message.toLowerCase().includes("where is") ||
+                          message.toLowerCase().includes("can't find") ||
+                          message.toLowerCase().includes("cannot find");
 
     // Get current workflow context for analysis
     let currentWorkflowAnalysis = '';
@@ -198,12 +205,6 @@ WORKFLOW STATISTICS:
       }
     }
 
-    const isSearchQuery = message.toLowerCase().includes("find") || 
-                          message.toLowerCase().includes("search") || 
-                          message.toLowerCase().includes("locate") ||
-                          message.toLowerCase().includes("where is") ||
-                          message.toLowerCase().includes("can't find") ||
-                          message.toLowerCase().includes("cannot find");
 
     const pageContext = context?.currentPage ? `CURRENT PAGE: ${context.currentPage}\n` : '';
 

@@ -6,6 +6,11 @@ interface MessageFormatterProps {
 }
 
 export function MessageFormatter({ content, className = "" }: MessageFormatterProps) {
+  // Safety check for undefined content
+  if (!content || typeof content !== 'string') {
+    return <div className={className}>No content available</div>;
+  }
+
   const formatMessage = (text: string) => {
     // Split by double newlines to create paragraphs
     const paragraphs = text.split('\n\n');
