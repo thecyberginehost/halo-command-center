@@ -41,57 +41,15 @@ const categoryLabels: Record<IntegrationCategory, string> = {
   triggers: 'Triggers',
 };
 
-// Node type groupings for better organization
+// Redesigned for ultra-compact display - all node types fit without scrolling
 const nodeTypeGroups = [
-  {
-    id: 'triggers',
-    label: 'Triggers',
-    icon: Zap,
-    color: '#10B981',
-    categories: ['triggers']
-  },
-  {
-    id: 'actions',
-    label: 'Actions',
-    icon: Send,
-    color: '#3B82F6',
-    categories: ['communication', 'crm', 'productivity', 'payment', 'file_storage']
-  },
-  {
-    id: 'data',
-    label: 'Data',
-    icon: Database,
-    color: '#8B5CF6',
-    categories: ['database']
-  },
-  {
-    id: 'flow_control',
-    label: 'Flow Control',
-    icon: GitBranch,
-    color: '#F59E0B',
-    categories: ['webhook'] // This includes our router, iterator, aggregator
-  },
-  {
-    id: 'ai',
-    label: 'AI & ML',
-    icon: Brain,
-    color: '#EC4899',
-    categories: ['ai']
-  },
-  {
-    id: 'analytics',
-    label: 'Analytics',
-    icon: BarChart,
-    color: '#06B6D4',
-    categories: ['analytics']
-  },
-  {
-    id: 'developer',
-    label: 'Developer',
-    icon: Code,
-    color: '#64748B',
-    categories: ['developer_tools']
-  }
+  { id: 'triggers', label: 'Triggers', icon: Zap, color: '#10B981', categories: ['triggers'] },
+  { id: 'actions', label: 'Actions', icon: Send, color: '#3B82F6', categories: ['communication', 'crm', 'productivity', 'payment', 'file_storage'] },
+  { id: 'data', label: 'Data', icon: Database, color: '#8B5CF6', categories: ['database'] },
+  { id: 'flow', label: 'Flow', icon: GitBranch, color: '#F59E0B', categories: ['webhook'] },
+  { id: 'ai', label: 'AI', icon: Brain, color: '#EC4899', categories: ['ai'] },
+  { id: 'analytics', label: 'Stats', icon: BarChart, color: '#06B6D4', categories: ['analytics'] },
+  { id: 'dev', label: 'Dev', icon: Code, color: '#64748B', categories: ['developer_tools'] }
 ];
 
 export function BottomNodeToolbar({ onAddNode }: BottomNodeToolbarProps) {
@@ -180,112 +138,131 @@ export function BottomNodeToolbar({ onAddNode }: BottomNodeToolbarProps) {
   const hasSearchResults = searchTerm && globalSearchResults.length > 0;
 
   return (
-    <Card className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 bg-background/95 backdrop-blur-sm border shadow-lg max-w-3xl mx-4">
-      <div className="flex items-center gap-1.5 p-2 overflow-hidden">
-        {/* Search */}
-        <div className="relative flex-shrink-0">
-          <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
-          <Input
-            placeholder="Search..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-7 w-36 h-7 text-xs"
-          />
-          
-          {/* Global Search Results Dropdown */}
-          {hasSearchResults && (
-            <Card className="absolute bottom-10 left-0 w-72 max-h-80 z-50 border shadow-lg">
-              <div className="p-2 border-b">
-                <h4 className="font-semibold text-sm flex items-center gap-2">
-                  <Search className="h-3.5 w-3.5" />
-                  Search Results
-                </h4>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {globalSearchResults.length} integration{globalSearchResults.length !== 1 ? 's' : ''} found
-                </p>
-              </div>
-              <ScrollArea className="max-h-64">
-                <div className="p-1 space-y-1">
-                  {globalSearchResults.map((integration) => (
-                    <NodeItem key={integration.id} integration={integration} />
-                  ))}
-                </div>
-              </ScrollArea>
-            </Card>
-          )}
-        </div>
+    <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-30 flex flex-col items-center">
+      {/* Search Results Dropdown - Above everything */}
+      {hasSearchResults && (
+        <Card className="mb-2 w-80 max-h-80 border shadow-xl bg-background">
+          <div className="p-3 border-b">
+            <h4 className="font-semibold text-sm flex items-center gap-2">
+              <Search className="h-4 w-4" />
+              Search Results
+            </h4>
+            <p className="text-xs text-muted-foreground mt-1">
+              {globalSearchResults.length} integration{globalSearchResults.length !== 1 ? 's' : ''} found
+            </p>
+          </div>
+          <ScrollArea className="max-h-64">
+            <div className="p-2 space-y-1">
+              {globalSearchResults.map((integration) => (
+                <NodeItem key={integration.id} integration={integration} />
+              ))}
+            </div>
+          </ScrollArea>
+        </Card>
+      )}
 
-        {/* Node Type Buttons - Ultra compact with horizontal scroll */}
-        <div className="flex items-center gap-1 overflow-x-auto max-w-full">
-          {nodeTypeGroups.map((group) => {
-            const integrations = getFilteredIntegrationsForGroup(group);
-            const totalIntegrations = getIntegrationsForGroup(group);
-            const Icon = group.icon;
-            
-            if (totalIntegrations.length === 0) return null;
+      {/* Main Toolbar - Redesigned for maximum compactness */}
+      <Card className="bg-background/95 backdrop-blur-sm border shadow-xl">
+        <div className="flex items-center gap-2 p-3">
+          {/* Search Input */}
+          <div className="relative">
+            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search nodes..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-8 w-40 h-8 text-sm"
+            />
+          </div>
 
-            return (
-              <Popover 
-                key={group.id} 
-                open={openPopover === group.id} 
-                onOpenChange={(open) => setOpenPopover(open ? group.id : null)}
-              >
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className={`flex items-center gap-1 h-7 px-2 text-xs flex-shrink-0 ${
-                      openPopover === group.id ? 'bg-primary/10 border-primary/20' : ''
-                    }`}
-                    style={{ 
-                      borderColor: openPopover === group.id ? group.color + '40' : undefined
-                    }}
-                  >
-                    <Icon 
-                      className="h-3 w-3" 
-                      style={{ color: group.color }}
-                    />
-                    <span className="font-medium text-xs hidden sm:inline">{group.label}</span>
-                    <Plus className="h-2.5 w-2.5 opacity-60" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent 
-                  side="top" 
-                  align="start" 
-                  className="w-80 p-0 mb-2"
-                  sideOffset={8}
+          {/* Separator */}
+          <div className="w-px h-6 bg-border" />
+
+          {/* Node Type Buttons - Icon-only for maximum compactness */}
+          <div className="flex items-center gap-1">
+            {nodeTypeGroups.map((group) => {
+              const integrations = getFilteredIntegrationsForGroup(group);
+              const totalIntegrations = getIntegrationsForGroup(group);
+              const Icon = group.icon;
+              
+              if (totalIntegrations.length === 0) return null;
+
+              return (
+                <Popover 
+                  key={group.id} 
+                  open={openPopover === group.id} 
+                  onOpenChange={(open) => setOpenPopover(open ? group.id : null)}
                 >
-                  <div className="p-3 border-b">
-                    <h4 className="font-semibold text-sm flex items-center gap-2">
-                      <Icon className="h-4 w-4" style={{ color: group.color }} />
-                      {group.label}
-                    </h4>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {integrations.length} of {totalIntegrations.length} integration{totalIntegrations.length !== 1 ? 's' : ''}
-                      {searchTerm && integrations.length !== totalIntegrations.length && ' (filtered)'}
-                    </p>
-                  </div>
-                  <ScrollArea className="max-h-72">
-                    <div className="p-2 space-y-1">
-                      {integrations.length > 0 ? (
-                        integrations.map((integration) => (
-                          <NodeItem key={integration.id} integration={integration} />
-                        ))
-                      ) : (
-                        <div className="text-center py-4 text-muted-foreground">
-                          <Search className="h-6 w-6 mx-auto mb-2 opacity-50" />
-                          <p className="text-sm">No integrations found</p>
-                          <p className="text-xs">Try a different search term</p>
-                        </div>
-                      )}
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className={`relative h-8 w-8 p-0 rounded-lg transition-all duration-200 ${
+                        openPopover === group.id 
+                          ? 'bg-primary/10 scale-110 shadow-md' 
+                          : 'hover:bg-accent hover:scale-105'
+                      }`}
+                      title={`${group.label} (${totalIntegrations.length} integrations)`}
+                    >
+                      <Icon 
+                        className="h-4 w-4" 
+                        style={{ color: group.color }}
+                      />
+                      {/* Integration count badge */}
+                      <span 
+                        className="absolute -top-1 -right-1 h-4 w-4 text-xs font-medium text-white rounded-full flex items-center justify-center"
+                        style={{ backgroundColor: group.color }}
+                      >
+                        {totalIntegrations.length}
+                      </span>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent 
+                    side="top" 
+                    align="start" 
+                    className="w-80 p-0 mb-2"
+                    sideOffset={12}
+                  >
+                    <div className="p-3 border-b">
+                      <h4 className="font-semibold text-sm flex items-center gap-2">
+                        <Icon className="h-4 w-4" style={{ color: group.color }} />
+                        {group.label}
+                      </h4>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {integrations.length} of {totalIntegrations.length} integration{totalIntegrations.length !== 1 ? 's' : ''}
+                        {searchTerm && integrations.length !== totalIntegrations.length && ' (filtered)'}
+                      </p>
                     </div>
-                  </ScrollArea>
-                </PopoverContent>
-              </Popover>
-            );
-          })}
+                    <ScrollArea className="max-h-72">
+                      <div className="p-2 space-y-1">
+                        {integrations.length > 0 ? (
+                          integrations.map((integration) => (
+                            <NodeItem key={integration.id} integration={integration} />
+                          ))
+                        ) : (
+                          <div className="text-center py-6 text-muted-foreground">
+                            <Search className="h-8 w-8 mx-auto mb-2 opacity-40" />
+                            <p className="text-sm font-medium">No integrations found</p>
+                            <p className="text-xs">Try a different search term</p>
+                          </div>
+                        )}
+                      </div>
+                    </ScrollArea>
+                  </PopoverContent>
+                </Popover>
+              );
+            })}
+          </div>
+
+          {/* Separator */}
+          <div className="w-px h-6 bg-border" />
+
+          {/* Quick Help */}
+          <div className="text-xs text-muted-foreground font-medium">
+            Drag to canvas
+          </div>
         </div>
-      </div>
-    </Card>
+      </Card>
+    </div>
   );
 }

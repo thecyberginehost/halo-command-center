@@ -338,11 +338,11 @@ export function VisualWorkflowCanvas({
   }, [handleDuplicateNode, handleDeleteNode]);
 
   return (
-    <div className="relative w-full h-full">
-      {/* Main Canvas - Fixed size to prevent resizing */}
-      <div className="absolute inset-0" ref={reactFlowWrapper}>
+    <div className="relative w-full h-full overflow-hidden">
+      {/* Main Canvas - Ensure React Flow is visible */}
+      <div className="absolute inset-0 z-10" ref={reactFlowWrapper}>
         {/* Action Buttons */}
-        <div className="absolute top-4 right-4 z-10 flex space-x-2">
+        <div className="absolute top-4 right-4 z-20 flex space-x-2">
           <Button onClick={handleSaveWorkflow} size="sm" variant="outline">
             <Save className="h-4 w-4 mr-2" />
             Save
@@ -377,7 +377,7 @@ export function VisualWorkflowCanvas({
           }}
         >
           <Background />
-          <Controls />
+          <Controls position="bottom-right" />
           <MiniMap 
             nodeStrokeWidth={2}
             nodeColor={(node) => {
@@ -385,12 +385,13 @@ export function VisualWorkflowCanvas({
               return workflowNode.data.integration.color;
             }}
             className="bg-background"
+            position="bottom-left"
           />
         </ReactFlow>
 
         {/* Empty State */}
         {nodes.length === 0 && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-15">
             <div className="text-center">
               <h3 className="text-lg font-medium text-muted-foreground mb-2">
                 Start building your workflow
@@ -403,12 +404,12 @@ export function VisualWorkflowCanvas({
         )}
       </div>
 
-      {/* Bottom Node Toolbar */}
+      {/* Bottom Node Toolbar - Lower z-index to not interfere */}
       <BottomNodeToolbar onAddNode={addNodeFromIntegration} />
 
-      {/* Configuration Panel - Right slide-out */}
+      {/* Configuration Panel - Right slide-out with higher z-index */}
       {selectedNode && (
-        <div className="fixed top-0 right-0 h-full w-96 bg-background border-l shadow-lg z-40 animate-slide-in-right">
+        <div className="fixed top-0 right-0 h-full w-96 bg-background border-l shadow-xl z-50 animate-slide-in-right">
           <NodeConfigPanel
             node={selectedNode}
             onConfigChange={handleNodeConfigChange}
