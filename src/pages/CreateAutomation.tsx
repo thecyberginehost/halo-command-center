@@ -123,11 +123,12 @@ async function executeAutomation(input) {
       });
 
       const data = await response.json();
+      console.log('AI Response:', data); // Debug log
       
       // Add AI response to chat
       setChatMessages(prev => [...prev, {
         role: 'assistant', 
-        content: data.message
+        content: data.message || data.fallbackMessage || "I received your message but couldn't process it properly."
       }]);
 
       // If AI generated workflow data, apply it to the canvas
