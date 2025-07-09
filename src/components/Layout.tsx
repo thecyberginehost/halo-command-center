@@ -11,7 +11,7 @@ import ReminderNotification from './chat/ReminderNotification';
 import WorkflowBuilder from './WorkflowBuilder';
 import { useChat } from '@/contexts/ChatContext';
 import { ResonantDirectiveChat } from './automation/ResonantDirectiveChat';
-import { FloatingChatButton } from './automation/FloatingChatButton';
+
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -95,9 +95,6 @@ const Layout = ({ children, pageTitle = "Dashboard" }: LayoutProps) => {
         onSendMessage={onSendMessage}
       />
 
-      {!isChatOpen && (
-        <FloatingChatButton onClick={handleChatToggle} />
-      )}
       
       {/* Welcome Popup - only shows when sidebar opens for first time */}
       <WelcomePopup 

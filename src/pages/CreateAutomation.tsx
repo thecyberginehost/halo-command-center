@@ -11,7 +11,7 @@ import { DeveloperModeEditor } from '@/components/automation/DeveloperModeEditor
 import { VisualModeCanvas } from '@/components/automation/VisualModeCanvas';
 import { StepSelectorModal } from '@/components/automation/StepSelectorModal';
 import { ResonantDirectiveChat } from '@/components/automation/ResonantDirectiveChat';
-import { FloatingChatButton } from '@/components/automation/FloatingChatButton';
+
 import { useAutomationChat } from '@/hooks/useAutomationChat';
 import { useWorkflowOperations } from '@/hooks/useWorkflowOperations';
 
@@ -162,9 +162,6 @@ async function executeAutomation(input) {
         isThinking={isThinking}
       />
 
-      {!isChatOpen && (
-        <FloatingChatButton onClick={() => setIsChatOpen(true)} />
-      )}
     </div>
   );
 };
