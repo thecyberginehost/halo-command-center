@@ -12,7 +12,8 @@ import { VisualModeCanvas } from '@/components/automation/VisualModeCanvas';
 import { StepSelectorModal } from '@/components/automation/StepSelectorModal';
 import { ResonantDirectiveChat } from '@/components/automation/ResonantDirectiveChat';
 import { FloatingChatButton } from '@/components/automation/FloatingChatButton';
-import { AutomationImportExportService } from '@/services/automationImportExport';
+import { useAutomationChat } from '@/hooks/useAutomationChat';
+import { useWorkflowOperations } from '@/hooks/useWorkflowOperations';
 
 const CreateAutomation = () => {
   const navigate = useNavigate();
@@ -21,8 +22,6 @@ const CreateAutomation = () => {
   const { toast } = useToast();
   
   const [workflow, setWorkflow] = useState<WorkflowRecord | null>(null);
-  const [workflowNodes, setWorkflowNodes] = useState<any[]>([]);
-  const [workflowEdges, setWorkflowEdges] = useState<any[]>([]);
   const [workflowName, setWorkflowName] = useState('My Automation');
   const [isDeveloperMode, setIsDeveloperMode] = useState(false);
   const [showStepSelector, setShowStepSelector] = useState(false);
@@ -41,14 +40,29 @@ async function executeAutomation(input) {
     data: input
   };
 }`);
-  const [chatMessages, setChatMessages] = useState([
-    {
-      role: 'assistant',
-      content: "I'm Resonant Directive, your AI automation architect! I can build complete workflows from your descriptions, analyze your current automation, and suggest optimizations. What would you like to create?"
-    }
-  ]);
-  const [chatInput, setChatInput] = useState('');
-  const [isThinking, setIsThinking] = useState(false);
+
+  const {
+    workflowNodes,
+    workflowEdges,
+    handleAIWorkflowGeneration,
+    handleExport,
+    handleSaveWorkflow,
+    handleWorkflowChange
+  } = useWorkflowOperations(workflow);
+
+  const {
+    chatMessages,
+    setChatMessages,
+    chatInput,
+    setChatInput,
+    isThinking,
+    handleSendMessage
+  } = useAutomationChat({
+    workflow,
+    workflowNodes,
+    workflowEdges,
+    onWorkflowGeneration: handleAIWorkflowGeneration
+  });
 
   useEffect(() => {
     const fetchWorkflow = async () => {
@@ -94,188 +108,6 @@ async function executeAutomation(input) {
     ]);
   };
 
-  const handleSendMessage = async () => {
-    if (!chatInput.trim()) return;
-    
-    const newMessage = { role: 'user', content: chatInput };
-    setChatMessages(prev => [...prev, newMessage]);
-    const currentInput = chatInput;
-    setChatInput('');
-    
-    // Determine thinking message based on input
-    const isWorkflowRequest = currentInput.toLowerCase().includes('build') || 
-                             currentInput.toLowerCase().includes('create') || 
-                             currentInput.toLowerCase().includes('workflow') ||
-                             currentInput.toLowerCase().includes('automation');
-    
-    const thinkingMessage = isWorkflowRequest ? 'Building your workflow...' : 'Thinking...';
-    
-    // Add thinking indicator
-    setIsThinking(true);
-    setChatMessages(prev => [...prev, { role: 'assistant', content: thinkingMessage }]);
-    
-    try {
-      const response = await fetch(`https://xxltijgxrwhdudhzicel.supabase.co/functions/v1/ai-chat`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4bHRpamd4cndoZHVkaHppY2VsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4MjM4MDUsImV4cCI6MjA2NzM5OTgwNX0.Vu4GrS5lgDBpWErm6evBXAZM1jhl75m-3tXJXiz66ZE`
-        },
-        body: JSON.stringify({
-          message: currentInput,
-          tenantId: currentTenant?.id,
-          context: {
-            currentPage: `/automations/create/${workflowId}`,
-            currentWorkflow: workflow,
-            currentWorkflowNodes: workflowNodes,
-            currentWorkflowEdges: workflowEdges,
-            workflowCount: 1
-          },
-          conversationHistory: chatMessages.slice(-10) // Last 10 messages for context
-        })
-      });
-
-      const data = await response.json();
-      console.log('AI Response:', data); // Debug log
-      
-      // Replace thinking message with actual response
-      setChatMessages(prev => {
-        const newMessages = [...prev];
-        newMessages[newMessages.length - 1] = {
-          role: 'assistant', 
-          content: data.message || data.fallbackMessage || "I received your message but couldn't process it properly."
-        };
-        return newMessages;
-      });
-
-      // If AI generated workflow data, apply it to the canvas
-      console.log('Checking for workflow data:', data.workflowData);
-      if (data.workflowData && data.workflowData.action === 'build_workflow') {
-        console.log('Found workflow data, applying to canvas:', data.workflowData);
-        handleAIWorkflowGeneration(data.workflowData);
-      }
-      
-    } catch (error) {
-      console.error('Chat error:', error);
-      // Replace thinking message with error message
-      setChatMessages(prev => {
-        const newMessages = [...prev];
-        newMessages[newMessages.length - 1] = {
-          role: 'assistant', 
-          content: "I'm having trouble connecting right now. Please try again in a moment."
-        };
-        return newMessages;
-      });
-    } finally {
-      setIsThinking(false);
-    }
-  };
-
-  const handleAIWorkflowGeneration = (workflowData: any) => {
-    if (!workflowData.nodes || !Array.isArray(workflowData.nodes)) return;
-
-    // Convert AI-generated nodes to visual workflow format
-    const newNodes = workflowData.nodes.map((node: any) => ({
-      id: node.id || `node-${Date.now()}-${Math.random()}`,
-      type: 'integrationNode',
-      position: node.position || { x: Math.random() * 400 + 100, y: Math.random() * 300 + 100 },
-      data: {
-        integration: {
-          id: node.integration,
-          name: node.name,
-          type: node.type,
-          color: node.type === 'trigger' ? '#10B981' : '#3B82F6',
-          icon: () => null // Will be set by integration system
-        },
-        config: node.config || {},
-        label: node.name,
-        isConfigured: false,
-      },
-    }));
-
-    // Convert connections to edges
-    const newEdges = (workflowData.connections || []).map((conn: any, index: number) => ({
-      id: `edge-${index}`,
-      source: conn.source,
-      target: conn.target,
-      type: 'smoothstep',
-      animated: true,
-      style: { stroke: 'hsl(var(--primary))', strokeWidth: 2 },
-    }));
-
-    // Update workflow state
-    setWorkflowNodes(newNodes);
-    setWorkflowEdges(newEdges);
-    
-    toast({
-      title: "Workflow Generated!",
-      description: `Created ${newNodes.length} nodes with ${newEdges.length} connections`
-    });
-  };
-
-  const handleExport = async () => {
-    if (!workflow) return;
-    
-    try {
-      await AutomationImportExportService.exportWorkflow(workflow);
-      toast({
-        title: "Export Successful",
-        description: `"${workflow.name}" has been exported to your downloads.`
-      });
-    } catch (error) {
-      toast({
-        title: "Export Failed", 
-        description: "Failed to export automation.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleSaveWorkflow = async () => {
-    if (!workflow || !currentTenant) return;
-    
-    try {
-      // Convert visual workflow to steps format
-      const steps = workflowNodes.map((node, index) => ({
-        id: node.id,
-        type: node.data.integration.type,
-        name: node.data.integration.name,
-        config: node.data.config || {},
-        position: { x: node.position.x, y: node.position.y },
-        order: index
-      }));
-
-      const { error } = await supabase
-        .from('workflows')
-        .update({
-          name: workflowName,
-          steps: steps,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', workflow.id)
-        .eq('tenant_id', currentTenant.id);
-
-      if (error) throw error;
-      
-      toast({
-        title: "Workflow Saved",
-        description: `Saved ${steps.length} workflow steps successfully.`
-      });
-    } catch (error) {
-      console.error('Save error:', error);
-      toast({
-        title: "Save Failed",
-        description: "Failed to save workflow.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleWorkflowChange = (nodes: any[], edges: any[]) => {
-    setWorkflowNodes(nodes);
-    setWorkflowEdges(edges);
-  };
-
   return (
     <div className="flex min-h-screen w-full">
       <AppSidebar />
@@ -287,7 +119,7 @@ async function executeAutomation(input) {
           isDeveloperMode={isDeveloperMode}
           setIsDeveloperMode={setIsDeveloperMode}
           onExport={handleExport}
-          onSave={handleSaveWorkflow}
+          onSave={() => handleSaveWorkflow(workflowName)}
         />
 
         <div className={`flex-1 transition-all duration-300 ${isChatOpen ? 'mr-96' : ''} flex flex-col`}>
@@ -304,7 +136,7 @@ async function executeAutomation(input) {
             ) : (
               <VisualModeCanvas
                 onAddStepClick={() => setShowStepSelector(true)}
-                onSaveWorkflow={handleSaveWorkflow}
+                onSaveWorkflow={() => handleSaveWorkflow(workflowName)}
                 onWorkflowChange={handleWorkflowChange}
                 initialNodes={workflowNodes}
                 initialEdges={workflowEdges}
