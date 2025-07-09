@@ -38,7 +38,9 @@ npm install
 
 # Start development server
 npm run dev
-Requirements: Node.js 18+ and npm
+
+# Requirements: 
+Node.js 18+ and npm
 
 # Direct GitHub Editing
 
