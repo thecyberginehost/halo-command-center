@@ -164,6 +164,8 @@ services:
     environment:
       - VITE_SUPABASE_URL=https://${DOMAIN:-halo.yourdomain.com}
       - VITE_SUPABASE_ANON_KEY=${ANON_KEY:-}
+    ports:
+      - "2552:2552"  # HALO's signature port - commemorating Halo: Combat Evolved (2552)
     networks:
       - halo-network
 

@@ -1,11 +1,17 @@
 # Welcome to HALO (Hyper-Automation & Logic Orchestrator)
 HALO is a powerful, AI-driven automation platform that enables organizations to create, manage, and execute sophisticated workflow automations through an intuitive interface.
 
+🎮 **Port 2552** - HALO's signature port (commemorating Halo: Combat Evolved timeline)
+
 ## 🐳 Self-Hosted Docker Deployment
 
 HALO supports self-hosted deployment using Docker for enterprise environments:
 
 ```bash
+# Interactive setup (Recommended - like n8n!)
+chmod +x interactive-setup.sh
+./interactive-setup.sh
+
 # Quick setup
 chmod +x setup.sh
 ./setup.sh

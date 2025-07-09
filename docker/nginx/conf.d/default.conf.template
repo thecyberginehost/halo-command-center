@@ -38,27 +38,27 @@ server {
     # Rate limiting for auth endpoints
     location /auth/ {
         limit_req zone=login burst=5 nodelay;
-        proxy_pass http://frontend:80;
+        proxy_pass http://frontend:2552;
         include /etc/nginx/proxy_params;
     }
     
     # Rate limiting for API endpoints  
     location /api/ {
         limit_req zone=api burst=20 nodelay;
-        proxy_pass http://frontend:80;
+        proxy_pass http://frontend:2552;
         include /etc/nginx/proxy_params;
     }
     
     # Main application
     location / {
-        proxy_pass http://frontend:80;
+        proxy_pass http://frontend:2552;
         include /etc/nginx/proxy_params;
     }
     
     # Health check endpoint
     location /health {
         access_log off;
-        proxy_pass http://frontend:80;
+        proxy_pass http://frontend:2552;
         include /etc/nginx/proxy_params;
     }
 }

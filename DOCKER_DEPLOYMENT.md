@@ -18,19 +18,25 @@ This guide will help you deploy HALO as a self-hosted solution using Docker with
    cd halo
    ```
 
-2. **Run the setup script**
+2. **Run the interactive setup script (Recommended)**
+   ```bash
+   chmod +x interactive-setup.sh
+   ./interactive-setup.sh
+   ```
+
+3. **Or run the basic setup script**
    ```bash
    chmod +x setup.sh
    ./setup.sh
    ```
 
-3. **For subdomain deployment with SSL**
+4. **For subdomain deployment with SSL**
    ```bash
    ./ssl-setup.sh halo.yourdomain.com admin@yourdomain.com
    ```
 
-4. **Access HALO**
-   - Local: `http://localhost`
+5. **Access HALO**
+   - Local: `http://localhost:2552` 🎮 (HALO's signature port)
    - Production: `https://halo.yourdomain.com`
 
 ## SSL and Subdomain Configuration
@@ -180,7 +186,7 @@ The self-hosted setup includes:
 
 ### Health Checks
 
-- Application: `https://halo.yourdomain.com/health`
+- Application: `https://halo.yourdomain.com/health` or `http://localhost:2552/health`
 - Database: `docker-compose exec db pg_isready`
 - Services: `docker-compose ps`
 - SSL Status: `docker-compose run --rm certbot certificates`

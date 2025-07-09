@@ -67,7 +67,8 @@ sleep 30
 if docker-compose ps | grep -q "Up"; then
     echo "✅ Services are running successfully!"
     echo ""
-    echo "🌐 HALO is now available at: http://localhost"
+    echo "🌐 HALO is now available at: http://localhost:2552"
+    echo "   🎮 Port 2552 - HALO's signature port (Halo: Combat Evolved timeline)"
     echo "📊 Database is accessible at: localhost:5432"
     echo "🔐 Auth service at: http://localhost:9999"
     echo "🗄️  Storage service at: http://localhost:5000"
@@ -76,7 +77,7 @@ if docker-compose ps | grep -q "Up"; then
     echo "   Run: ./ssl-setup.sh your-subdomain.yourdomain.com admin@yourdomain.com"
     echo ""
     echo "📚 Next steps:"
-    echo "1. Visit http://localhost to access HALO (local)"
+    echo "1. Visit http://localhost:2552 to access HALO (local)"
     echo "2. Configure your domain and run SSL setup for production"
     echo "3. Update your .env file with external API keys (OpenAI, etc.)"
     echo "4. Configure SMTP settings for email notifications"
