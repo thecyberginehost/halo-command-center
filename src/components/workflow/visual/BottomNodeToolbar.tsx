@@ -4,12 +4,13 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Search, Zap, Send, Database, FileText, Brain, BarChart, CreditCard, Code, GitBranch } from 'lucide-react';
+import { Search, Zap, Send, Database, FileText, Brain, BarChart, CreditCard, Code, GitBranch, Bot, Sparkles } from 'lucide-react';
 import { IntegrationNode, IntegrationCategory } from '@/types/integrations';
 import { integrationsByCategory } from '@/lib/integrations';
 
 interface BottomNodeToolbarProps {
   onAddNode: (integration: IntegrationNode, position: { x: number; y: number }) => void;
+  onChatToggle?: () => void;
 }
 
 const categoryIcons: Record<IntegrationCategory, any> = {
@@ -51,7 +52,7 @@ const nodeTypeGroups = [
   { id: 'dev', label: 'Dev', icon: Code, color: '#64748B', categories: ['developer_tools'] }
 ];
 
-export function BottomNodeToolbar({ onAddNode }: BottomNodeToolbarProps) {
+export function BottomNodeToolbar({ onAddNode, onChatToggle }: BottomNodeToolbarProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [openPopover, setOpenPopover] = useState<string | null>(null);
 
@@ -248,6 +249,28 @@ export function BottomNodeToolbar({ onAddNode }: BottomNodeToolbarProps) {
               );
             })}
           </div>
+
+          {/* Separator */}
+          <div className="w-px h-6 bg-border" />
+
+          {/* Resonant Directive AI Assistant */}
+          {onChatToggle && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onChatToggle}
+              className="relative h-8 px-3 bg-gradient-to-r from-halo-primary/10 to-halo-accent/10 hover:from-halo-primary/20 hover:to-halo-accent/20 border border-halo-primary/20 hover:border-halo-primary/30 rounded-lg transition-all duration-200"
+              title="Open Resonant Directive AI Assistant"
+            >
+              <div className="flex items-center gap-1.5">
+                <div className="relative">
+                  <Bot className="h-3.5 w-3.5 text-halo-primary" />
+                  <Sparkles className="h-2 w-2 text-halo-accent absolute -top-0.5 -right-0.5 animate-pulse" />
+                </div>
+                <span className="text-xs font-medium text-halo-text">AI</span>
+              </div>
+            </Button>
+          )}
 
           {/* Separator */}
           <div className="w-px h-6 bg-border" />

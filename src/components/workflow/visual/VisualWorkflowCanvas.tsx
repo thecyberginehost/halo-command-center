@@ -27,6 +27,7 @@ interface VisualWorkflowCanvasProps {
   initialEdges?: VisualWorkflowEdge[];
   onWorkflowChange?: (nodes: VisualWorkflowNode[], edges: VisualWorkflowEdge[]) => void;
   onSaveWorkflow?: () => void;
+  onChatToggle?: () => void;
 }
 
 // Create a proper component instead of inline function
@@ -76,7 +77,8 @@ export function VisualWorkflowCanvas({
   initialNodes = [], 
   initialEdges = [],
   onWorkflowChange,
-  onSaveWorkflow 
+  onSaveWorkflow,
+  onChatToggle 
 }: VisualWorkflowCanvasProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState<VisualWorkflowNode>(initialNodes || []);
   const [edges, setEdges, onEdgesChange] = useEdgesState<VisualWorkflowEdge>(initialEdges || []);
@@ -402,7 +404,7 @@ export function VisualWorkflowCanvas({
       </div>
 
       {/* Bottom Node Toolbar - Lower z-index to not interfere */}
-      <BottomNodeToolbar onAddNode={addNodeFromIntegration} />
+      <BottomNodeToolbar onAddNode={addNodeFromIntegration} onChatToggle={onChatToggle} />
 
       {/* Configuration Panel - Right slide-out with higher z-index */}
       {selectedNode && (

@@ -140,6 +140,7 @@ async function executeAutomation(input) {
                 onWorkflowChange={handleWorkflowChange}
                 initialNodes={workflowNodes}
                 initialEdges={workflowEdges}
+                onChatToggle={() => setIsChatOpen(true)}
               />
             )}
 
