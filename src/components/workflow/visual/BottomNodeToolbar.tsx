@@ -91,8 +91,7 @@ export function BottomNodeToolbar({ onAddNode, onChatToggle }: BottomNodeToolbar
   // Remove drag functionality - just use click
   const handleNodeClick = (integration: IntegrationNode) => {
     onAddNode(integration, { x: 100, y: 100 }); // Default position
-    setOpenPopover(null);
-    setSearchTerm(''); // Clear search after adding
+    // Keep popover open and search term so users can add multiple nodes quickly
   };
 
   const NodeItem = ({ integration }: { integration: IntegrationNode }) => {
