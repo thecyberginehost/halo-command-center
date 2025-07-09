@@ -57,99 +57,85 @@ export default function AIAssist() {
     <Layout>
       <div className="flex h-full">
         <div className="flex-1 overflow-auto">
-          <div className="max-w-6xl mx-auto p-6">
+          <div className="max-w-5xl mx-auto p-6 h-full flex flex-col justify-center">
             {!isChatOpen ? (
               <>
                 {/* Hero Section */}
-                <div className="text-center mb-12">
-                  <div className="w-20 h-20 bg-gradient-to-r from-halo-primary to-halo-accent rounded-full flex items-center justify-center mx-auto mb-6">
-                    <MessageSquare className="w-10 h-10 text-white" />
+                <div className="text-center mb-8">
+                  <div className="w-16 h-16 bg-gradient-to-r from-halo-primary to-halo-accent rounded-full flex items-center justify-center mx-auto mb-4">
+                    <MessageSquare className="w-8 h-8 text-white" />
                   </div>
-                  <h1 className="text-4xl font-bold text-halo-text mb-4">
+                  <h1 className="text-3xl font-bold text-halo-text mb-3">
                     Meet Resonant Directive
                   </h1>
-                  <p className="text-xl text-halo-textSecondary mb-6 max-w-3xl mx-auto">
-                    Your AI automation architect for HALO. I specialize in building enterprise-grade workflows, 
-                    optimizing automation strategies, and helping MASP-certified providers deliver exceptional results.
+                  <p className="text-lg text-halo-textSecondary mb-6 max-w-2xl mx-auto">
+                    Your AI automation architect for HALO. I specialize in building enterprise-grade workflows 
+                    and helping MASP-certified providers deliver exceptional results.
                   </p>
+                </div>
+
+                {/* Central CTA */}
+                <div className="text-center mb-8">
                   <Button 
                     onClick={() => setIsChatOpen(true)}
                     size="lg"
-                    className="bg-halo-primary hover:bg-halo-primary/90 text-white px-8 py-3"
+                    className="bg-halo-primary hover:bg-halo-primary/90 text-white px-12 py-4 text-lg"
                   >
-                    <MessageSquare className="w-5 h-5 mr-2" />
-                    Start Conversation
+                    <MessageSquare className="w-6 h-6 mr-3" />
+                    Start Chat
                   </Button>
                 </div>
 
-                {/* Capabilities Grid */}
-                <div className="mb-12">
-                  <h2 className="text-2xl font-semibold text-halo-text mb-8 text-center">
-                    What I Can Help You With
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {capabilities.map((capability, index) => (
-                      <Card key={index} className="border-halo-border hover:border-halo-primary/50 transition-colors">
-                        <CardHeader>
-                          <div className="w-12 h-12 bg-halo-primary/10 rounded-lg flex items-center justify-center mb-4">
-                            <capability.icon className="w-6 h-6 text-halo-primary" />
-                          </div>
-                          <CardTitle className="text-halo-text">{capability.title}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <CardDescription className="text-halo-textSecondary">
-                            {capability.description}
-                          </CardDescription>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
+                {/* Compact Capabilities */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+                  <Card className="border-halo-border hover:border-halo-primary/50 transition-colors">
+                    <CardContent className="p-4 text-center">
+                      <Lightbulb className="w-8 h-8 text-halo-primary mx-auto mb-2" />
+                      <h3 className="font-semibold text-halo-text mb-1">Workflow Generation</h3>
+                      <p className="text-sm text-halo-textSecondary">Generate complete automations from natural language</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-halo-border hover:border-halo-primary/50 transition-colors">
+                    <CardContent className="p-4 text-center">
+                      <Target className="w-8 h-8 text-halo-primary mx-auto mb-2" />
+                      <h3 className="font-semibold text-halo-text mb-1">Optimization & Analysis</h3>
+                      <p className="text-sm text-halo-textSecondary">Analyze and improve existing workflows</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-halo-border hover:border-halo-primary/50 transition-colors">
+                    <CardContent className="p-4 text-center">
+                      <Users className="w-8 h-8 text-halo-primary mx-auto mb-2" />
+                      <h3 className="font-semibold text-halo-text mb-1">MASP Best Practices</h3>
+                      <p className="text-sm text-halo-textSecondary">Enterprise-grade automation guidance</p>
+                    </CardContent>
+                  </Card>
                 </div>
 
-                {/* Example Prompts */}
-                <div className="mb-12">
-                  <h2 className="text-2xl font-semibold text-halo-text mb-6 text-center">
-                    Try These Example Prompts
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+                {/* Quick Examples */}
+                <div className="text-center mt-6">
+                  <p className="text-sm text-halo-textSecondary mb-3">Try asking me:</p>
+                  <div className="flex flex-wrap justify-center gap-2 max-w-3xl mx-auto">
                     {[
-                      "Build a workflow that processes customer support tickets and routes them to the right team",
-                      "Create an automation that syncs new leads from our website to our CRM and sends a welcome email",
-                      "Help me optimize this workflow for better performance and error handling",
-                      "Design a client onboarding automation for our MASP practice"
+                      "Build a customer support workflow",
+                      "Create a lead processing automation", 
+                      "Help optimize my existing workflow"
                     ].map((prompt, index) => (
-                      <Card 
-                        key={index} 
-                        className="cursor-pointer border-halo-border hover:border-halo-primary hover:shadow-md transition-all"
+                      <Button
+                        key={index}
+                        variant="outline"
+                        size="sm"
+                        className="text-xs border-halo-border hover:bg-halo-primary/10"
                         onClick={() => {
                           setInputValue(prompt);
                           setIsChatOpen(true);
                         }}
                       >
-                        <CardContent className="p-4">
-                          <p className="text-halo-textSecondary text-sm">"{prompt}"</p>
-                        </CardContent>
-                      </Card>
+                        "{prompt}"
+                      </Button>
                     ))}
                   </div>
-                </div>
-
-                {/* CTA Section */}
-                <div className="text-center bg-gradient-to-r from-halo-primary/5 to-halo-accent/5 rounded-lg p-8">
-                  <h3 className="text-xl font-semibold text-halo-text mb-4">
-                    Ready to Build Something Amazing?
-                  </h3>
-                  <p className="text-halo-textSecondary mb-6">
-                    I'm here to help you create powerful automations that drive real business value.
-                  </p>
-                  <Button 
-                    onClick={() => setIsChatOpen(true)}
-                    size="lg"
-                    className="bg-halo-primary hover:bg-halo-primary/90 text-white"
-                  >
-                    <MessageSquare className="w-5 h-5 mr-2" />
-                    Let's Get Started
-                  </Button>
                 </div>
               </>
             ) : (
