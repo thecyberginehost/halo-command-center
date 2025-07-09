@@ -31,7 +31,8 @@ export function NodeConfigPanel({ node, onConfigChange, onClose }: NodeConfigPan
 
   useEffect(() => {
     // Validate configuration
-    const requiredFields = node.data.integration.fields.filter(field => field.required);
+    const integrationFields = node.data.integration.fields || [];
+    const requiredFields = integrationFields.filter(field => field.required);
     const hasAllRequired = requiredFields.every(field => 
       config[field.name] !== undefined && config[field.name] !== ''
     );
@@ -167,7 +168,7 @@ export function NodeConfigPanel({ node, onConfigChange, onClose }: NodeConfigPan
       case 'select':
         const isCredentialField = field.name === 'credential';
         const options = isCredentialField ? 
-          availableCredentials.map(cred => ({ label: cred.name, value: cred.name })) :
+          (availableCredentials || []).map(cred => ({ label: cred.name, value: cred.name })) :
           field.options || [];
 
         return (
@@ -256,7 +257,7 @@ export function NodeConfigPanel({ node, onConfigChange, onClose }: NodeConfigPan
 
         <ScrollArea className="flex-1 pr-4">
         <div className="space-y-4">
-          {node.data.integration.fields.map((field) => (
+          {(node.data.integration.fields || []).map((field) => (
             <div key={field.name} className="space-y-2">
               <Label htmlFor={field.name} className="flex items-center gap-2">
                 {field.label}
