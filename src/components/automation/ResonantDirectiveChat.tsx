@@ -33,7 +33,7 @@ export function ResonantDirectiveChat({
   return (
     <div className="fixed right-0 top-0 h-full w-96 bg-gradient-to-br from-white to-gray-50 border-l-2 border-primary/10 shadow-2xl flex flex-col z-20">
       {/* Chat Header */}
-      <div className="flex-shrink-0 p-4 border-b bg-gradient-to-r from-halo-primary to-halo-accent">
+      <div className="flex-shrink-0 p-4 border-b bg-sidebar">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
