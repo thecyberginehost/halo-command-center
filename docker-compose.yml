@@ -1,6 +1,33 @@
 version: '3.8'
 
 services:
+  # Reverse Proxy with SSL
+  nginx-proxy:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./docker/nginx/ssl:/etc/nginx/ssl:ro
+      - ./docker/certbot/www:/var/www/certbot/:ro
+      - ./docker/certbot/conf:/etc/letsencrypt/:ro
+    depends_on:
+      - frontend
+    networks:
+      - halo-network
+
+  # Certbot for SSL certificates
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ./docker/certbot/www:/var/www/certbot/:rw
+      - ./docker/certbot/conf:/etc/letsencrypt/:rw
+    networks:
+      - halo-network
+
   # PostgreSQL Database
   db:
     image: postgres:15-alpine
@@ -12,8 +39,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
-    ports:
-      - "5432:5432"
     networks:
       - halo-network
 
@@ -28,7 +53,7 @@ services:
       GOTRUE_API_PORT: 9999
       GOTRUE_DB_DRIVER: postgres
       GOTRUE_DB_DATABASE_URL: postgres://postgres:${DB_PASSWORD:-your_secure_password}@db:5432/halo_db?search_path=auth
-      GOTRUE_SITE_URL: ${SITE_URL:-http://localhost:3000}
+      GOTRUE_SITE_URL: ${SITE_URL:-https://halo.yourdomain.com}
       GOTRUE_URI_ALLOW_LIST: ${ADDITIONAL_REDIRECT_URLS:-}
       GOTRUE_DISABLE_SIGNUP: ${DISABLE_SIGNUP:-false}
       GOTRUE_JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-token-with-at-least-32-characters-long}
@@ -48,8 +73,6 @@ services:
       GOTRUE_MAILER_URLPATHS_CONFIRMATION: ${MAILER_URLPATHS_CONFIRMATION:-/auth/v1/verify}
       GOTRUE_MAILER_URLPATHS_RECOVERY: ${MAILER_URLPATHS_RECOVERY:-/auth/v1/verify}
       GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE: ${MAILER_URLPATHS_EMAIL_CHANGE:-/auth/v1/verify}
-    ports:
-      - "9999:9999"
     networks:
       - halo-network
 
@@ -65,8 +88,6 @@ services:
       PGRST_DB_ANON_ROLE: anon
       PGRST_JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-token-with-at-least-32-characters-long}
       PGRST_DB_USE_LEGACY_GUCS: "false"
-    ports:
-      - "3000:3000"
     networks:
       - halo-network
 
@@ -93,8 +114,6 @@ services:
       GLOBAL_S3_BUCKET: stub
     volumes:
       - storage_data:/var/lib/storage
-    ports:
-      - "5000:5000"
     networks:
       - halo-network
 
@@ -111,8 +130,6 @@ services:
       SUPABASE_SERVICE_ROLE_KEY: ${SERVICE_ROLE_KEY:-}
     volumes:
       - ./supabase/functions:/home/deno/functions:cached
-    ports:
-      - "9998:9998"
     networks:
       - halo-network
 
@@ -135,8 +152,6 @@ services:
       KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
     volumes:
       - ./docker/kong.yml:/var/lib/kong/kong.yml:ro
-    ports:
-      - "8000:8000"
     networks:
       - halo-network
 
@@ -147,10 +162,8 @@ services:
     depends_on:
       - kong
     environment:
-      - VITE_SUPABASE_URL=http://localhost:8000
+      - VITE_SUPABASE_URL=https://${DOMAIN:-halo.yourdomain.com}
       - VITE_SUPABASE_ANON_KEY=${ANON_KEY:-}
-    ports:
-      - "80:80"
     networks:
       - halo-network
 

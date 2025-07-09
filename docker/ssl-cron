@@ -1,0 +1,6 @@
+# Automatic SSL Certificate Renewal
+# Add this to your crontab: crontab -e
+# This will check for certificate renewal twice daily
+
+0 12 * * * /path/to/your/halo/ssl-renew.sh >> /var/log/ssl-renew.log 2>&1
+0 0 * * * /path/to/your/halo/ssl-renew.sh >> /var/log/ssl-renew.log 2>&1

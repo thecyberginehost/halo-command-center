@@ -1,6 +1,6 @@
 # HALO Self-Hosted Docker Deployment
 
-This guide will help you deploy HALO as a self-hosted solution using Docker.
+This guide will help you deploy HALO as a self-hosted solution using Docker with SSL support and subdomain configuration.
 
 ## Prerequisites
 
@@ -8,6 +8,7 @@ This guide will help you deploy HALO as a self-hosted solution using Docker.
 - Docker Compose 2.0+
 - At least 4GB RAM
 - 20GB free disk space
+- Domain name with DNS access (for SSL/subdomain setup)
 
 ## Quick Start
 
@@ -23,9 +24,68 @@ This guide will help you deploy HALO as a self-hosted solution using Docker.
    ./setup.sh
    ```
 
-3. **Access HALO**
-   - Open your browser to `http://localhost`
-   - The platform will be ready to use
+3. **For subdomain deployment with SSL**
+   ```bash
+   ./ssl-setup.sh halo.yourdomain.com admin@yourdomain.com
+   ```
+
+4. **Access HALO**
+   - Local: `http://localhost`
+   - Production: `https://halo.yourdomain.com`
+
+## SSL and Subdomain Configuration
+
+### Automatic SSL Setup
+
+The deployment includes automatic SSL certificate generation using Let's Encrypt:
+
+```bash
+# Configure your domain in .env
+DOMAIN=halo.yourdomain.com
+SITE_URL=https://halo.yourdomain.com
+SSL_EMAIL=admin@yourdomain.com
+
+# Run SSL setup
+./ssl-setup.sh halo.yourdomain.com admin@yourdomain.com
+```
+
+### Manual SSL Configuration
+
+For manual SSL setup:
+
+1. **Point your domain to the server**
+   - Create an A record: `halo.yourdomain.com` → `your-server-ip`
+
+2. **Generate SSL certificates**
+   ```bash
+   docker-compose run --rm certbot certonly \
+     --webroot \
+     --webroot-path=/var/www/certbot \
+     --email admin@yourdomain.com \
+     --agree-tos \
+     --no-eff-email \
+     -d halo.yourdomain.com
+   ```
+
+3. **Restart nginx**
+   ```bash
+   docker-compose restart nginx-proxy
+   ```
+
+### Certificate Renewal
+
+SSL certificates auto-renew. To manually renew:
+
+```bash
+./ssl-renew.sh
+```
+
+Set up automatic renewal with cron:
+```bash
+crontab -e
+# Add this line:
+0 12 * * * /path/to/halo/ssl-renew.sh >> /var/log/ssl-renew.log 2>&1
+```
 
 ## Manual Setup
 
@@ -53,13 +113,37 @@ If you prefer to set up manually:
 
 Key variables in your `.env` file:
 
+- `DOMAIN`: Your subdomain (e.g., halo.yourdomain.com)
+- `SITE_URL`: Full URL with HTTPS
 - `DB_PASSWORD`: PostgreSQL database password
 - `JWT_SECRET`: JWT signing secret (32+ characters)
-- `SITE_URL`: Your domain URL
 - `ANON_KEY`: Supabase anonymous key
 - `SERVICE_ROLE_KEY`: Supabase service role key
 - `OPENAI_API_KEY`: OpenAI API key for AI features
 - `SMTP_*`: Email configuration for notifications
+- `SSL_EMAIL`: Email for SSL certificate notifications
+
+### DNS Configuration
+
+Before running SSL setup, configure your DNS:
+
+1. **A Record**: Point your subdomain to your server's IP
+   ```
+   Type: A
+   Name: halo
+   Value: your-server-ip-address
+   TTL: 300 (or default)
+   ```
+
+2. **Wait for DNS propagation** (usually 5-15 minutes)
+   ```bash
+   nslookup halo.yourdomain.com
+   ```
+
+3. **Verify HTTP access** before SSL setup
+   ```bash
+   curl -I http://halo.yourdomain.com
+   ```
 
 ### Database Migration
 
@@ -82,6 +166,8 @@ Your existing database schema will need to be migrated:
 
 The self-hosted setup includes:
 
+- **Reverse Proxy**: Nginx with SSL termination
+- **SSL Manager**: Certbot for automatic certificate management
 - **Frontend**: React app served by Nginx
 - **Database**: PostgreSQL with your data
 - **Auth**: Supabase GoTrue for authentication
@@ -94,9 +180,10 @@ The self-hosted setup includes:
 
 ### Health Checks
 
-- Application: `http://localhost/health`
+- Application: `https://halo.yourdomain.com/health`
 - Database: `docker-compose exec db pg_isready`
 - Services: `docker-compose ps`
+- SSL Status: `docker-compose run --rm certbot certificates`
 
 ### Logs
 
@@ -134,40 +221,40 @@ docker-compose up -d
 
 1. **Change default passwords** in `.env`
 2. **Use strong JWT secrets** (32+ characters)
-3. **Enable SSL/TLS** for production
-4. **Configure firewall rules**
+3. **Enable SSL/TLS** for production (included)
+4. **Configure firewall rules** (ports 80, 443, 22)
 5. **Regular security updates**
+6. **Use strong domain and SSL email**
+7. **Enable fail2ban** for SSH protection
+
+### Firewall Configuration
+
+```bash
+# UFW example
+sudo ufw allow ssh
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw --force enable
+```
 
 ## Production Deployment
 
-For production deployment:
+The Docker setup is production-ready with:
 
-1. **Use reverse proxy** (Nginx, Traefik, or Cloudflare)
-2. **Configure SSL certificates**
-3. **Set up monitoring** (Prometheus, Grafana)
-4. **Configure backups**
-5. **Use external database** for high availability
+1. **SSL/TLS encryption** (Let's Encrypt)
+2. **Reverse proxy** with security headers
+3. **Rate limiting** for API endpoints
+4. **Automatic certificate renewal**
+5. **Security headers** (HSTS, CSP, etc.)
+6. **Health checks** and monitoring
 
-### SSL Configuration
+### Additional Production Considerations
 
-Add to your reverse proxy:
-```nginx
-server {
-    listen 443 ssl;
-    server_name your-domain.com;
-    
-    ssl_certificate /path/to/cert.pem;
-    ssl_certificate_key /path/to/key.pem;
-    
-    location / {
-        proxy_pass http://localhost:80;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-```
+1. **Use external database** for high availability
+2. **Set up monitoring** (Prometheus, Grafana)
+3. **Configure log rotation**
+4. **Set up backup schedule**
+5. **Use CDN** for static assets
 
 ## Scaling
 

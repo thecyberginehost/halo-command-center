@@ -45,10 +45,15 @@ fi
 # Create necessary directories
 mkdir -p docker/volumes/postgres
 mkdir -p docker/volumes/storage
+mkdir -p docker/nginx/conf.d
+mkdir -p docker/certbot/www
+mkdir -p docker/certbot/conf
 
 # Set proper permissions
 chmod 755 docker/volumes/postgres
 chmod 755 docker/volumes/storage
+chmod +x ssl-setup.sh
+chmod +x ssl-renew.sh
 
 echo "📦 Building and starting services..."
 
@@ -67,11 +72,14 @@ if docker-compose ps | grep -q "Up"; then
     echo "🔐 Auth service at: http://localhost:9999"
     echo "🗄️  Storage service at: http://localhost:5000"
     echo ""
+    echo "🔒 SSL Setup (for subdomain deployment):"
+    echo "   Run: ./ssl-setup.sh your-subdomain.yourdomain.com admin@yourdomain.com"
+    echo ""
     echo "📚 Next steps:"
-    echo "1. Visit http://localhost to access HALO"
-    echo "2. Update your .env file with external API keys (OpenAI, etc.)"
-    echo "3. Configure SMTP settings for email notifications"
-    echo "4. Set up SSL certificates for production use"
+    echo "1. Visit http://localhost to access HALO (local)"
+    echo "2. Configure your domain and run SSL setup for production"
+    echo "3. Update your .env file with external API keys (OpenAI, etc.)"
+    echo "4. Configure SMTP settings for email notifications"
     echo ""
     echo "🛠️  To stop services: docker-compose down"
     echo "🔄 To restart services: docker-compose restart"
