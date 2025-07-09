@@ -229,7 +229,7 @@ export function BottomNodeToolbar({ onAddNode, onChatToggle }: BottomNodeToolbar
                     align="start" 
                      className="w-80 p-0 mb-2"
                      sideOffset={12}
-                     onPointerDownOutside={(e) => {
+                     onInteractOutside={(e) => {
                        // Prevent closing when clicking on nodes inside
                        const target = e.target as Element;
                        if (target.closest('[data-node-item]')) {

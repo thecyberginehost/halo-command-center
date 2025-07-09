@@ -124,6 +124,10 @@ export function VisualWorkflowCanvas({
         label: integration.name,
         isConfigured: false,
       },
+      draggable: true,
+      selectable: true,
+      connectable: true,
+      deletable: true,
     };
 
     setNodes(prev => [...prev, newNode]);
