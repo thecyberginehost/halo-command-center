@@ -93,6 +93,9 @@ export function VisualWorkflowCanvas({
   // Removed drag and drop handlers - now using click-to-add
 
   const addNodeFromIntegration = useCallback((integration: IntegrationNode, position: { x: number; y: number }) => {
+    console.log('addNodeFromIntegration called:', integration.name);
+    console.log('Current nodes count:', nodes.length);
+    
     // Calculate smart position based on existing nodes
     const calculateSmartPosition = (): { x: number; y: number } => {
       if (nodes.length === 0) {
@@ -130,7 +133,12 @@ export function VisualWorkflowCanvas({
       deletable: true,
     };
 
-    setNodes(prev => [...prev, newNode]);
+    console.log('Adding node:', newNode);
+    setNodes(prev => {
+      const newNodes = [...prev, newNode];
+      console.log('New nodes array length:', newNodes.length);
+      return newNodes;
+    });
     
     // Auto-fit view after adding node
     setTimeout(() => {

@@ -54,7 +54,7 @@ const nodeTypeGroups = [
 
 export function BottomNodeToolbar({ onAddNode, onChatToggle }: BottomNodeToolbarProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [openPopover, setOpenPopover] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const getIntegrationsForGroup = (group: typeof nodeTypeGroups[0]) => {
     const allIntegrations: IntegrationNode[] = [];
@@ -90,12 +90,17 @@ export function BottomNodeToolbar({ onAddNode, onChatToggle }: BottomNodeToolbar
 
   // Remove drag functionality - just use click
   const handleNodeClick = (integration: IntegrationNode, event?: React.MouseEvent) => {
+    console.log('Node clicked:', integration.name);
+    console.log('Current selectedCategory:', selectedCategory);
+    
     if (event) {
       event.preventDefault();
       event.stopPropagation();
     }
+    
     onAddNode(integration, { x: 100, y: 100 }); // Default position
-    // Keep popover open and search term so users can add multiple nodes quickly
+    console.log('Node added, keeping category open');
+    // Keep category open so users can add multiple nodes quickly
   };
 
   const NodeItem = ({ integration }: { integration: IntegrationNode }) => {
@@ -139,23 +144,62 @@ export function BottomNodeToolbar({ onAddNode, onChatToggle }: BottomNodeToolbar
 
   return (
     <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-30 flex flex-col items-center">
-      {/* Search Results Dropdown - Above everything */}
-      {hasSearchResults && (
+      {/* Search Results or Category Content - Above everything */}
+      {(hasSearchResults || selectedCategory) && (
         <Card className="mb-2 w-80 max-h-80 border shadow-xl bg-background">
           <div className="p-3 border-b">
             <h4 className="font-semibold text-sm flex items-center gap-2">
-              <Search className="h-4 w-4" />
-              Search Results
+              {hasSearchResults ? (
+                <>
+                  <Search className="h-4 w-4" />
+                  Search Results
+                </>
+              ) : selectedCategory ? (
+                <>
+                  {(() => {
+                    const group = nodeTypeGroups.find(g => g.id === selectedCategory);
+                    const Icon = group?.icon || Search;
+                    return <Icon className="h-4 w-4" style={{ color: group?.color }} />;
+                  })()}
+                  {nodeTypeGroups.find(g => g.id === selectedCategory)?.label}
+                </>
+              ) : null}
             </h4>
             <p className="text-xs text-muted-foreground mt-1">
-              {globalSearchResults.length} integration{globalSearchResults.length !== 1 ? 's' : ''} found
+              {hasSearchResults 
+                ? `${globalSearchResults.length} integration${globalSearchResults.length !== 1 ? 's' : ''} found`
+                : selectedCategory 
+                  ? `Click to add multiple nodes`
+                  : ''
+              }
             </p>
+            {selectedCategory && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setSelectedCategory(null)}
+                className="mt-2 h-6 px-2 text-xs"
+              >
+                Close
+              </Button>
+            )}
           </div>
           <div className="max-h-64 overflow-y-auto">
             <div className="p-2 space-y-1">
-              {globalSearchResults.map((integration) => (
-                <NodeItem key={integration.id} integration={integration} />
-              ))}
+              {hasSearchResults 
+                ? globalSearchResults.map((integration) => (
+                    <NodeItem key={integration.id} integration={integration} />
+                  ))
+                : selectedCategory 
+                  ? (() => {
+                      const group = nodeTypeGroups.find(g => g.id === selectedCategory);
+                      const integrations = group ? getFilteredIntegrationsForGroup(group) : [];
+                      return integrations.map((integration) => (
+                        <NodeItem key={integration.id} integration={integration} />
+                      ));
+                    })()
+                : null
+              }
             </div>
           </div>
         </Card>
@@ -188,82 +232,30 @@ export function BottomNodeToolbar({ onAddNode, onChatToggle }: BottomNodeToolbar
               if (totalIntegrations.length === 0) return null;
 
               return (
-                <Popover 
-                  key={group.id} 
-                  open={openPopover === group.id} 
-                  onOpenChange={(open) => {
-                    // Only close if explicitly closing, not from node clicks
-                    if (!open) {
-                      setOpenPopover(null);
-                    } else {
-                      setOpenPopover(group.id);
-                    }
-                  }}
+                <Button
+                  key={group.id}
+                  variant="ghost"
+                  size="sm"
+                  className={`relative h-8 w-8 p-0 rounded-lg transition-all duration-200 ${
+                    selectedCategory === group.id
+                      ? 'bg-primary/10 scale-110 shadow-md' 
+                      : 'hover:bg-accent hover:scale-105'
+                  }`}
+                  title={`${group.label} (${totalIntegrations.length} integrations)`}
+                  onClick={() => setSelectedCategory(selectedCategory === group.id ? null : group.id)}
                 >
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className={`relative h-8 w-8 p-0 rounded-lg transition-all duration-200 ${
-                        openPopover === group.id 
-                          ? 'bg-primary/10 scale-110 shadow-md' 
-                          : 'hover:bg-accent hover:scale-105'
-                      }`}
-                      title={`${group.label} (${totalIntegrations.length} integrations)`}
-                    >
-                      <Icon 
-                        className="h-4 w-4" 
-                        style={{ color: group.color }}
-                      />
-                      {/* Integration count badge */}
-                      <span 
-                        className="absolute -top-1 -right-1 h-4 w-4 text-xs font-medium text-white rounded-full flex items-center justify-center"
-                        style={{ backgroundColor: group.color }}
-                      >
-                        {totalIntegrations.length}
-                      </span>
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent 
-                    side="top" 
-                    align="start" 
-                     className="w-80 p-0 mb-2"
-                     sideOffset={12}
-                     onInteractOutside={(e) => {
-                       // Prevent closing when clicking on nodes inside
-                       const target = e.target as Element;
-                       if (target.closest('[data-node-item]')) {
-                         e.preventDefault();
-                       }
-                     }}
-                   >
-                     <div className="p-3 border-b">
-                       <h4 className="font-semibold text-sm flex items-center gap-2">
-                         <Icon className="h-4 w-4" style={{ color: group.color }} />
-                         {group.label}
-                       </h4>
-                       <p className="text-xs text-muted-foreground mt-1">
-                         {integrations.length} of {totalIntegrations.length} integration{totalIntegrations.length !== 1 ? 's' : ''}
-                         {searchTerm && integrations.length !== totalIntegrations.length && ' (filtered)'}
-                       </p>
-                     </div>
-                     <div className="max-h-64 overflow-y-auto">
-                       <div className="p-2 space-y-1 max-h-60">
-                         {integrations.length > 0 ? (
-                           integrations.map((integration) => (
-                             <NodeItem key={integration.id} integration={integration} />
-                           ))
-                         ) : (
-                           <div className="text-center py-6 text-muted-foreground">
-                             <Search className="h-8 w-8 mx-auto mb-2 opacity-40" />
-                             <p className="text-sm font-medium">No integrations found</p>
-                             <p className="text-xs">Try a different search term</p>
-                           </div>
-                         )}
-                       </div>
-                     </div>
-                  </PopoverContent>
-                </Popover>
+                  <Icon 
+                    className="h-4 w-4" 
+                    style={{ color: group.color }}
+                  />
+                  {/* Integration count badge */}
+                  <span 
+                    className="absolute -top-1 -right-1 h-4 w-4 text-xs font-medium text-white rounded-full flex items-center justify-center"
+                    style={{ backgroundColor: group.color }}
+                  >
+                    {totalIntegrations.length}
+                  </span>
+                </Button>
               );
             })}
           </div>
