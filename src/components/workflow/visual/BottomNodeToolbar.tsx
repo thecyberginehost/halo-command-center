@@ -89,7 +89,11 @@ export function BottomNodeToolbar({ onAddNode, onChatToggle }: BottomNodeToolbar
   };
 
   // Remove drag functionality - just use click
-  const handleNodeClick = (integration: IntegrationNode) => {
+  const handleNodeClick = (integration: IntegrationNode, event?: React.MouseEvent) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     onAddNode(integration, { x: 100, y: 100 }); // Default position
     // Keep popover open and search term so users can add multiple nodes quickly
   };
@@ -100,7 +104,7 @@ export function BottomNodeToolbar({ onAddNode, onChatToggle }: BottomNodeToolbar
     return (
       <div
         className="flex items-center space-x-3 p-2 rounded-lg cursor-pointer hover:bg-accent/50 transition-colors border hover:border-primary/20"
-        onClick={() => handleNodeClick(integration)}
+        onClick={(e) => handleNodeClick(integration, e)}
       >
         <div 
           className="p-1.5 rounded flex items-center justify-center min-w-[28px] h-7"
