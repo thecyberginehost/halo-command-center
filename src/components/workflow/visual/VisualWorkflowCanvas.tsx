@@ -94,47 +94,48 @@ export function VisualWorkflowCanvas({
 
   const addNodeFromIntegration = useCallback((integration: IntegrationNode, position: { x: number; y: number }) => {
     console.log('addNodeFromIntegration called:', integration.name);
-    console.log('Current nodes count:', nodes.length);
     
-    // Calculate smart position based on existing nodes
-    const calculateSmartPosition = (): { x: number; y: number } => {
-      if (nodes.length === 0) {
-        return { x: 100, y: 100 };
-      }
-      
-      // Find the rightmost node
-      const rightmostNode = nodes.reduce((prev, current) => 
-        (prev.position.x > current.position.x) ? prev : current
-      );
-      
-      return {
-        x: rightmostNode.position.x + 200, // Add 200px spacing
-        y: rightmostNode.position.y
-      };
-    };
-
-    const smartPosition = position.x === 100 && position.y === 100 
-      ? calculateSmartPosition() 
-      : position;
-
-    const newNode: VisualWorkflowNode = {
-      id: `${integration.id}-${Date.now()}`,
-      type: 'integrationNode',
-      position: smartPosition,
-      data: {
-        integration,
-        config: {},
-        label: integration.name,
-        isConfigured: false,
-      },
-      draggable: true,
-      selectable: true,
-      connectable: true,
-      deletable: true,
-    };
-
-    console.log('Adding node:', newNode);
     setNodes(prev => {
+      console.log('Current nodes count:', prev.length);
+      
+      // Calculate smart position based on existing nodes
+      const calculateSmartPosition = (): { x: number; y: number } => {
+        if (prev.length === 0) {
+          return { x: 100, y: 100 };
+        }
+        
+        // Find the rightmost node
+        const rightmostNode = prev.reduce((prevNode, current) => 
+          (prevNode.position.x > current.position.x) ? prevNode : current
+        );
+        
+        return {
+          x: rightmostNode.position.x + 200, // Add 200px spacing
+          y: rightmostNode.position.y
+        };
+      };
+
+      const smartPosition = position.x === 100 && position.y === 100 
+        ? calculateSmartPosition() 
+        : position;
+
+      const newNode: VisualWorkflowNode = {
+        id: `${integration.id}-${Date.now()}`,
+        type: 'integrationNode',
+        position: smartPosition,
+        data: {
+          integration,
+          config: {},
+          label: integration.name,
+          isConfigured: false,
+        },
+        draggable: true,
+        selectable: true,
+        connectable: true,
+        deletable: true,
+      };
+
+      console.log('Adding node:', newNode);
       const newNodes = [...prev, newNode];
       console.log('New nodes array length:', newNodes.length);
       return newNodes;
@@ -152,7 +153,7 @@ export function VisualWorkflowCanvas({
       title: "Node Added",
       description: `${integration.name} node added to workflow`,
     });
-  }, [setNodes, toast, nodes]);
+  }, [setNodes, toast]);
 
   const onConnect = useCallback((connection: Connection) => {
     const edge: VisualWorkflowEdge = {
