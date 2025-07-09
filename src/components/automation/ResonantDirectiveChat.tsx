@@ -68,7 +68,22 @@ export function ResonantDirectiveChat({
                     : 'bg-muted text-foreground'
                 }`}
               >
-                <MessageFormatter content={message.content} />
+                {/* Show thinking animation for the last assistant message when thinking */}
+                {message.role === 'assistant' && 
+                 isThinking && 
+                 index === chatMessages.length - 1 && 
+                 (message.content === 'Thinking...' || message.content === 'Building your workflow...') ? (
+                  <div className="flex items-center space-x-1">
+                    <span>{message.content}</span>
+                    <div className="flex space-x-1 ml-2">
+                      <div className="w-1 h-1 bg-current rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                      <div className="w-1 h-1 bg-current rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                      <div className="w-1 h-1 bg-current rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                    </div>
+                  </div>
+                ) : (
+                  <MessageFormatter content={message.content} />
+                )}
               </div>
             </div>
           ))}
