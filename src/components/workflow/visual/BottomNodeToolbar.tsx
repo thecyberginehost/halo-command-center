@@ -105,6 +105,7 @@ export function BottomNodeToolbar({ onAddNode, onChatToggle }: BottomNodeToolbar
       <div
         className="flex items-center space-x-3 p-2 rounded-lg cursor-pointer hover:bg-accent/50 transition-colors border hover:border-primary/20"
         onClick={(e) => handleNodeClick(integration, e)}
+        data-node-item
       >
         <div 
           className="p-1.5 rounded flex items-center justify-center min-w-[28px] h-7"
@@ -190,7 +191,14 @@ export function BottomNodeToolbar({ onAddNode, onChatToggle }: BottomNodeToolbar
                 <Popover 
                   key={group.id} 
                   open={openPopover === group.id} 
-                  onOpenChange={(open) => setOpenPopover(open ? group.id : null)}
+                  onOpenChange={(open) => {
+                    // Only close if explicitly closing, not from node clicks
+                    if (!open) {
+                      setOpenPopover(null);
+                    } else {
+                      setOpenPopover(group.id);
+                    }
+                  }}
                 >
                   <PopoverTrigger asChild>
                     <Button
@@ -221,6 +229,13 @@ export function BottomNodeToolbar({ onAddNode, onChatToggle }: BottomNodeToolbar
                     align="start" 
                      className="w-80 p-0 mb-2"
                      sideOffset={12}
+                     onPointerDownOutside={(e) => {
+                       // Prevent closing when clicking on nodes inside
+                       const target = e.target as Element;
+                       if (target.closest('[data-node-item]')) {
+                         e.preventDefault();
+                       }
+                     }}
                    >
                      <div className="p-3 border-b">
                        <h4 className="font-semibold text-sm flex items-center gap-2">

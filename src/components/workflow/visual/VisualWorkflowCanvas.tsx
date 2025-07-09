@@ -8,7 +8,6 @@ import {
   useEdgesState,
   Background,
   Controls,
-  MiniMap,
   Connection,
   useReactFlow,
 } from '@xyflow/react';
@@ -377,15 +376,6 @@ export function VisualWorkflowCanvas({
         >
           <Background />
           <Controls position="bottom-right" />
-          <MiniMap 
-            nodeStrokeWidth={2}
-            nodeColor={(node) => {
-              const workflowNode = node as VisualWorkflowNode;
-              return workflowNode.data.integration.color;
-            }}
-            className="bg-background"
-            position="bottom-left"
-          />
         </ReactFlow>
 
         {/* Empty State */}
