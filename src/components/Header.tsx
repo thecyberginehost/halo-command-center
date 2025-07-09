@@ -1,5 +1,5 @@
 
-import { Bell, ChevronDown, User, MessageCircle } from 'lucide-react';
+import { Bell, ChevronDown, User, Bot, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -35,14 +35,20 @@ const Header = ({ onChatToggle, pageTitle = "Dashboard" }: HeaderProps) => {
 
       {/* Right - Chat, Notifications & Profile */}
       <div className="flex items-center space-x-4">
-        {/* Resonant Directive Chat */}
+        {/* Resonant Directive AI Assistant */}
         <Button 
-          variant="ghost" 
+          variant="outline" 
           size="sm" 
           onClick={onChatToggle}
-          className="relative hover:bg-halo-primary/10"
+          className="relative bg-gradient-to-r from-halo-primary/5 to-halo-accent/5 border-halo-primary/20 hover:from-halo-primary/10 hover:to-halo-accent/10 hover:border-halo-primary/30 transition-all duration-200 px-3 py-2"
         >
-          <MessageCircle className="h-5 w-5 text-halo-primary" />
+          <div className="flex items-center space-x-2">
+            <div className="relative">
+              <Bot className="h-4 w-4 text-halo-primary" />
+              <Sparkles className="h-2 w-2 text-halo-accent absolute -top-1 -right-1 animate-pulse" />
+            </div>
+            <span className="text-xs font-medium text-halo-text">Resonant Directive</span>
+          </div>
         </Button>
         
         {/* Notifications */}

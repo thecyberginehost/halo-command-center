@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { X } from 'lucide-react';
+import { X, MessageSquare, Send } from 'lucide-react';
 import { MessageFormatter } from '@/components/chat/MessageFormatter';
 
 interface ChatMessage {
@@ -33,24 +33,36 @@ export function ResonantDirectiveChat({
   return (
     <div className="fixed right-0 top-0 h-full w-96 bg-gradient-to-br from-white to-gray-50 border-l-2 border-primary/10 shadow-2xl flex flex-col z-20">
       {/* Chat Header */}
-      <div className="flex-shrink-0 p-4 border-b bg-gradient-to-r from-primary to-secondary">
+      <div className="flex-shrink-0 p-4 border-b bg-gradient-to-r from-halo-primary to-halo-accent">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="h-5 w-5 text-primary-foreground">💬</div>
-            <span className="text-primary-foreground font-semibold">Resonant Directive</span>
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+              <MessageSquare className="h-4 w-4 text-white" />
+            </div>
+            <div>
+              <span className="text-white font-semibold text-sm">Resonant Directive</span>
+              <p className="text-xs text-white/90 font-medium">AI Automation Architect</p>
+            </div>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onClose}
-            className="text-primary-foreground hover:bg-white/20"
-          >
-            <X className="h-4 w-4" />
-          </Button>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-white hover:bg-white/20 px-2 py-1 h-auto"
+            >
+              <MessageSquare className="h-3 w-3 mr-1" />
+              <span className="text-xs">Chat</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="text-white hover:bg-white/20 p-1 h-auto"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
-        <p className="text-xs text-primary-foreground/90 font-medium mt-1">
-          How can I assist in creating this automation?
-        </p>
       </div>
       
       {/* Chat Messages */}
@@ -102,7 +114,13 @@ export function ResonantDirectiveChat({
             }}
             className="flex-1"
           />
-          <Button size="sm" onClick={onSendMessage} disabled={isThinking}>
+          <Button 
+            size="sm" 
+            onClick={onSendMessage} 
+            disabled={isThinking}
+            className="bg-halo-primary hover:bg-halo-primary/90 text-white px-4"
+          >
+            <Send className="h-3 w-3 mr-1" />
             {isThinking ? 'Thinking...' : 'Send'}
           </Button>
         </div>
