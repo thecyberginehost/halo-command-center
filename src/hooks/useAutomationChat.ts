@@ -57,11 +57,11 @@ export const useAutomationChat = ({
     setChatMessages(prev => [...prev, { role: 'assistant', content: thinkingMessage }]);
     
     try {
-      const response = await fetch(`https://xxltijgxrwhdudhzicel.supabase.co/functions/v1/ai-chat`, {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4bHRpamd4cndoZHVkaHppY2VsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4MjM4MDUsImV4cCI6MjA2NzM5OTgwNX0.Vu4GrS5lgDBpWErm6evBXAZM1jhl75m-3tXJXiz66ZE`
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
         },
         body: JSON.stringify({
           message: currentInput,

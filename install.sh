@@ -7,7 +7,7 @@ set -e
 
 # Download and run the interactive setup
 echo "🚀 Installing HALO - Hyper-Automation & Logical Orchestration Platform"
-echo "🎮 Port 2552 - HALO's signature port (Halo: Combat Evolved timeline)"
+echo "🎮 Self-hosted automation platform for MASP-certified providers"
 echo ""
 
 # Check if we're in a git repository

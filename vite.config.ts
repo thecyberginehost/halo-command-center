@@ -7,7 +7,7 @@ import { componentTagger } from "lovable-tagger";
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
-    port: 2552, // HALO's signature port - commemorating Halo: Combat Evolved (2552)
+    port: 8080,
   },
   plugins: [
     react(),

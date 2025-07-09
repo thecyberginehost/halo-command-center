@@ -1,135 +1,209 @@
-# Welcome to HALO (Hyper-Automation & Logic Orchestrator)
-HALO is a powerful, AI-driven automation platform that enables organizations to create, manage, and execute sophisticated workflow automations through an intuitive interface.
+# HALO - Hyper-Automation & Logical Orchestration Platform
 
-🎮 **Port 2552** - HALO's signature port (commemorating Halo: Combat Evolved timeline)
+<div align="center">
 
-## 🐳 Self-Hosted Docker Deployment
-
-HALO supports self-hosted deployment using Docker for enterprise environments:
-
-```bash
-# Interactive setup (Recommended - like n8n!)
-chmod +x interactive-setup.sh
-./interactive-setup.sh
-
-# Quick setup
-chmod +x setup.sh
-./setup.sh
-
-# Manual setup
-cp .env.example .env
-# Edit .env with your configuration
-docker-compose up -d
+```
+██╗  ██╗ █████╗ ██╗      ██████╗ 
+██║  ██║██╔══██╗██║     ██╔═══██╗
+███████║███████║██║     ██║   ██║
+██╔══██║██╔══██║██║     ██║   ██║
+██║  ██║██║  ██║███████╗╚██████╔╝
+╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝ ╚═════╝ 
 ```
 
-For detailed deployment instructions, see [DOCKER_DEPLOYMENT.md](DOCKER_DEPLOYMENT.md).
+**Enterprise-grade automation platform for MASP-certified providers**
 
-# What is HALO?
-Hyper-Automation and Logic Orchestrator (HALO) is a comprehensive automation platform designed to streamline business processes through:
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue)](docker-compose.yml)
+[![Supabase](https://img.shields.io/badge/Supabase-Integrated-green)](https://supabase.com)
 
-Visual Workflow Builder: Create complex automations using drag-and-drop interface
-AI-Powered Assistant: "Resonant Directive" helps generate and optimize workflows
-Multi-Tenant Architecture: Secure isolation for different organizations
-Extensive Integrations: Connect with popular services, APIs, and databases
-Real-Time Monitoring: Track execution, performance, and system health
-Developer-Friendly: Switch between visual and code modes seamlessly
+</div>
 
-# How can I edit this code?
-There are several ways to work with the HALO codebase:
+## 🎯 What is HALO?
 
-Use a low-code prompt engineering editor (Recommended for rapid development)
+HALO is the "Salesforce of automation platforms" - an enterprise-grade solution designed specifically for **MASP (Managed Automation Service Provider)** certified professionals. It combines AI-powered workflow generation with enterprise-grade security and multi-tenant architecture.
 
-Continue development in the your editor where changes are automatically committed to this repository. This approach is ideal for:
+### Key Features
 
-Quick iterations and prototyping
-AI-assisted development
-Real-time preview of changes
-Non-technical team members
-Local Development
+- **🤖 AI Workflow Designer**: Generate working automations from natural language
+- **🏢 Multi-Tenant Architecture**: Database-level isolation for enterprise compliance
+- **🔐 Enterprise Security**: SOC2 and HIPAA compliance ready
+- **🌐 Self-Hosted & SaaS**: Deploy on-premises or use our hosted version
+- **🔌 Integration Hub**: 100+ pre-built connectors and dynamic generation
+- **📊 MASP Provider Tools**: Client management, billing, and reporting
 
-Set up a local development environment for traditional coding workflows:
+## 🚀 Quick Start
 
+### One-Command Installation
 
+```bash
+curl -sSL https://raw.githubusercontent.com/your-username/halo/main/install.sh | bash
+```
+
+Or for step-by-step setup:
+
+```bash
+git clone https://github.com/your-username/halo.git
+cd halo
+chmod +x interactive-setup.sh
+./interactive-setup.sh
+```
+
+### Prerequisites
+
+- Docker & Docker Compose
+- A Supabase account (free tier works)
+- OpenSSL (for secure key generation)
+
+## 🛠️ Setup Requirements
+
+### 1. Supabase Configuration
+
+HALO requires a Supabase project for backend functionality:
+
+1. Create a project at [supabase.com](https://supabase.com)
+2. Get your Project URL and API keys from Settings > API
+3. Update your configuration (the setup script will guide you)
+
+### 2. Environment Variables
+
+The interactive setup generates a `.env` file with:
+
+```env
+# Frontend Configuration (required)
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your_anon_key
+
+# Backend Configuration
+ANON_KEY=your_anon_key
+SERVICE_ROLE_KEY=your_service_role_key
+
+# Security (auto-generated)
+DB_PASSWORD=secure_random_password
+JWT_SECRET=secure_jwt_secret
+CREDENTIAL_ENCRYPTION_KEY=encryption_key
+```
+
+## 🏗️ Architecture
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   MASP Provider │    │   MASP Provider │    │   MASP Provider │
+│   (Tenant A)    │    │   (Tenant B)    │    │   (Tenant C)    │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         └───────────────────────┼───────────────────────┘
+                                 │
+                    ┌─────────────────┐
+                    │   HALO Core     │
+                    │   Platform      │
+                    └─────────────────┘
+                                 │
+                    ┌─────────────────┐
+                    │   Supabase      │
+                    │   Database      │
+                    └─────────────────┘
+```
+
+## 📚 Documentation
+
+- [Setup Guide](SETUP.md) - Detailed installation instructions
+- [API Documentation](docs/api.md) - Integration endpoints
+- [MASP Certification](https://maspcertified.com) - Training platform
+
+## 🔧 Development
+
+### Local Development
+
+```bash
 # Clone the repository
-git clone <YOUR_GIT_URL>
-
-# Navigate to project directory
-cd <YOUR_PROJECT_NAME>
+git clone https://github.com/your-username/halo.git
+cd halo
 
 # Install dependencies
 npm install
 
+# Configure environment
+cp .env.local.example .env.local
+# Edit .env.local with your Supabase credentials
+
 # Start development server
 npm run dev
+```
 
-# Requirements: 
-Node.js 18+ and npm
+The application will be available at `http://localhost:8080`
 
-# Direct GitHub Editing
+### Docker Development
 
-# For quick fixes and documentation updates:
+```bash
+# Build and start all services
+docker-compose up -d --build
 
-Navigate to the file you want to edit
-Click the "Edit" button (pencil icon)
-Make changes and commit directly
-GitHub Codespaces
+# View logs
+docker-compose logs -f
 
-# Full cloud development environment:
+# Stop services
+docker-compose down
+```
 
-Click the "Code" button on the repository
-Select "Codespaces" tab
-Launch a new codespace for instant development
-Technology Stack
+## 🌟 Features
 
+### AI-Powered Automation
+- Natural language to workflow conversion
+- Intelligent step suggestions
+- Auto-completion and validation
 
-# HALO is built with modern web technologies:
+### Enterprise-Grade Security
+- Database-level tenant isolation
+- Encrypted credential storage
+- Audit trails and compliance reporting
+- SSO integration ready
 
-Frontend: React 18 with TypeScript
-Build Tool: Vite for fast development and building
-UI Framework: Tailwind CSS with shadcn/ui components
-Backend: Supabase (PostgreSQL + Edge Functions)
-State Management: React Query for server state
-Routing: React Router DOM
-Workflow Engine: Custom visual flow builder with @xyflow/react
-Key Features
-Multi-Mode Builder: Visual drag-and-drop or code-based workflow creation
-AI Integration: Intelligent workflow generation and optimization
-Enterprise Security: Row-level security and tenant isolation
-Real-Time Execution: Live monitoring and logging
-Extensible Architecture: Plugin-based integration system
-Import/Export: Backup and share workflow configurations
-Responsive Design: Works seamlessly across desktop and mobile
-Getting Started
-Setup Environment: Copy .env.example to .env and configure your Supabase credentials
-Database Setup: Run migrations to set up the database schema
-Create Organization: Set up your first tenant organization
-Build Your First Automation: Use the visual builder or AI assistant
-Deploy: Configure your deployment environment
-Architecture Overview
-HALO follows a modern, scalable architecture:
+### Multi-Tenant Management
+- White-label capabilities
+- Client portal access
+- Usage tracking and billing
+- Performance monitoring
 
-Frontend: React SPA with component-based architecture
-API Layer: Supabase Edge Functions for serverless compute
-Database: PostgreSQL with real-time subscriptions
-Authentication: Supabase Auth with multi-tenant support
-File Storage: Supabase Storage for assets and exports
-Monitoring: Built-in analytics and execution logging
-Contributing
-We welcome contributions! Please:
+### Integration Ecosystem
+- 100+ pre-built connectors
+- Dynamic API integration
+- Webhook management
+- Real-time synchronization
 
-Fork the repository
-Create a feature branch
-Make your changes with proper TypeScript types
-Add tests for new functionality
-Submit a pull request with a clear description
-Deployment Options
-Lovable Hosting (Fastest) Deploy directly from the Lovable editor with one click.
+## 🏢 Business Model
 
-Self-Hosted Deploy to your preferred platform:
+**Target Users**: MASP-certified automation service providers  
+**End Clients**: Enterprise businesses served by MASP providers  
+**Revenue**: Licensing fees + per-client usage
 
-Vercel, Netlify, AWS Amplify (Frontend)
-Railway, Render (Full-stack)
-Docker containers (Custom infrastructure)
-AWS, GCP, Azure (Enterprise)
-Custom Domain Connect your domain through project settings for professional branding.
+## 🤝 Contributing
+
+We welcome contributions from the automation community! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🔗 Links
+
+- [MASP Certification Program](https://maspcertified.com)
+- [Documentation](https://docs.halo-automation.com)
+- [Community Discord](https://discord.gg/halo-automation)
+- [Support](mailto:support@halo-automation.com)
+
+## 🙏 Acknowledgments
+
+- Built with React, TypeScript, and Supabase
+- Inspired by the automation needs of MASP providers
+- Powered by the open-source community
+
+---
+
+<div align="center">
+
+**Welcome to HALO - Happy Automating! 🚀**
+
+</div>
+
 

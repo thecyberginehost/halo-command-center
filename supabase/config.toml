@@ -1,4 +1,4 @@
-project_id = "xxltijgxrwhdudhzicel"
+project_id = "YOUR_SUPABASE_PROJECT_ID"
 
 [functions.generate-workflow]
 verify_jwt = false
