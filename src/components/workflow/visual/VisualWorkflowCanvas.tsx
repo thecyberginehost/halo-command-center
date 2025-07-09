@@ -181,6 +181,7 @@ export function VisualWorkflowCanvas({
   }, [setNodes, toast]);
 
   const handleNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
+    event.stopPropagation();
     setSelectedNodeId(node.id);
   }, []);
 

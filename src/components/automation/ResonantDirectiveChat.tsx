@@ -16,6 +16,7 @@ interface ResonantDirectiveChatProps {
   chatInput: string;
   setChatInput: (value: string) => void;
   onSendMessage: () => void;
+  isThinking?: boolean;
 }
 
 export function ResonantDirectiveChat({
@@ -24,7 +25,8 @@ export function ResonantDirectiveChat({
   chatMessages,
   chatInput,
   setChatInput,
-  onSendMessage
+  onSendMessage,
+  isThinking = false
 }: ResonantDirectiveChatProps) {
   if (!isOpen) return null;
 
@@ -85,7 +87,9 @@ export function ResonantDirectiveChat({
             }}
             className="flex-1"
           />
-          <Button size="sm" onClick={onSendMessage}>Send</Button>
+          <Button size="sm" onClick={onSendMessage} disabled={isThinking}>
+            {isThinking ? 'Thinking...' : 'Send'}
+          </Button>
         </div>
       </div>
     </div>

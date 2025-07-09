@@ -48,6 +48,7 @@ async function executeAutomation(input) {
     }
   ]);
   const [chatInput, setChatInput] = useState('');
+  const [isThinking, setIsThinking] = useState(false);
 
   useEffect(() => {
     const fetchWorkflow = async () => {
@@ -101,6 +102,18 @@ async function executeAutomation(input) {
     const currentInput = chatInput;
     setChatInput('');
     
+    // Determine thinking message based on input
+    const isWorkflowRequest = currentInput.toLowerCase().includes('build') || 
+                             currentInput.toLowerCase().includes('create') || 
+                             currentInput.toLowerCase().includes('workflow') ||
+                             currentInput.toLowerCase().includes('automation');
+    
+    const thinkingMessage = isWorkflowRequest ? 'Building your workflow...' : 'Thinking...';
+    
+    // Add thinking indicator
+    setIsThinking(true);
+    setChatMessages(prev => [...prev, { role: 'assistant', content: thinkingMessage }]);
+    
     try {
       const response = await fetch(`https://xxltijgxrwhdudhzicel.supabase.co/functions/v1/ai-chat`, {
         method: 'POST',
@@ -125,11 +138,15 @@ async function executeAutomation(input) {
       const data = await response.json();
       console.log('AI Response:', data); // Debug log
       
-      // Add AI response to chat
-      setChatMessages(prev => [...prev, {
-        role: 'assistant', 
-        content: data.message || data.fallbackMessage || "I received your message but couldn't process it properly."
-      }]);
+      // Replace thinking message with actual response
+      setChatMessages(prev => {
+        const newMessages = [...prev];
+        newMessages[newMessages.length - 1] = {
+          role: 'assistant', 
+          content: data.message || data.fallbackMessage || "I received your message but couldn't process it properly."
+        };
+        return newMessages;
+      });
 
       // If AI generated workflow data, apply it to the canvas
       console.log('Checking for workflow data:', data.workflowData);
@@ -140,10 +157,17 @@ async function executeAutomation(input) {
       
     } catch (error) {
       console.error('Chat error:', error);
-      setChatMessages(prev => [...prev, {
-        role: 'assistant', 
-        content: "I'm having trouble connecting right now. Please try again in a moment."
-      }]);
+      // Replace thinking message with error message
+      setChatMessages(prev => {
+        const newMessages = [...prev];
+        newMessages[newMessages.length - 1] = {
+          role: 'assistant', 
+          content: "I'm having trouble connecting right now. Please try again in a moment."
+        };
+        return newMessages;
+      });
+    } finally {
+      setIsThinking(false);
     }
   };
 
@@ -303,6 +327,7 @@ async function executeAutomation(input) {
         chatInput={chatInput}
         setChatInput={setChatInput}
         onSendMessage={handleSendMessage}
+        isThinking={isThinking}
       />
 
       {!isChatOpen && (

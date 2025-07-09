@@ -31,9 +31,9 @@ export const BaseWorkflowNode = memo(({
   };
 
   const getStatusIcon = () => {
-    if (hasError) return <AlertCircle className="h-4 w-4" />;
-    if (isConfigured) return <CheckCircle2 className="h-4 w-4" />;
-    return <Settings className="h-4 w-4" />;
+    if (hasError) return <AlertCircle className="h-2 w-2" />;
+    if (isConfigured) return <CheckCircle2 className="h-2 w-2" />;
+    return <Settings className="h-2 w-2" />;
   };
 
   const nodeStyle = {
@@ -49,20 +49,20 @@ export const BaseWorkflowNode = memo(({
     >
       <div className="relative">
         <Card 
-          className="min-w-[100px] max-w-[130px] shadow-md transition-all duration-200 hover:shadow-lg"
+          className="min-w-[90px] max-w-[110px] shadow-md transition-all duration-200 hover:shadow-lg"
           style={nodeStyle}
         >
-          <div className="p-1.5">
+          <div className="p-1">
             {/* Node Header */}
             <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center space-x-1">
+              <div className="flex items-center space-x-1 flex-1 min-w-0">
                 <div 
-                  className="p-1 rounded-sm flex items-center justify-center"
+                  className="p-0.5 rounded-sm flex items-center justify-center flex-shrink-0"
                   style={{ backgroundColor: integration.color + '20' }}
                 >
                   {Icon && (
                     <Icon 
-                      className="h-3 w-3" 
+                      className="h-2.5 w-2.5" 
                       style={{ color: integration.color }}
                     />
                   )}
@@ -72,8 +72,11 @@ export const BaseWorkflowNode = memo(({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => onConfigClick?.(id)}
-                className={`h-3 w-3 p-0 ${getStatusColor()}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onConfigClick?.(id);
+                }}
+                className={`h-2.5 w-2.5 p-0 flex-shrink-0 ${getStatusColor()}`}
               >
                 {getStatusIcon()}
               </Button>
@@ -83,7 +86,7 @@ export const BaseWorkflowNode = memo(({
             <div className="flex items-center justify-center">
               <Badge 
                 variant={integration.type === 'trigger' ? 'default' : 'secondary'}
-                className="text-xs px-1 py-0"
+                className="text-xs px-1 py-0 text-xs"
               >
                 {integration.type}
               </Badge>
