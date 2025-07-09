@@ -1,6 +1,23 @@
 # Welcome to HALO (Hyper-Automation & Logic Orchestrator)
 HALO is a powerful, AI-driven automation platform that enables organizations to create, manage, and execute sophisticated workflow automations through an intuitive interface.
 
+## 🐳 Self-Hosted Docker Deployment
+
+HALO supports self-hosted deployment using Docker for enterprise environments:
+
+```bash
+# Quick setup
+chmod +x setup.sh
+./setup.sh
+
+# Manual setup
+cp .env.example .env
+# Edit .env with your configuration
+docker-compose up -d
+```
+
+For detailed deployment instructions, see [DOCKER_DEPLOYMENT.md](DOCKER_DEPLOYMENT.md).
+
 # What is HALO?
 Hyper-Automation and Logic Orchestrator (HALO) is a comprehensive automation platform designed to streamline business processes through:
 
