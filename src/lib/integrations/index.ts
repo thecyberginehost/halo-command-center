@@ -100,6 +100,11 @@ import { githubIntegration, jiraIntegration, trelloIntegration, asanaIntegration
 import { googleAnalyticsIntegration, mixpanelIntegration, segmentIntegration } from './analyticsIntegrations';
 import { stripeIntegration, paypalIntegration } from './paymentIntegrations';
 import { routerIntegration, iteratorIntegration, aggregatorIntegration } from './flowControlIntegrations';
+import * as EcommerceIntegrations from './ecommerceIntegrations';
+import * as SocialMediaIntegrations from './socialMediaIntegrations';
+import * as MarketingIntegrations from './marketingIntegrations';
+import * as CloudIntegrations from './cloudIntegrations';
+import * as BusinessIntegrations from './businessIntegrations';
 
 export const allIntegrations: IntegrationNode[] = [
   // Triggers
@@ -154,6 +159,21 @@ export const allIntegrations: IntegrationNode[] = [
   
   // Flow Control
   routerIntegration, iteratorIntegration, aggregatorIntegration,
+  
+  // E-commerce
+  ...Object.values(EcommerceIntegrations),
+  
+  // Social Media
+  ...Object.values(SocialMediaIntegrations),
+  
+  // Marketing
+  ...Object.values(MarketingIntegrations),
+  
+  // Cloud Services
+  ...Object.values(CloudIntegrations),
+  
+  // Business Applications
+  ...Object.values(BusinessIntegrations),
 ];
 
 export const integrationsByCategory: Record<IntegrationCategory, IntegrationNode[]> = {
