@@ -12,8 +12,8 @@ const cloudPlans = [
     id: "masp_starter",
     name: "MASP Starter",
     description: "Perfect for small automation agencies",
-    monthlyPrice: 49,
-    yearlyPrice: 470,
+    monthlyPrice: 79,
+    yearlyPrice: 756,
     organizationLimit: 3,
     popular: false,
     features: [
@@ -29,8 +29,8 @@ const cloudPlans = [
     id: "masp_pro", 
     name: "MASP Pro",
     description: "For growing automation service providers",
-    monthlyPrice: 149,
-    yearlyPrice: 1430,
+    monthlyPrice: 299,
+    yearlyPrice: 2868,
     organizationLimit: 10,
     popular: true,
     features: [
@@ -47,8 +47,8 @@ const cloudPlans = [
     id: "masp_enterprise",
     name: "MASP Enterprise", 
     description: "For large-scale automation operations",
-    monthlyPrice: 399,
-    yearlyPrice: 3830,
+    monthlyPrice: 799,
+    yearlyPrice: 7668,
     organizationLimit: null,
     popular: false,
     features: [
