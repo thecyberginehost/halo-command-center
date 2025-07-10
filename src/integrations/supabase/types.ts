@@ -149,6 +149,70 @@ export type Database = {
           },
         ]
       }
+      execution_metrics: {
+        Row: {
+          additional_data: Json | null
+          execution_id: string
+          id: string
+          integration_id: string
+          metric_type: string
+          metric_unit: string
+          metric_value: number
+          recorded_at: string
+          step_id: string
+          tenant_id: string
+          workflow_id: string
+        }
+        Insert: {
+          additional_data?: Json | null
+          execution_id: string
+          id?: string
+          integration_id: string
+          metric_type: string
+          metric_unit: string
+          metric_value: number
+          recorded_at?: string
+          step_id: string
+          tenant_id: string
+          workflow_id: string
+        }
+        Update: {
+          additional_data?: Json | null
+          execution_id?: string
+          id?: string
+          integration_id?: string
+          metric_type?: string
+          metric_unit?: string
+          metric_value?: number
+          recorded_at?: string
+          step_id?: string
+          tenant_id?: string
+          workflow_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "execution_metrics_execution_id_fkey"
+            columns: ["execution_id"]
+            isOneToOne: false
+            referencedRelation: "workflow_executions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "execution_metrics_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "execution_metrics_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       file_metadata: {
         Row: {
           bucket_name: string
@@ -364,6 +428,218 @@ export type Database = {
           },
         ]
       }
+      integration_migrations: {
+        Row: {
+          backup_data: Json | null
+          completed_at: string | null
+          created_at: string
+          credentials_count: number | null
+          error_details: Json | null
+          id: string
+          migration_batch_id: string
+          migration_config: Json | null
+          migration_log: Json | null
+          migration_status: string
+          migration_type: string
+          source_integration_id: string
+          started_at: string | null
+          target_integration_id: string
+          tenant_id: string
+          updated_at: string
+          workflow_count: number | null
+        }
+        Insert: {
+          backup_data?: Json | null
+          completed_at?: string | null
+          created_at?: string
+          credentials_count?: number | null
+          error_details?: Json | null
+          id?: string
+          migration_batch_id: string
+          migration_config?: Json | null
+          migration_log?: Json | null
+          migration_status?: string
+          migration_type: string
+          source_integration_id: string
+          started_at?: string | null
+          target_integration_id: string
+          tenant_id: string
+          updated_at?: string
+          workflow_count?: number | null
+        }
+        Update: {
+          backup_data?: Json | null
+          completed_at?: string | null
+          created_at?: string
+          credentials_count?: number | null
+          error_details?: Json | null
+          id?: string
+          migration_batch_id?: string
+          migration_config?: Json | null
+          migration_log?: Json | null
+          migration_status?: string
+          migration_type?: string
+          source_integration_id?: string
+          started_at?: string | null
+          target_integration_id?: string
+          tenant_id?: string
+          updated_at?: string
+          workflow_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "integration_migrations_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      marketplace_packages: {
+        Row: {
+          category: string
+          changelog: Json | null
+          created_at: string
+          description: string | null
+          display_name: string
+          documentation_url: string | null
+          download_count: number | null
+          icon_url: string | null
+          id: string
+          installation_config: Json
+          is_active: boolean | null
+          is_verified: boolean | null
+          min_halo_version: string | null
+          package_config: Json
+          package_name: string
+          package_version: string
+          price_per_month: number | null
+          pricing_model: string | null
+          rating: number | null
+          rating_count: number | null
+          screenshots: string[] | null
+          support_url: string | null
+          tags: string[] | null
+          updated_at: string
+          vendor_email: string | null
+          vendor_name: string
+        }
+        Insert: {
+          category: string
+          changelog?: Json | null
+          created_at?: string
+          description?: string | null
+          display_name: string
+          documentation_url?: string | null
+          download_count?: number | null
+          icon_url?: string | null
+          id?: string
+          installation_config: Json
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          min_halo_version?: string | null
+          package_config: Json
+          package_name: string
+          package_version?: string
+          price_per_month?: number | null
+          pricing_model?: string | null
+          rating?: number | null
+          rating_count?: number | null
+          screenshots?: string[] | null
+          support_url?: string | null
+          tags?: string[] | null
+          updated_at?: string
+          vendor_email?: string | null
+          vendor_name: string
+        }
+        Update: {
+          category?: string
+          changelog?: Json | null
+          created_at?: string
+          description?: string | null
+          display_name?: string
+          documentation_url?: string | null
+          download_count?: number | null
+          icon_url?: string | null
+          id?: string
+          installation_config?: Json
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          min_halo_version?: string | null
+          package_config?: Json
+          package_name?: string
+          package_version?: string
+          price_per_month?: number | null
+          pricing_model?: string | null
+          rating?: number | null
+          rating_count?: number | null
+          screenshots?: string[] | null
+          support_url?: string | null
+          tags?: string[] | null
+          updated_at?: string
+          vendor_email?: string | null
+          vendor_name?: string
+        }
+        Relationships: []
+      }
+      marketplace_reviews: {
+        Row: {
+          created_at: string
+          helpful_count: number | null
+          id: string
+          is_verified_purchase: boolean | null
+          is_visible: boolean | null
+          package_id: string
+          rating: number
+          reported_count: number | null
+          review_text: string | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          helpful_count?: number | null
+          id?: string
+          is_verified_purchase?: boolean | null
+          is_visible?: boolean | null
+          package_id: string
+          rating: number
+          reported_count?: number | null
+          review_text?: string | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          helpful_count?: number | null
+          id?: string
+          is_verified_purchase?: boolean | null
+          is_visible?: boolean | null
+          package_id?: string
+          rating?: number
+          reported_count?: number | null
+          review_text?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketplace_reviews_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "marketplace_reviews_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       oauth_configs: {
         Row: {
           client_id: string
@@ -503,6 +779,137 @@ export type Database = {
           },
         ]
       }
+      performance_alerts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          alert_type: string
+          created_at: string
+          id: string
+          is_acknowledged: boolean | null
+          is_resolved: boolean | null
+          message: string
+          metric_data: Json | null
+          related_entity_id: string | null
+          related_entity_type: string | null
+          resolved_at: string | null
+          severity: string
+          tenant_id: string
+          title: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_type: string
+          created_at?: string
+          id?: string
+          is_acknowledged?: boolean | null
+          is_resolved?: boolean | null
+          message: string
+          metric_data?: Json | null
+          related_entity_id?: string | null
+          related_entity_type?: string | null
+          resolved_at?: string | null
+          severity: string
+          tenant_id: string
+          title: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_type?: string
+          created_at?: string
+          id?: string
+          is_acknowledged?: boolean | null
+          is_resolved?: boolean | null
+          message?: string
+          metric_data?: Json | null
+          related_entity_id?: string | null
+          related_entity_type?: string | null
+          resolved_at?: string | null
+          severity?: string
+          tenant_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "performance_alerts_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      performance_benchmarks: {
+        Row: {
+          baseline_value: number
+          benchmark_type: string
+          calculation_period: string
+          created_at: string
+          current_value: number
+          id: string
+          integration_id: string | null
+          last_calculated: string
+          metric_name: string
+          sample_size: number
+          tenant_id: string
+          threshold_critical: number | null
+          threshold_warning: number | null
+          updated_at: string
+          workflow_id: string | null
+        }
+        Insert: {
+          baseline_value: number
+          benchmark_type: string
+          calculation_period: string
+          created_at?: string
+          current_value: number
+          id?: string
+          integration_id?: string | null
+          last_calculated?: string
+          metric_name: string
+          sample_size: number
+          tenant_id: string
+          threshold_critical?: number | null
+          threshold_warning?: number | null
+          updated_at?: string
+          workflow_id?: string | null
+        }
+        Update: {
+          baseline_value?: number
+          benchmark_type?: string
+          calculation_period?: string
+          created_at?: string
+          current_value?: number
+          id?: string
+          integration_id?: string | null
+          last_calculated?: string
+          metric_name?: string
+          sample_size?: number
+          tenant_id?: string
+          threshold_critical?: number | null
+          threshold_warning?: number | null
+          updated_at?: string
+          workflow_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "performance_benchmarks_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_benchmarks_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       system_knowledge_base: {
         Row: {
           category: string
@@ -592,6 +999,56 @@ export type Database = {
           },
         ]
       }
+      tenant_features: {
+        Row: {
+          created_at: string
+          current_usage: number | null
+          feature_config: Json | null
+          feature_name: string
+          id: string
+          is_enabled: boolean | null
+          last_reset: string | null
+          reset_period: string | null
+          tenant_id: string
+          updated_at: string
+          usage_limit: number | null
+        }
+        Insert: {
+          created_at?: string
+          current_usage?: number | null
+          feature_config?: Json | null
+          feature_name: string
+          id?: string
+          is_enabled?: boolean | null
+          last_reset?: string | null
+          reset_period?: string | null
+          tenant_id: string
+          updated_at?: string
+          usage_limit?: number | null
+        }
+        Update: {
+          created_at?: string
+          current_usage?: number | null
+          feature_config?: Json | null
+          feature_name?: string
+          id?: string
+          is_enabled?: boolean | null
+          last_reset?: string | null
+          reset_period?: string | null
+          tenant_id?: string
+          updated_at?: string
+          usage_limit?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_features_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tenant_knowledge_bases: {
         Row: {
           category: string | null
@@ -626,6 +1083,107 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "tenant_knowledge_bases_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenant_marketplace_installs: {
+        Row: {
+          custom_settings: Json | null
+          id: string
+          installation_config: Json | null
+          installed_at: string
+          installed_version: string
+          is_active: boolean | null
+          last_updated: string
+          package_id: string
+          tenant_id: string
+        }
+        Insert: {
+          custom_settings?: Json | null
+          id?: string
+          installation_config?: Json | null
+          installed_at?: string
+          installed_version: string
+          is_active?: boolean | null
+          last_updated?: string
+          package_id: string
+          tenant_id: string
+        }
+        Update: {
+          custom_settings?: Json | null
+          id?: string
+          installation_config?: Json | null
+          installed_at?: string
+          installed_version?: string
+          is_active?: boolean | null
+          last_updated?: string
+          package_id?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_marketplace_installs_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenant_marketplace_installs_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenant_quotas: {
+        Row: {
+          created_at: string
+          current_usage: number | null
+          hard_limit: number | null
+          id: string
+          last_reset: string | null
+          quota_limit: number
+          reset_period: string | null
+          resource_type: string
+          soft_limit: number | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          current_usage?: number | null
+          hard_limit?: number | null
+          id?: string
+          last_reset?: string | null
+          quota_limit: number
+          reset_period?: string | null
+          resource_type: string
+          soft_limit?: number | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          current_usage?: number | null
+          hard_limit?: number | null
+          id?: string
+          last_reset?: string | null
+          quota_limit?: number
+          reset_period?: string | null
+          resource_type?: string
+          soft_limit?: number | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_quotas_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
@@ -818,6 +1376,79 @@ export type Database = {
           },
         ]
       }
+      workflow_conversions: {
+        Row: {
+          conversion_notes: string | null
+          conversion_status: string
+          converted_steps: Json | null
+          created_at: string
+          id: string
+          manual_review_required: boolean | null
+          migration_id: string
+          original_steps: Json
+          reviewed_at: string | null
+          reviewed_by: string | null
+          tenant_id: string
+          updated_at: string
+          validation_results: Json | null
+          workflow_id: string
+        }
+        Insert: {
+          conversion_notes?: string | null
+          conversion_status?: string
+          converted_steps?: Json | null
+          created_at?: string
+          id?: string
+          manual_review_required?: boolean | null
+          migration_id: string
+          original_steps: Json
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          tenant_id: string
+          updated_at?: string
+          validation_results?: Json | null
+          workflow_id: string
+        }
+        Update: {
+          conversion_notes?: string | null
+          conversion_status?: string
+          converted_steps?: Json | null
+          created_at?: string
+          id?: string
+          manual_review_required?: boolean | null
+          migration_id?: string
+          original_steps?: Json
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          tenant_id?: string
+          updated_at?: string
+          validation_results?: Json | null
+          workflow_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_conversions_migration_id_fkey"
+            columns: ["migration_id"]
+            isOneToOne: false
+            referencedRelation: "integration_migrations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workflow_conversions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workflow_conversions_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workflow_executions: {
         Row: {
           completed_at: string | null
@@ -930,9 +1561,29 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_performance_metrics: {
+        Args: { _tenant_id: string; _time_period?: unknown }
+        Returns: Json
+      }
+      check_tenant_quota: {
+        Args: {
+          _tenant_id: string
+          _resource_type: string
+          _usage_increment?: number
+        }
+        Returns: Json
+      }
       cleanup_expired_files: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      update_tenant_quota_usage: {
+        Args: {
+          _tenant_id: string
+          _resource_type: string
+          _usage_change: number
+        }
+        Returns: boolean
       }
     }
     Enums: {
