@@ -9,6 +9,7 @@ import { User, Camera, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { toast } from "sonner";
+import Layout from "@/components/Layout";
 
 export default function ProfileSettings() {
   const { user } = useAuth();
@@ -62,9 +63,11 @@ export default function ProfileSettings() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
+      <Layout pageTitle="Profile Settings">
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      </Layout>
     );
   }
 
@@ -73,7 +76,7 @@ export default function ProfileSettings() {
     : 'U';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 p-6">
+    <Layout pageTitle="Profile Settings">
       <div className="max-w-4xl mx-auto space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Profile Settings</h1>
@@ -232,6 +235,6 @@ export default function ProfileSettings() {
           </Card>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 }
