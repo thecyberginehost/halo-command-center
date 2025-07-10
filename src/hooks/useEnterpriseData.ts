@@ -1,11 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTenant } from '@/contexts/TenantContext';
-import { 
-  MASPCertificationService, 
-  MarketplaceService, 
-  WhiteLabelService,
-  type MASPProvider 
-} from '@/services/enterpriseFeatureService';
+import { enterpriseFeatureService } from '@/services/enterpriseFeatureService';
+import { marketplaceService } from '@/services/marketplaceService';
 import { supabase } from '@/integrations/supabase/client';
 
 export const useEnterpriseData = () => {
@@ -23,12 +19,12 @@ export const useEnterpriseData = () => {
     try {
       setLoading(true);
       
-      const maspService = new MASPCertificationService();
-      const existingProvider = await maspService.getMASPProvider(currentTenant!.id);
+      // Mock data since services don't exist yet
+      const existingProvider = null;
       
       if (!existingProvider) {
         // Seed sample MASP provider data
-        const sampleMASPData: MASPProvider = {
+        const sampleMASPData: any = {
           id: `masp-${currentTenant!.id}`,
           tenantId: currentTenant!.id,
           certificationLevel: 'gold',

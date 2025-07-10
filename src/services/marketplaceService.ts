@@ -24,7 +24,7 @@ export interface MarketplacePackage {
   screenshots: string[];
   documentation_url?: string;
   support_url?: string;
-  changelog: any[];
+  changelog: any;
   created_at: string;
   updated_at: string;
 }
@@ -95,7 +95,7 @@ export class MarketplaceService {
       throw error;
     }
 
-    return data || [];
+    return (data || []) as MarketplacePackage[];
   }
 
   /**
@@ -114,7 +114,7 @@ export class MarketplaceService {
       return null;
     }
 
-    return data;
+    return data as MarketplacePackage;
   }
 
   /**
@@ -135,7 +135,7 @@ export class MarketplaceService {
       throw error;
     }
 
-    return data || [];
+    return (data || []) as TenantMarketplaceInstall[];
   }
 
   /**

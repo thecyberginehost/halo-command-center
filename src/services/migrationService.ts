@@ -11,7 +11,7 @@ export interface IntegrationMigration {
   credentials_count: number;
   migration_status: string;
   migration_config: any;
-  migration_log: any[];
+  migration_log: any;
   error_details?: any;
   backup_data?: any;
   started_at?: string;
@@ -119,7 +119,7 @@ export class MigrationService {
     return {
       stub_integrations: Array.from(stubIntegrations),
       outdated_integrations: Array.from(outdatedIntegrations),
-      migrationOpportunities
+      migration_opportunities: migrationOpportunities
     };
   }
 
@@ -257,7 +257,7 @@ export class MigrationService {
         throw error;
       }
 
-      migrations.push(migrationRecord);
+      migrations.push(migrationRecord as IntegrationMigration);
 
       // Create workflow conversion records
       for (const workflowId of migration.affected_workflows) {
@@ -300,7 +300,7 @@ export class MigrationService {
         workflow_id: workflowId,
         original_steps: workflow.steps,
         conversion_status: 'pending',
-        manual_review_required: this.requiresManualReview(workflow.steps)
+        manual_review_required: this.requiresManualReview(workflow.steps as any[])
       })
       .select()
       .single();
@@ -356,7 +356,7 @@ export class MigrationService {
       throw error;
     }
 
-    return data || [];
+    return (data || []) as IntegrationMigration[];
   }
 
   /**

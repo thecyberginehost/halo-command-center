@@ -21,12 +21,12 @@ import {
 import Layout from '@/components/Layout';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useTenant } from '@/contexts/TenantContext';
-import { MarketplaceService, type MarketplaceIntegration } from '@/services/enterpriseFeatureService';
+import { MarketplaceService } from '@/services/marketplaceService';
 
 const Marketplace = () => {
   usePageTitle('Marketplace');
   const { currentTenant } = useTenant();
-  const [integrations, setIntegrations] = useState<MarketplaceIntegration[]>([]);
+  const [integrations, setIntegrations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -40,13 +40,13 @@ const Marketplace = () => {
     try {
       setLoading(true);
       const marketplaceService = new MarketplaceService();
-      const data = await marketplaceService.getMarketplaceIntegrations(
-        selectedCategory === 'all' ? undefined : selectedCategory
-      );
+      const data = await marketplaceService.getMarketplacePackages({
+        category: selectedCategory === 'all' ? undefined : selectedCategory
+      });
       
       // Add some sample data if none exists
       if (data.length === 0) {
-        const sampleIntegrations: MarketplaceIntegration[] = [
+        const sampleIntegrations: any[] = [
           {
             id: 'email-master',
             name: 'Email Master Pro',
@@ -164,7 +164,7 @@ const Marketplace = () => {
   const handleInstall = async (integrationId: string) => {
     try {
       const marketplaceService = new MarketplaceService();
-      await marketplaceService.installIntegration(currentTenant!.id, integrationId);
+      await marketplaceService.installPackage(currentTenant!.id, integrationId);
       // Refresh the integrations to update download count
       await loadMarketplaceIntegrations();
     } catch (error) {
