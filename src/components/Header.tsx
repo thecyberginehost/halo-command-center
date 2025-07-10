@@ -1,5 +1,5 @@
 
-import { Bell, ChevronDown, User, Bot, Sparkles } from 'lucide-react';
+import { Bell, ChevronDown, User, Bot, Sparkles, Settings, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -11,6 +11,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { TenantSelector } from './TenantSelector';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
   onChatToggle?: () => void;
@@ -18,6 +20,29 @@ interface HeaderProps {
 }
 
 const Header = ({ onChatToggle, pageTitle = "Dashboard" }: HeaderProps) => {
+  const { user, profile, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const getDisplayName = () => {
+    if (profile?.name) return profile.name;
+    if (user?.user_metadata?.name) return user.user_metadata.name;
+    if (user?.email) return user.email.split('@')[0];
+    return 'User';
+  };
+
+  const getInitials = () => {
+    const name = getDisplayName();
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  };
+
+  const handleProfileSettings = () => {
+    navigate('/profile-settings');
+  };
+
+  const handleSignOut = () => {
+    signOut();
+  };
+
   return (
     <header className="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 shadow-sm">
       {/* Left - Logo and Page Title */}
@@ -64,23 +89,31 @@ const Header = ({ onChatToggle, pageTitle = "Dashboard" }: HeaderProps) => {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="flex items-center space-x-2 px-3">
               <Avatar className="h-8 w-8">
-                <AvatarImage src="/placeholder.svg" />
+                <AvatarImage src={profile?.avatar_url || undefined} />
                 <AvatarFallback className="bg-halo-secondary text-white">
-                  <User className="h-4 w-4" />
+                  {getInitials()}
                 </AvatarFallback>
               </Avatar>
-              <span className="text-sm font-medium text-halo-text">Alex Morgan</span>
+              <span className="text-sm font-medium text-halo-text">{getDisplayName()}</span>
               <ChevronDown className="h-4 w-4 text-halo-textSecondary" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile Settings</DropdownMenuItem>
-            <DropdownMenuItem>Preferences</DropdownMenuItem>
-            <DropdownMenuItem>Help & Support</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleProfileSettings}>
+              <Settings className="mr-2 h-4 w-4" />
+              Profile Settings
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <User className="mr-2 h-4 w-4" />
+              Preferences
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-halo-accent">Sign Out</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
+              <LogOut className="mr-2 h-4 w-4" />
+              Sign Out
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

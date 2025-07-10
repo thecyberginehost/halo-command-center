@@ -11,7 +11,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Pricing from "./pages/Pricing";
-import SelfHosted from "./pages/SelfHosted";
+import ProfileSettings from "./pages/ProfileSettings";
 import Automations from "./pages/Automations";
 import CreateAutomation from "./pages/CreateAutomation";
 import CreateOrganization from "./pages/CreateOrganization";
@@ -40,7 +40,7 @@ const App = () => (
                   {/* Public routes */}
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/pricing" element={<Pricing />} />
-                  <Route path="/self-hosted" element={<SelfHosted />} />
+                  <Route path="/profile-settings" element={<ProtectedRoute><ProfileSettings /></ProtectedRoute>} />
                   
                   {/* Protected routes */}
                   <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
