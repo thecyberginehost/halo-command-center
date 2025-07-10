@@ -206,6 +206,107 @@ export type Database = {
         }
         Relationships: []
       }
+      webhook_executions: {
+        Row: {
+          duration: number
+          error: string | null
+          executed_at: string
+          id: string
+          request: Json
+          response: Json | null
+          status: string
+          webhook_id: string
+        }
+        Insert: {
+          duration?: number
+          error?: string | null
+          executed_at?: string
+          id?: string
+          request: Json
+          response?: Json | null
+          status: string
+          webhook_id: string
+        }
+        Update: {
+          duration?: number
+          error?: string | null
+          executed_at?: string
+          id?: string
+          request?: Json
+          response?: Json | null
+          status?: string
+          webhook_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_webhook_executions_webhook_id"
+            columns: ["webhook_id"]
+            isOneToOne: false
+            referencedRelation: "webhooks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      webhooks: {
+        Row: {
+          body: string | null
+          created_at: string
+          headers: Json
+          id: string
+          is_active: boolean
+          method: string
+          retries: number
+          tenant_id: string
+          timeout: number
+          updated_at: string
+          url: string
+          workflow_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          headers?: Json
+          id?: string
+          is_active?: boolean
+          method: string
+          retries?: number
+          tenant_id: string
+          timeout?: number
+          updated_at?: string
+          url: string
+          workflow_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          headers?: Json
+          id?: string
+          is_active?: boolean
+          method?: string
+          retries?: number
+          tenant_id?: string
+          timeout?: number
+          updated_at?: string
+          url?: string
+          workflow_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_webhooks_tenant_id"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_webhooks_workflow_id"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workflow_executions: {
         Row: {
           completed_at: string | null
