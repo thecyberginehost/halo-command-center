@@ -86,7 +86,10 @@ class PerformanceOptimizationService {
       .single();
 
     if (error) throw error;
-    return data;
+    return {
+      ...data,
+      test_data: data.test_data as Record<string, any>
+    } as LoadTestConfig;
   }
 
   // Run load test
@@ -99,6 +102,12 @@ class PerformanceOptimizationService {
 
     if (error) throw error;
 
+    const typedConfig: LoadTestConfig = {
+      ...config,
+      test_data: config.test_data as Record<string, any>,
+      environment: config.environment as LoadTestConfig['environment']
+    };
+
     const startTime = new Date().toISOString();
     const metrics: PerformanceMetrics[] = [];
     const responseTimes: number[] = [];
@@ -108,11 +117,11 @@ class PerformanceOptimizationService {
     try {
       // Start performance monitoring
       const monitoringInterval = setInterval(() => {
-        this.collectPerformanceMetrics(config.integration_id, metrics);
+        this.collectPerformanceMetrics(typedConfig.integration_id, metrics);
       }, 1000);
 
       // Run load test
-      await this.executeLoadTest(config, (responseTime: number, success: boolean) => {
+      await this.executeLoadTest(typedConfig, (responseTime: number, success: boolean) => {
         responseTimes.push(responseTime);
         if (success) successfulRequests++;
         else failedRequests++;
@@ -141,12 +150,16 @@ class PerformanceOptimizationService {
         min_response_time: Math.min(...responseTimes),
         p95_response_time: sortedTimes[p95Index] || 0,
         p99_response_time: sortedTimes[p99Index] || 0,
-        throughput: totalRequests / config.test_duration,
+        throughput: totalRequests / typedConfig.test_duration,
         error_rate: (failedRequests / totalRequests) * 100,
         metrics_timeline: metrics,
-        bottlenecks: this.identifyBottlenecks(metrics),
-        recommendations: this.generateRecommendations(metrics, result)
+        bottlenecks: [],
+        recommendations: []
       };
+
+      // Set bottlenecks and recommendations after result is defined
+      result.bottlenecks = this.identifyBottlenecks(metrics);
+      result.recommendations = this.generateRecommendations(metrics, result);
 
       // Store result
       await supabase
@@ -154,7 +167,7 @@ class PerformanceOptimizationService {
         .insert({
           config_id: configId,
           result_data: result as any,
-          tenant_id: config.tenant_id
+          tenant_id: typedConfig.tenant_id
         });
 
       return result;
@@ -300,7 +313,7 @@ class PerformanceOptimizationService {
         name: rule.name,
         condition: rule.condition,
         action: rule.action,
-        parameters: rule.parameters,
+        parameters: rule.parameters as any,
         priority: rule.priority,
         is_active: rule.is_active,
         tenant_id: rule.tenant_id
@@ -309,7 +322,11 @@ class PerformanceOptimizationService {
       .single();
 
     if (error) throw error;
-    return data;
+    return {
+      ...data,
+      action: data.action as OptimizationRule['action'],
+      parameters: data.parameters as Record<string, any>
+    } as OptimizationRule;
   }
 
   // Apply optimization automatically
@@ -323,9 +340,14 @@ class PerformanceOptimizationService {
 
     if (error) throw error;
 
-    for (const rule of rules) {
-      await this.applyOptimizationRule(integrationId, rule);
-    }
+      for (const rule of rules) {
+        const typedRule: OptimizationRule = {
+          ...rule,
+          action: rule.action as OptimizationRule['action'],
+          parameters: rule.parameters as Record<string, any>
+        };
+        await this.applyOptimizationRule(integrationId, typedRule);
+      }
   }
 
   // Apply single optimization rule
@@ -387,13 +409,14 @@ class PerformanceOptimizationService {
     if (error) throw error;
 
     // Aggregate performance data
+    const validResults = results.filter(r => r.result_data && typeof r.result_data === 'object');
     return {
       total_tests: results.length,
-      average_response_time: results.reduce((sum, r) => sum + r.result_data.average_response_time, 0) / results.length,
-      average_throughput: results.reduce((sum, r) => sum + r.result_data.throughput, 0) / results.length,
-      average_error_rate: results.reduce((sum, r) => sum + r.result_data.error_rate, 0) / results.length,
-      trends: this.calculatePerformanceTrends(results),
-      bottlenecks: this.aggregateBottlenecks(results)
+      average_response_time: validResults.length > 0 ? validResults.reduce((sum, r) => sum + ((r.result_data as any).average_response_time || 0), 0) / validResults.length : 0,
+      average_throughput: validResults.length > 0 ? validResults.reduce((sum, r) => sum + ((r.result_data as any).throughput || 0), 0) / validResults.length : 0,
+      average_error_rate: validResults.length > 0 ? validResults.reduce((sum, r) => sum + ((r.result_data as any).error_rate || 0), 0) / validResults.length : 0,
+      trends: this.calculatePerformanceTrends(validResults),
+      bottlenecks: this.aggregateBottlenecks(validResults)
     };
   }
 
@@ -407,14 +430,14 @@ class PerformanceOptimizationService {
   }
 
   private aggregateBottlenecks(results: any[]): string[] {
-    const allBottlenecks = results.flatMap(r => r.result_data.bottlenecks);
-    const bottleneckCounts = allBottlenecks.reduce((acc, b) => {
+    const allBottlenecks = results.flatMap(r => (r.result_data as any)?.bottlenecks || []);
+    const bottleneckCounts = allBottlenecks.reduce((acc: Record<string, number>, b: string) => {
       acc[b] = (acc[b] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
 
     return Object.entries(bottleneckCounts)
-      .sort(([, a], [, b]) => b - a)
+      .sort(([, a], [, b]) => (b as number) - (a as number))
       .slice(0, 5)
       .map(([bottleneck]) => bottleneck);
   }

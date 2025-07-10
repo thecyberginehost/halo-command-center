@@ -94,7 +94,7 @@ class IntegrationTestingService {
     if (error) throw error;
     return {
       ...data,
-      test_cases: Array.isArray(data.test_cases) ? data.test_cases as TestCase[] : []
+      test_cases: Array.isArray(data.test_cases) ? (data.test_cases as unknown as TestCase[]) : []
     } as TestSuite;
   }
 
@@ -222,7 +222,8 @@ class IntegrationTestingService {
         test_type: testCase.test_type as TestCase['test_type'],
         input_data: testCase.input_data as Record<string, any>,
         expected_output: testCase.expected_output as Record<string, any>,
-        test_config: testCase.test_config as TestCase['test_config']
+        test_config: testCase.test_config as TestCase['test_config'],
+        status: testCase.status as TestCase['status']
       };
 
       const result = await this.runTestCase(typedTestCase);
