@@ -55,7 +55,7 @@ const Header = ({ onChatToggle, pageTitle = "Dashboard" }: HeaderProps) => {
             <img 
               src="/src/assets/halo-header-logo.png" 
               alt="HALO Logo" 
-              className="w-5 h-5 object-contain"
+              className="w-8 h-8 object-contain"
             />
           </div>
           <div className="text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
