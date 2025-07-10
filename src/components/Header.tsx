@@ -1,9 +1,11 @@
-import { Bell, ChevronDown, User, Bot, Sparkles, Settings, LogOut } from 'lucide-react';
+import { Bell, ChevronDown, User, Bot, Sparkles, Settings, LogOut, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { TenantSelector } from './TenantSelector';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSubscription } from '@/hooks/useSubscription';
 import { useNavigate } from 'react-router-dom';
 interface HeaderProps {
   onChatToggle?: () => void;
@@ -18,6 +20,7 @@ const Header = ({
     profile,
     signOut
   } = useAuth();
+  const { plan, loading: subscriptionLoading } = useSubscription();
   const navigate = useNavigate();
   const getDisplayName = () => {
     if (profile?.name) return profile.name;
@@ -36,6 +39,9 @@ const Header = ({
   };
   const handleSignOut = () => {
     signOut();
+  };
+  const handlePricingClick = () => {
+    navigate('/pricing');
   };
   return <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200/80 h-16 flex items-center justify-between px-6 shadow-sm relative z-50">
       {/* Left - Logo and Page Title */}
@@ -93,9 +99,20 @@ const Header = ({
                 <p className="text-xs leading-none text-gray-500">
                   {getUserEmail()}
                 </p>
+                {!subscriptionLoading && plan && (
+                  <div className="flex items-center space-x-2 mt-2">
+                    <Badge variant="secondary" className="text-xs">
+                      {plan.plan_name}
+                    </Badge>
+                  </div>
+                )}
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handlePricingClick} className="cursor-pointer">
+              <CreditCard className="mr-2 h-4 w-4" />
+              View Subscriptions
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={handleProfileSettings} className="cursor-pointer">
               <Settings className="mr-2 h-4 w-4" />
               Profile Settings
