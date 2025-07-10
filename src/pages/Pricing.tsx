@@ -13,7 +13,7 @@ const cloudPlans = [
     name: "MASP Starter",
     description: "Perfect for small automation agencies",
     monthlyPrice: 49,
-    yearlyPrice: 490,
+    yearlyPrice: 470,
     organizationLimit: 3,
     popular: false,
     features: [
@@ -30,7 +30,7 @@ const cloudPlans = [
     name: "MASP Pro",
     description: "For growing automation service providers",
     monthlyPrice: 149,
-    yearlyPrice: 1490,
+    yearlyPrice: 1430,
     organizationLimit: 10,
     popular: true,
     features: [
@@ -48,7 +48,7 @@ const cloudPlans = [
     name: "MASP Enterprise", 
     description: "For large-scale automation operations",
     monthlyPrice: 399,
-    yearlyPrice: 3990,
+    yearlyPrice: 3830,
     organizationLimit: null,
     popular: false,
     features: [
@@ -68,9 +68,11 @@ export default function Pricing() {
   const [isYearly, setIsYearly] = useState(false);
 
   const formatPrice = (monthly: number, yearly: number) => {
-    const price = isYearly ? yearly : monthly;
-    const period = isYearly ? "year" : "month";
-    return { price, period };
+    if (isYearly) {
+      const monthlyEquivalent = Math.round(yearly / 12);
+      return { price: monthlyEquivalent, period: "paid annually" };
+    }
+    return { price: monthly, period: "month" };
   };
 
   const getSavings = (monthly: number, yearly: number) => {
@@ -103,7 +105,7 @@ export default function Pricing() {
             />
             <Label htmlFor="billing-toggle" className="text-sm font-medium">
               Yearly
-              <Badge variant="secondary" className="ml-2">Save up to 17%</Badge>
+              <Badge variant="secondary" className="ml-2">Save 20%</Badge>
             </Label>
           </div>
         </div>
