@@ -55,6 +55,62 @@ export type Database = {
           },
         ]
       }
+      dynamic_properties: {
+        Row: {
+          created_at: string
+          default_value: Json | null
+          display_conditions: Json | null
+          id: string
+          integration_id: string
+          is_dynamic: boolean | null
+          is_required: boolean | null
+          property_name: string
+          property_type: string
+          resource_locator: Json | null
+          tenant_id: string
+          updated_at: string
+          validation_rules: Json | null
+        }
+        Insert: {
+          created_at?: string
+          default_value?: Json | null
+          display_conditions?: Json | null
+          id?: string
+          integration_id: string
+          is_dynamic?: boolean | null
+          is_required?: boolean | null
+          property_name: string
+          property_type: string
+          resource_locator?: Json | null
+          tenant_id: string
+          updated_at?: string
+          validation_rules?: Json | null
+        }
+        Update: {
+          created_at?: string
+          default_value?: Json | null
+          display_conditions?: Json | null
+          id?: string
+          integration_id?: string
+          is_dynamic?: boolean | null
+          is_required?: boolean | null
+          property_name?: string
+          property_type?: string
+          resource_locator?: Json | null
+          tenant_id?: string
+          updated_at?: string
+          validation_rules?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dynamic_properties_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       execution_logs: {
         Row: {
           data: Json | null
@@ -89,6 +145,155 @@ export type Database = {
             columns: ["execution_id"]
             isOneToOne: false
             referencedRelation: "workflow_executions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      file_metadata: {
+        Row: {
+          bucket_name: string
+          checksum: string | null
+          created_at: string
+          expires_at: string | null
+          file_name: string
+          file_path: string
+          file_size: number
+          id: string
+          integration_id: string | null
+          is_processed: boolean | null
+          metadata: Json | null
+          mime_type: string
+          processing_result: Json | null
+          processing_status: string | null
+          tenant_id: string
+          updated_at: string
+          uploaded_by: string | null
+          usage_context: string | null
+          workflow_id: string | null
+        }
+        Insert: {
+          bucket_name: string
+          checksum?: string | null
+          created_at?: string
+          expires_at?: string | null
+          file_name: string
+          file_path: string
+          file_size: number
+          id?: string
+          integration_id?: string | null
+          is_processed?: boolean | null
+          metadata?: Json | null
+          mime_type: string
+          processing_result?: Json | null
+          processing_status?: string | null
+          tenant_id: string
+          updated_at?: string
+          uploaded_by?: string | null
+          usage_context?: string | null
+          workflow_id?: string | null
+        }
+        Update: {
+          bucket_name?: string
+          checksum?: string | null
+          created_at?: string
+          expires_at?: string | null
+          file_name?: string
+          file_path?: string
+          file_size?: number
+          id?: string
+          integration_id?: string | null
+          is_processed?: boolean | null
+          metadata?: Json | null
+          mime_type?: string
+          processing_result?: Json | null
+          processing_status?: string | null
+          tenant_id?: string
+          updated_at?: string
+          uploaded_by?: string | null
+          usage_context?: string | null
+          workflow_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "file_metadata_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "file_metadata_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      helper_functions: {
+        Row: {
+          cache_duration: number | null
+          created_at: string
+          description: string | null
+          error_mapping: Json | null
+          execution_timeout: number | null
+          function_config: Json
+          function_name: string
+          function_type: string
+          id: string
+          input_parameters: Json
+          is_active: boolean | null
+          is_cached: boolean | null
+          output_format: Json | null
+          rate_limit: Json | null
+          tenant_id: string
+          updated_at: string
+          usage_count: number | null
+        }
+        Insert: {
+          cache_duration?: number | null
+          created_at?: string
+          description?: string | null
+          error_mapping?: Json | null
+          execution_timeout?: number | null
+          function_config: Json
+          function_name: string
+          function_type: string
+          id?: string
+          input_parameters: Json
+          is_active?: boolean | null
+          is_cached?: boolean | null
+          output_format?: Json | null
+          rate_limit?: Json | null
+          tenant_id: string
+          updated_at?: string
+          usage_count?: number | null
+        }
+        Update: {
+          cache_duration?: number | null
+          created_at?: string
+          description?: string | null
+          error_mapping?: Json | null
+          execution_timeout?: number | null
+          function_config?: Json
+          function_name?: string
+          function_type?: string
+          id?: string
+          input_parameters?: Json
+          is_active?: boolean | null
+          is_cached?: boolean | null
+          output_format?: Json | null
+          rate_limit?: Json | null
+          tenant_id?: string
+          updated_at?: string
+          usage_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "helper_functions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]
@@ -223,6 +428,74 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "fk_oauth_states_tenant_id"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      operation_templates: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          error_handling: Json | null
+          id: string
+          input_schema: Json
+          is_active: boolean | null
+          is_system_template: boolean | null
+          operation_config: Json
+          output_schema: Json
+          retry_config: Json | null
+          tags: string[] | null
+          template_name: string
+          tenant_id: string
+          updated_at: string
+          usage_count: number | null
+          version: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          error_handling?: Json | null
+          id?: string
+          input_schema: Json
+          is_active?: boolean | null
+          is_system_template?: boolean | null
+          operation_config: Json
+          output_schema: Json
+          retry_config?: Json | null
+          tags?: string[] | null
+          template_name: string
+          tenant_id: string
+          updated_at?: string
+          usage_count?: number | null
+          version?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          error_handling?: Json | null
+          id?: string
+          input_schema?: Json
+          is_active?: boolean | null
+          is_system_template?: boolean | null
+          operation_config?: Json
+          output_schema?: Json
+          retry_config?: Json | null
+          tags?: string[] | null
+          template_name?: string
+          tenant_id?: string
+          updated_at?: string
+          usage_count?: number | null
+          version?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "operation_templates_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
@@ -657,7 +930,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      cleanup_expired_files: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
