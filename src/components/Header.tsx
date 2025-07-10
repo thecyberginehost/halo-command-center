@@ -49,18 +49,16 @@ const Header = ({ onChatToggle, pageTitle = "Dashboard" }: HeaderProps) => {
   return (
     <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200/80 h-16 flex items-center justify-between px-6 shadow-sm relative z-50">
       {/* Left - Logo and Page Title */}
-      <div className="flex items-center space-x-8">
-        <div className="flex items-center space-x-3">
-          <div className="w-9 h-9 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-sm">
-            <img 
-              src="/src/assets/halo-header-logo.png" 
-              alt="HALO Logo" 
-              className="w-8 h-8 object-contain"
-            />
-          </div>
-          <div className="text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-            HALO
-          </div>
+      <div className="flex items-center space-x-6">
+        <div className="w-9 h-9 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-sm">
+          <img 
+            src="/src/assets/halo-header-logo.png" 
+            alt="HALO Logo" 
+            className="w-8 h-8 object-contain"
+          />
+        </div>
+        <div className="text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+          HALO
         </div>
         <div className="hidden md:block h-6 w-px bg-gray-300"></div>
         <h1 className="text-lg font-semibold text-gray-800 hidden md:block">{pageTitle}</h1>
