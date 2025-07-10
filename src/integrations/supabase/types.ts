@@ -177,26 +177,32 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          masp_provider_data: Json | null
           name: string
           settings: Json | null
           subdomain: string
           updated_at: string
+          white_label_config: Json | null
         }
         Insert: {
           created_at?: string
           id?: string
+          masp_provider_data?: Json | null
           name: string
           settings?: Json | null
           subdomain: string
           updated_at?: string
+          white_label_config?: Json | null
         }
         Update: {
           created_at?: string
           id?: string
+          masp_provider_data?: Json | null
           name?: string
           settings?: Json | null
           subdomain?: string
           updated_at?: string
+          white_label_config?: Json | null
         }
         Relationships: []
       }

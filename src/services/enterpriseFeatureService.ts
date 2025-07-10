@@ -4,8 +4,8 @@ export interface MASPProvider {
   id: string;
   tenantId: string;
   certificationLevel: 'bronze' | 'silver' | 'gold' | 'platinum';
-  certificationDate: Date;
-  expirationDate: Date;
+  certificationDate: string; // ISO string for JSON compatibility
+  expirationDate: string; // ISO string for JSON compatibility
   isActive: boolean;
   specializations: string[];
   clientCount: number;
@@ -103,16 +103,20 @@ export class MASPCertificationService {
     try {
       const { data, error } = await supabase
         .from('tenants')
-        .select('*, masp_provider_data')
+        .select('id, masp_provider_data')
         .eq('id', tenantId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 
-      return data?.masp_provider_data ? {
-        ...data.masp_provider_data,
-        tenantId: data.id
-      } : null;
+      if (data?.masp_provider_data && typeof data.masp_provider_data === 'object') {
+        const providerData = data.masp_provider_data as any;
+        return {
+          ...providerData,
+          tenantId: data.id
+        } as MASPProvider;
+      }
+      return null;
     } catch (error) {
       console.error('Failed to get MASP provider:', error);
       return null;
@@ -127,19 +131,19 @@ export class MASPCertificationService {
     try {
       const provider = await this.getMASPProvider(tenantId);
       
-      const updatedProvider: Partial<MASPProvider> = {
+      const updatedProvider = {
         ...provider,
         certificationLevel: level,
         specializations,
-        certificationDate: new Date(),
-        expirationDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year
+        certificationDate: new Date().toISOString(),
+        expirationDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
         isActive: true
       };
 
       const { error } = await supabase
         .from('tenants')
         .update({
-          masp_provider_data: updatedProvider,
+          masp_provider_data: updatedProvider as any,
           updated_at: new Date().toISOString()
         })
         .eq('id', tenantId);
@@ -415,13 +419,13 @@ export class WhiteLabelService {
     try {
       const { data, error } = await supabase
         .from('tenants')
-        .select('*, white_label_config')
+        .select('id, white_label_config')
         .eq('id', tenantId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 
-      return data?.white_label_config || null;
+      return data?.white_label_config ? (data.white_label_config as unknown as WhiteLabelConfig) : null;
     } catch (error) {
       console.error('Failed to get white label config:', error);
       return null;
@@ -444,7 +448,7 @@ export class WhiteLabelService {
       const { error } = await supabase
         .from('tenants')
         .update({
-          white_label_config: updatedConfig,
+          white_label_config: updatedConfig as any,
           updated_at: new Date().toISOString()
         })
         .eq('id', tenantId);
