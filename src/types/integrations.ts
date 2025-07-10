@@ -34,7 +34,11 @@ export type IntegrationCategory =
   | 'payment'
   | 'productivity'
   | 'developer_tools'
-  | 'triggers';
+  | 'triggers'
+  | 'logic'
+  | 'data_transform'
+  | 'flow_control'
+  | 'masp_tools';
 
 export interface IntegrationField {
   name: string;
@@ -64,8 +68,8 @@ export interface IntegrationNode extends BaseIntegration {
   type: 'trigger' | 'action' | 'condition' | 'delay' | 'data_transform' | 'logic' | 'router' | 'iterator' | 'aggregator';
   fields: IntegrationField[];
   endpoints: IntegrationEndpoint[];
-  serviceId?: string; // Reference to parent service (optional for backward compatibility)
-  actionId?: string; // Specific action ID within the service (optional for backward compatibility)
+  serviceId?: string;
+  actionId?: string;
 }
 
 export interface IntegrationEndpoint {
@@ -84,6 +88,8 @@ export interface ExecutionContext {
   input: Record<string, any>;
   credentials: Record<string, string>;
   previousStepOutputs: Record<string, any>;
+  tenantId?: string;
+  userId?: string;
 }
 
 export interface ExecutionResult {

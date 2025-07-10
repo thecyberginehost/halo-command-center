@@ -159,12 +159,11 @@ export const allIntegrations: IntegrationNode[] = [
 export const integrationsByCategory: Record<IntegrationCategory, IntegrationNode[]> = {
   communication: [gmailSendEmail, gmailSearchEmails, gmailDeleteEmail, gmailArchiveEmail, gmailReplyEmail, sesIntegration, sendgridIntegration, slackIntegration],
   crm: [salesforceCreateLead, salesforceCreateContact, salesforceUpdateContact, salesforceSearchContacts, salesforceCreateOpportunity, hubspotCreateContact, hubspotUpdateContact, hubspotCreateDeal, pipedriveCreatePerson, pipedriveCreateDeal, pipedriveUpdateDeal],
-  webhook: [webhookTrigger, httpRequestAction, conditionIntegration, delayIntegration, loopIntegration, errorHandlerIntegration, routerIntegration, iteratorIntegration, aggregatorIntegration],
+  webhook: [webhookTrigger, httpRequestAction, routerIntegration, iteratorIntegration, aggregatorIntegration],
   database: [
     postgresqlCreateRecord, postgresqlReadRecords, postgresqlUpdateRecord, postgresqlDeleteRecord, postgresqlExecuteQuery,
     mysqlCreateRecord, mysqlReadRecords, mysqlUpdateRecord, mysqlDeleteRecord, mysqlExecuteQuery,
-    mongodbCreateDocument, mongodbFindDocuments, mongodbUpdateDocument, mongodbDeleteDocument, mongodbAggregate, redisIntegration,
-    dataTransformIntegration, dataValidationIntegration, dataStorageIntegration, jsonProcessorIntegration, calculatorIntegration
+    mongodbCreateDocument, mongodbFindDocuments, mongodbUpdateDocument, mongodbDeleteDocument, mongodbAggregate, redisIntegration
   ],
   file_storage: [
     googleDriveUploadFile, googleDriveDownloadFile, googleDriveListFiles, googleDriveDeleteFile, googleDriveCreateFolder, googleDriveShareFile,
@@ -180,7 +179,11 @@ export const integrationsByCategory: Record<IntegrationCategory, IntegrationNode
     airtableCreateRecord, airtableGetRecords, airtableUpdateRecord
   ],
   developer_tools: [githubIntegration, jiraIntegration, trelloIntegration, asanaIntegration],
-  triggers: [scheduleTrigger, emailTrigger, formTrigger, fileUploadTrigger, gmailNewEmailTrigger]
+  triggers: [scheduleTrigger, emailTrigger, formTrigger, fileUploadTrigger, gmailNewEmailTrigger],
+  logic: [conditionIntegration, loopIntegration, errorHandlerIntegration],
+  data_transform: [dataTransformIntegration, dataValidationIntegration, jsonProcessorIntegration, calculatorIntegration],
+  flow_control: [routerIntegration, iteratorIntegration, aggregatorIntegration],
+  masp_tools: [dataStorageIntegration], // MASP-specific tools for service providers
 };
 
 export const getIntegrationById = (id: string): IntegrationNode | undefined => {

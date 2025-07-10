@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, Zap, Send, Database, FileText, Brain, BarChart, CreditCard, Code, Plus } from 'lucide-react';
+import { Search, Zap, Send, Database, FileText, Brain, BarChart, CreditCard, Code, Plus, MessageCircle, Users, Webhook, Bot, Briefcase, Settings, ArrowLeftRight, GitBranch, Star } from 'lucide-react';
 import { IntegrationNode, IntegrationCategory } from '@/types/integrations';
 import { integrationsByCategory } from '@/lib/integrations';
 
@@ -13,17 +13,21 @@ interface NodePaletteProps {
 }
 
 const categoryIcons: Record<IntegrationCategory, any> = {
-  communication: Send,
-  crm: Database,
-  webhook: Zap,
+  communication: MessageCircle,
+  crm: Users,
+  webhook: Webhook,
   database: Database,
   file_storage: FileText,
-  ai: Brain,
+  ai: Bot,
   analytics: BarChart,
   payment: CreditCard,
-  productivity: FileText,
+  productivity: Briefcase,
   developer_tools: Code,
   triggers: Zap,
+  logic: Settings,
+  data_transform: ArrowLeftRight,
+  flow_control: GitBranch,
+  masp_tools: Star,
 };
 
 const categoryLabels: Record<IntegrationCategory, string> = {
@@ -38,6 +42,10 @@ const categoryLabels: Record<IntegrationCategory, string> = {
   productivity: 'Productivity',
   developer_tools: 'Dev Tools',
   triggers: 'Triggers',
+  logic: 'Logic & Conditions',
+  data_transform: 'Data Transform',
+  flow_control: 'Flow Control',
+  masp_tools: 'MASP Tools',
 };
 
 export function NodePalette({ onAddNode }: NodePaletteProps) {
