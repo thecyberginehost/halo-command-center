@@ -14,6 +14,47 @@ export type Database = {
   }
   public: {
     Tables: {
+      data_mappings: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          mappings: Json
+          source_integration: string
+          target_integration: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          mappings?: Json
+          source_integration: string
+          target_integration: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          mappings?: Json
+          source_integration?: string
+          target_integration?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_data_mappings_tenant_id"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       execution_logs: {
         Row: {
           data: Json | null
@@ -48,6 +89,143 @@ export type Database = {
             columns: ["execution_id"]
             isOneToOne: false
             referencedRelation: "workflow_executions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      integration_executions: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          duration: number | null
+          error: string | null
+          id: string
+          input: Json
+          integration_id: string
+          output: Json | null
+          retry_count: number
+          started_at: string
+          status: string
+          tenant_id: string
+          updated_at: string
+          workflow_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          duration?: number | null
+          error?: string | null
+          id?: string
+          input?: Json
+          integration_id: string
+          output?: Json | null
+          retry_count?: number
+          started_at?: string
+          status: string
+          tenant_id: string
+          updated_at?: string
+          workflow_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          duration?: number | null
+          error?: string | null
+          id?: string
+          input?: Json
+          integration_id?: string
+          output?: Json | null
+          retry_count?: number
+          started_at?: string
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          workflow_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_integration_executions_tenant_id"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_integration_executions_workflow_id"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      oauth_configs: {
+        Row: {
+          client_id: string
+          client_secret: string
+          created_at: string
+          id: string
+          is_active: boolean
+          redirect_uri: string | null
+          scopes: string[] | null
+          service_id: string
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          client_secret: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          redirect_uri?: string | null
+          scopes?: string[] | null
+          service_id: string
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          client_secret?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          redirect_uri?: string | null
+          scopes?: string[] | null
+          service_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      oauth_states: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          service_id: string
+          state: string
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          service_id: string
+          state: string
+          tenant_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          service_id?: string
+          state?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_oauth_states_tenant_id"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]
@@ -90,34 +268,43 @@ export type Database = {
       }
       tenant_credentials: {
         Row: {
+          auth_type: string | null
           created_at: string
           credentials: Json
           description: string | null
+          expires_at: string | null
           id: string
           is_active: boolean
           name: string
+          scopes: string[] | null
           service_type: string
           tenant_id: string
           updated_at: string
         }
         Insert: {
+          auth_type?: string | null
           created_at?: string
           credentials: Json
           description?: string | null
+          expires_at?: string | null
           id?: string
           is_active?: boolean
           name: string
+          scopes?: string[] | null
           service_type: string
           tenant_id: string
           updated_at?: string
         }
         Update: {
+          auth_type?: string | null
           created_at?: string
           credentials?: Json
           description?: string | null
+          expires_at?: string | null
           id?: string
           is_active?: boolean
           name?: string
+          scopes?: string[] | null
           service_type?: string
           tenant_id?: string
           updated_at?: string
@@ -205,6 +392,57 @@ export type Database = {
           white_label_config?: Json | null
         }
         Relationships: []
+      }
+      webhook_environments: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          is_production: boolean
+          name: string
+          tenant_id: string
+          updated_at: string
+          url: string
+          workflow_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_production?: boolean
+          name: string
+          tenant_id: string
+          updated_at?: string
+          url: string
+          workflow_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_production?: boolean
+          name?: string
+          tenant_id?: string
+          updated_at?: string
+          url?: string
+          workflow_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_webhook_environments_tenant_id"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_webhook_environments_workflow_id"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "workflows"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       webhook_executions: {
         Row: {
