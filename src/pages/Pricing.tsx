@@ -70,7 +70,7 @@ export default function Pricing() {
   const formatPrice = (monthly: number, yearly: number) => {
     if (isYearly) {
       const monthlyEquivalent = Math.round(yearly / 12);
-      return { price: monthlyEquivalent, period: "paid annually" };
+      return { price: monthlyEquivalent, period: "mo paid annually" };
     }
     return { price: monthly, period: "month" };
   };
