@@ -1133,6 +1133,35 @@ export type Database = {
         }
         Relationships: []
       }
+      organization_usage: {
+        Row: {
+          id: string
+          last_updated: string | null
+          organization_count: number | null
+          tenant_id: string
+        }
+        Insert: {
+          id?: string
+          last_updated?: string | null
+          organization_count?: number | null
+          tenant_id: string
+        }
+        Update: {
+          id?: string
+          last_updated?: string | null
+          organization_count?: number | null
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_usage_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       performance_alerts: {
         Row: {
           acknowledged_at: string | null
@@ -1263,6 +1292,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      subscription_plans: {
+        Row: {
+          created_at: string | null
+          features: Json | null
+          id: string
+          is_active: boolean | null
+          organization_limit: number | null
+          plan_code: string
+          plan_name: string
+          plan_type: string
+          price_monthly: number | null
+          price_yearly: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          organization_limit?: number | null
+          plan_code: string
+          plan_name: string
+          plan_type: string
+          price_monthly?: number | null
+          price_yearly?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          organization_limit?: number | null
+          plan_code?: string
+          plan_name?: string
+          plan_type?: string
+          price_monthly?: number | null
+          price_yearly?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       system_knowledge_base: {
         Row: {
@@ -1577,6 +1648,66 @@ export type Database = {
           white_label_config?: Json | null
         }
         Relationships: []
+      }
+      user_subscriptions: {
+        Row: {
+          billing_cycle: string | null
+          created_at: string | null
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          plan_id: string | null
+          status: string
+          stripe_subscription_id: string | null
+          tenant_id: string | null
+          trial_ends_at: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          billing_cycle?: string | null
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          plan_id?: string | null
+          status: string
+          stripe_subscription_id?: string | null
+          tenant_id?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          billing_cycle?: string | null
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          plan_id?: string | null
+          status?: string
+          stripe_subscription_id?: string | null
+          tenant_id?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_subscriptions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       webhook_environments: {
         Row: {
@@ -1917,6 +2048,10 @@ export type Database = {
     Functions: {
       calculate_performance_metrics: {
         Args: { _tenant_id: string; _time_period?: unknown }
+        Returns: Json
+      }
+      check_organization_limit: {
+        Args: { p_tenant_id: string }
         Returns: Json
       }
       check_tenant_quota: {

@@ -6,7 +6,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { TenantProvider } from "@/contexts/TenantContext";
 import { ChatProvider } from "@/contexts/ChatContext";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
+import Auth from "./pages/Auth";
+import Pricing from "./pages/Pricing";
+import SelfHosted from "./pages/SelfHosted";
 import Automations from "./pages/Automations";
 import CreateAutomation from "./pages/CreateAutomation";
 import CreateOrganization from "./pages/CreateOrganization";
@@ -23,34 +28,43 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TenantProvider>
-      <ChatProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <SidebarProvider>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/automations" element={<Automations />} />
-              <Route path="/automations/create" element={<CreateAutomation />} />
-              <Route path="/automations/create/:workflowId" element={<CreateAutomation />} />
-              <Route path="/credentials" element={<Credentials />} />
-              <Route path="/ai-assist" element={<AIAssist />} />
-              <Route path="/docs" element={<Documentation />} />
-              <Route path="/enterprise" element={<Enterprise />} />
-              <Route path="/performance" element={<Performance />} />
-              <Route path="/marketplace" element={<Marketplace />} />
-              <Route path="/organizations/create" element={<CreateOrganization />} />
-              <Route path="/workflow-builder/:workflowId" element={<WorkflowBuilderPage />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            </SidebarProvider>
-          </BrowserRouter>
-        </TooltipProvider>
-      </ChatProvider>
-    </TenantProvider>
+    <AuthProvider>
+      <TenantProvider>
+        <ChatProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <SidebarProvider>
+                <Routes>
+                  {/* Public routes */}
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/pricing" element={<Pricing />} />
+                  <Route path="/self-hosted" element={<SelfHosted />} />
+                  
+                  {/* Protected routes */}
+                  <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+                  <Route path="/automations" element={<ProtectedRoute><Automations /></ProtectedRoute>} />
+                  <Route path="/automations/create" element={<ProtectedRoute><CreateAutomation /></ProtectedRoute>} />
+                  <Route path="/automations/create/:workflowId" element={<ProtectedRoute><CreateAutomation /></ProtectedRoute>} />
+                  <Route path="/credentials" element={<ProtectedRoute><Credentials /></ProtectedRoute>} />
+                  <Route path="/ai-assist" element={<ProtectedRoute><AIAssist /></ProtectedRoute>} />
+                  <Route path="/docs" element={<ProtectedRoute><Documentation /></ProtectedRoute>} />
+                  <Route path="/enterprise" element={<ProtectedRoute><Enterprise /></ProtectedRoute>} />
+                  <Route path="/performance" element={<ProtectedRoute><Performance /></ProtectedRoute>} />
+                  <Route path="/marketplace" element={<ProtectedRoute><Marketplace /></ProtectedRoute>} />
+                  <Route path="/organizations/create" element={<ProtectedRoute><CreateOrganization /></ProtectedRoute>} />
+                  <Route path="/workflow-builder/:workflowId" element={<ProtectedRoute><WorkflowBuilderPage /></ProtectedRoute>} />
+                  
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </SidebarProvider>
+            </BrowserRouter>
+          </TooltipProvider>
+        </ChatProvider>
+      </TenantProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
