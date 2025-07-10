@@ -101,6 +101,67 @@ export const useProfile = () => {
     }
   };
 
+  const uploadAvatar = async (file: File) => {
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+
+    try {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        throw new Error('Please select a valid image file');
+      }
+
+      // Validate file size (max 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        throw new Error('File size must be less than 5MB');
+      }
+
+      // Create unique filename
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/avatar.${fileExt}`;
+
+      // Delete existing avatar if it exists
+      if (profile?.avatar_url) {
+        const oldPath = profile.avatar_url.split('/').pop();
+        if (oldPath) {
+          await supabase.storage
+            .from('avatars')
+            .remove([`${user.id}/${oldPath}`]);
+        }
+      }
+
+      // Upload new avatar
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName);
+
+      const avatarUrl = urlData.publicUrl;
+
+      // Update profile with new avatar URL
+      const updatedProfile = await updateProfile({ avatar_url: avatarUrl });
+
+      toast.success('Profile picture updated successfully');
+      return updatedProfile;
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to upload avatar';
+      toast.error(errorMessage);
+      throw error;
+    }
+  };
+
   useEffect(() => {
     fetchProfile();
   }, [user]);
@@ -109,6 +170,7 @@ export const useProfile = () => {
     profile,
     loading,
     updateProfile,
+    uploadAvatar,
     refetchProfile: fetchProfile
   };
 };

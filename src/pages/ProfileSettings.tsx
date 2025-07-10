@@ -13,7 +13,7 @@ import Layout from "@/components/Layout";
 
 export default function ProfileSettings() {
   const { user } = useAuth();
-  const { profile, loading, updateProfile } = useProfile();
+  const { profile, loading, updateProfile, uploadAvatar } = useProfile();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -25,6 +25,23 @@ export default function ProfileSettings() {
     location: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingAvatar(true);
+    try {
+      await uploadAvatar(file);
+    } catch (error) {
+      // Error is already handled in the hook
+    } finally {
+      setIsUploadingAvatar(false);
+      // Reset the input
+      event.target.value = '';
+    }
+  };
 
   useEffect(() => {
     if (profile) {
@@ -97,13 +114,37 @@ export default function ProfileSettings() {
                   {initials}
                 </AvatarFallback>
               </Avatar>
-              <Button variant="outline" size="sm" disabled>
-                <Camera className="h-4 w-4 mr-2" />
-                Change Photo
-              </Button>
-              <p className="text-xs text-muted-foreground text-center">
-                Photo upload coming soon
-              </p>
+              <div className="flex flex-col items-center space-y-2">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarUpload}
+                  className="hidden"
+                  id="avatar-upload"
+                  disabled={isUploadingAvatar}
+                />
+                <label htmlFor="avatar-upload">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    disabled={isUploadingAvatar}
+                    className="cursor-pointer"
+                    asChild
+                  >
+                    <span>
+                      {isUploadingAvatar ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <Camera className="h-4 w-4 mr-2" />
+                      )}
+                      {isUploadingAvatar ? 'Uploading...' : 'Change Photo'}
+                    </span>
+                  </Button>
+                </label>
+                <p className="text-xs text-muted-foreground text-center">
+                  JPG, PNG up to 5MB
+                </p>
+              </div>
             </CardContent>
           </Card>
 
