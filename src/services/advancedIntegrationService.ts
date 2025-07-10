@@ -192,7 +192,7 @@ export class AdvancedIntegrationService {
       state,
       service_id: serviceId,
       tenant_id: tenantId,
-      expires_at: new Date(Date.now() + 600000) // 10 minutes
+      expires_at: new Date(Date.now() + 600000).toISOString() // 10 minutes
     });
 
     return {
@@ -316,13 +316,13 @@ export class AdvancedIntegrationService {
       integrationId: row.integration_id,
       tenantId: row.tenant_id,
       workflowId: row.workflow_id,
-      status: row.status,
-      input: row.input,
-      output: row.output,
-      error: row.error,
+      status: row.status as 'pending' | 'running' | 'completed' | 'failed',
+      input: row.input as Record<string, any>,
+      output: row.output as Record<string, any>,
+      error: row.error || undefined,
       startedAt: new Date(row.started_at),
       completedAt: row.completed_at ? new Date(row.completed_at) : undefined,
-      duration: row.duration,
+      duration: row.duration || undefined,
       retryCount: row.retry_count || 0
     }));
   }
@@ -389,8 +389,8 @@ export class AdvancedIntegrationService {
       tenantId: data.tenant_id,
       serviceId: data.service_type,
       name: data.name,
-      authType: data.auth_type || 'api_key',
-      credentials: data.credentials,
+      authType: (data.auth_type || 'api_key') as 'oauth' | 'api_key' | 'basic' | 'bearer' | 'custom',
+      credentials: typeof data.credentials === 'object' ? data.credentials as Record<string, any> : {},
       isActive: data.is_active,
       expiresAt: data.expires_at ? new Date(data.expires_at) : undefined,
       scopes: data.scopes
