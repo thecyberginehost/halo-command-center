@@ -2,17 +2,21 @@
 import Layout from '../components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Activity, CheckCircle, AlertTriangle, TrendingUp } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Activity, CheckCircle, AlertTriangle, TrendingUp, Zap, Users, Award, Package } from 'lucide-react';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { useWorkflows } from '@/hooks/useWorkflows';
 import { useTenant } from '@/contexts/TenantContext';
 import { usePageTitle } from '@/hooks/usePageTitle';
+import { useEnterpriseData } from '@/hooks/useEnterpriseData';
+import { Link } from 'react-router-dom';
 
 const Index = () => {
   usePageTitle('Dashboard');
   const { stats, loading: statsLoading } = useDashboardStats();
   const { workflows, loading: workflowsLoading } = useWorkflows();
   const { currentTenant, loading: tenantLoading } = useTenant();
+  const { hasEnterpiseData, loading: enterpriseLoading } = useEnterpriseData();
 
   if (tenantLoading) {
     return (
@@ -92,6 +96,106 @@ const Index = () => {
                 <p className="text-xs text-muted-foreground">
                   99.9% uptime
                 </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Enterprise Section */}
+          {hasEnterpiseData && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Award className="h-5 w-5 text-primary" />
+                    MASP Certification Status
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-2xl font-bold text-primary">GOLD Certified</div>
+                      <p className="text-sm text-muted-foreground">Enterprise automation provider</p>
+                    </div>
+                    <Link to="/enterprise">
+                      <Button variant="outline" size="sm">View Details</Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Zap className="h-5 w-5 text-primary" />
+                    Performance Metrics
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-sm">Response Time</span>
+                      <span className="text-sm font-medium">245ms</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm">System Uptime</span>
+                      <span className="text-sm font-medium">99.9%</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Error Rate</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">0.1%</span>
+                        <Link to="/performance">
+                          <Button variant="outline" size="sm">Monitor</Button>
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* AI Assistant & Marketplace */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Activity className="h-5 w-5 text-primary" />
+                  Resonant Directive AI
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Enhanced AI assistant with advanced workflow generation and optimization capabilities.
+                </p>
+                <div className="flex items-center justify-between">
+                  <Badge className="bg-green-100 text-green-800">Active</Badge>
+                  <Link to="/ai-assist">
+                    <Button size="sm">Open Assistant</Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Package className="h-5 w-5 text-primary" />
+                  Integration Marketplace
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Discover powerful integrations to extend your automation capabilities.
+                </p>
+                <div className="flex items-center justify-between">
+                  <div className="text-sm">
+                    <span className="font-medium">150+</span> integrations available
+                  </div>
+                  <Link to="/marketplace">
+                    <Button size="sm" variant="outline">Browse</Button>
+                  </Link>
+                </div>
               </CardContent>
             </Card>
           </div>

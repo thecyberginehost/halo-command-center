@@ -35,6 +35,14 @@ const menuSections = [
     ]
   },
   {
+    title: "ENTERPRISE",
+    items: [
+      { title: "Enterprise Dashboard", icon: BarChart, path: "/enterprise" },
+      { title: "Performance", icon: Users, path: "/performance" },
+      { title: "Marketplace", icon: Settings, path: "/marketplace" },
+    ]
+  },
+  {
     title: "AI ASSIST",
     items: [
       { title: "Resonant Directive", icon: Bell, path: "/ai-assist" },
