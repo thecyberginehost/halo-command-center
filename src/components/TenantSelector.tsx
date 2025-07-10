@@ -50,46 +50,65 @@ export function TenantSelector() {
 
   if (loading) {
     return (
-      <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+      <div className="flex items-center space-x-3 text-sm text-gray-500 w-full max-w-sm">
         <Building2 className="h-4 w-4" />
-        <span>Loading...</span>
+        <div className="bg-gray-100 rounded-md h-9 flex-1 flex items-center px-3">
+          <span>Loading organizations...</span>
+        </div>
       </div>
     );
   }
 
   if (tenants.length === 0) {
     return (
-      <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+      <div className="flex items-center space-x-3 text-sm text-gray-500 w-full max-w-sm">
         <Building2 className="h-4 w-4" />
-        <span>No organizations</span>
+        <div className="bg-gray-100 rounded-md h-9 flex-1 flex items-center px-3">
+          <span>No organizations found</span>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex items-center space-x-2 w-full max-w-sm">
-      <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-      <Select 
-        value={currentTenant?.id || ''} 
-        onValueChange={handleTenantChange}
-      >
-        <SelectTrigger className="w-full h-8 text-sm">
-          <SelectValue placeholder="Select organization" />
-        </SelectTrigger>
-        <SelectContent>
-          {tenants.map((tenant) => (
-            <SelectItem key={tenant.id} value={tenant.id}>
-              {tenant.name}
+    <div className="flex items-center space-x-3 w-full max-w-sm">
+      <div className="flex items-center space-x-2 min-w-0 flex-1">
+        <Building2 className="h-4 w-4 text-gray-500 flex-shrink-0" />
+        <Select 
+          value={currentTenant?.id || ''} 
+          onValueChange={handleTenantChange}
+        >
+          <SelectTrigger className="w-full h-9 text-sm bg-gray-50/80 border-gray-300/60 hover:bg-gray-100/80 focus:bg-white transition-colors">
+            <SelectValue 
+              placeholder="Select organization" 
+              className="text-gray-700 font-medium"
+            />
+          </SelectTrigger>
+          <SelectContent className="bg-white/95 backdrop-blur-sm border border-gray-200/80 shadow-xl z-50">
+            {tenants.map((tenant) => (
+              <SelectItem 
+                key={tenant.id} 
+                value={tenant.id}
+                className="cursor-pointer hover:bg-gray-50 focus:bg-gray-100"
+              >
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="font-medium text-gray-800">{tenant.name}</span>
+                </div>
+              </SelectItem>
+            ))}
+            <SelectItem 
+              value="create-new" 
+              className="text-primary font-medium cursor-pointer hover:bg-primary/5 focus:bg-primary/10 border-t border-gray-200 mt-1"
+            >
+              <div className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                <span>Create New Organization</span>
+              </div>
             </SelectItem>
-          ))}
-          <SelectItem value="create-new" className="text-primary font-medium">
-            <div className="flex items-center gap-2">
-              <Plus className="h-4 w-4" />
-              Create Organization
-            </div>
-          </SelectItem>
-        </SelectContent>
-      </Select>
+          </SelectContent>
+        </Select>
+      </div>
     </div>
   );
 }

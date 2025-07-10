@@ -47,42 +47,48 @@ const Header = ({ onChatToggle, pageTitle = "Dashboard" }: HeaderProps) => {
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 shadow-sm">
+    <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200/80 h-16 flex items-center justify-between px-6 shadow-sm relative z-50">
       {/* Left - Logo and Page Title */}
-      <div className="flex items-center space-x-6">
-        <div className="w-8 h-8 bg-halo-primary rounded-lg flex items-center justify-center">
-          <div className="w-4 h-4 bg-halo-accent rounded-sm"></div>
+      <div className="flex items-center space-x-8">
+        <div className="flex items-center space-x-3">
+          <div className="w-9 h-9 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-sm">
+            <div className="w-5 h-5 bg-white/90 rounded-sm"></div>
+          </div>
+          <div className="text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+            HALO
+          </div>
         </div>
-        <h1 className="text-lg font-semibold text-halo-text">{pageTitle}</h1>
+        <div className="hidden md:block h-6 w-px bg-gray-300"></div>
+        <h1 className="text-lg font-semibold text-gray-800 hidden md:block">{pageTitle}</h1>
       </div>
 
       {/* Center - Tenant Selector */}
-      <div className="flex-1 flex justify-center max-w-md">
+      <div className="flex-1 flex justify-center max-w-sm mx-8">
         <TenantSelector />
       </div>
 
-      {/* Right - Chat, Notifications & Profile */}
-      <div className="flex items-center space-x-4">
+      {/* Right - Actions & Profile */}
+      <div className="flex items-center space-x-3">
         {/* Resonant Directive AI Assistant */}
         <Button 
           variant="outline" 
           size="sm" 
           onClick={onChatToggle}
-          className="relative bg-gradient-to-r from-halo-primary/5 to-halo-accent/5 border-halo-primary/20 hover:from-halo-primary/10 hover:to-halo-accent/10 hover:border-halo-primary/30 transition-all duration-200 px-3 py-2"
+          className="relative bg-gradient-to-r from-primary/8 to-blue-500/8 border-primary/25 hover:from-primary/15 hover:to-blue-500/15 hover:border-primary/40 transition-all duration-200 px-3 py-2 shadow-sm"
         >
           <div className="flex items-center space-x-2">
             <div className="relative">
-              <Bot className="h-4 w-4 text-halo-primary" />
-              <Sparkles className="h-2 w-2 text-halo-accent absolute -top-1 -right-1 animate-pulse" />
+              <Bot className="h-4 w-4 text-primary" />
+              <Sparkles className="h-2 w-2 text-blue-500 absolute -top-1 -right-1 animate-pulse" />
             </div>
-            <span className="text-xs font-medium text-halo-text">Resonant Directive</span>
+            <span className="text-xs font-medium text-gray-700 hidden sm:inline">Resonant Directive</span>
           </div>
         </Button>
         
         {/* Notifications */}
-        <Button variant="ghost" size="sm" className="relative">
-          <Bell className="h-5 w-5 text-halo-textSecondary" />
-          <span className="absolute -top-1 -right-1 h-3 w-3 bg-halo-accent rounded-full flex items-center justify-center">
+        <Button variant="ghost" size="sm" className="relative p-2 hover:bg-gray-100/80">
+          <Bell className="h-5 w-5 text-gray-600" />
+          <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full flex items-center justify-center border-2 border-white">
             <span className="text-xs text-white font-medium">3</span>
           </span>
         </Button>
@@ -90,37 +96,37 @@ const Header = ({ onChatToggle, pageTitle = "Dashboard" }: HeaderProps) => {
         {/* Profile Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center space-x-2 px-3">
-              <Avatar className="h-8 w-8">
+            <Button variant="ghost" className="flex items-center space-x-2 px-3 py-2 hover:bg-gray-100/80 rounded-lg">
+              <Avatar className="h-8 w-8 ring-2 ring-gray-200">
                 <AvatarImage src={profile?.avatar_url || undefined} />
-                <AvatarFallback className="bg-halo-secondary text-white">
+                <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-white text-sm font-medium">
                   {getInitials()}
                 </AvatarFallback>
               </Avatar>
-              <span className="text-sm font-medium text-halo-text">{getDisplayName()}</span>
-              <ChevronDown className="h-4 w-4 text-halo-textSecondary" />
+              <span className="text-sm font-medium text-gray-700 hidden sm:inline max-w-32 truncate">{getDisplayName()}</span>
+              <ChevronDown className="h-4 w-4 text-gray-500" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuContent align="end" className="w-64 bg-white/95 backdrop-blur-sm border border-gray-200/80 shadow-xl z-50">
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{getDisplayName()}</p>
-                <p className="text-xs leading-none text-muted-foreground">
+                <p className="text-sm font-medium leading-none text-gray-900">{getDisplayName()}</p>
+                <p className="text-xs leading-none text-gray-500">
                   {getUserEmail()}
                 </p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleProfileSettings}>
+            <DropdownMenuItem onClick={handleProfileSettings} className="cursor-pointer">
               <Settings className="mr-2 h-4 w-4" />
               Profile Settings
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer">
               <User className="mr-2 h-4 w-4" />
               Preferences
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
+            <DropdownMenuItem onClick={handleSignOut} className="text-red-600 cursor-pointer">
               <LogOut className="mr-2 h-4 w-4" />
               Sign Out
             </DropdownMenuItem>
