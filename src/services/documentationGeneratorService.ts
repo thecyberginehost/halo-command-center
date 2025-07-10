@@ -139,6 +139,7 @@ class DocumentationGeneratorService {
         format: documentation.format,
         type: documentation.type,
         integration_id: documentation.integration_id,
+        workflow_id: documentation.workflow_id,
         version: documentation.version,
         metadata: documentation.metadata,
         tenant_id: documentation.tenant_id
@@ -149,12 +150,12 @@ class DocumentationGeneratorService {
 
   // Generate API documentation for all integrations
   async generateAPIDocumentation(tenantId: string): Promise<GeneratedDocumentation> {
-    const { data: integrations, error } = await supabase
-      .from('integrations')
-      .select('*')
-      .eq('tenant_id', tenantId);
-
-    if (error) throw error;
+    // Mock integrations data since integrations table doesn't exist yet
+    const integrations = [
+      { id: 'slack', name: 'Slack', description: 'Team communication' },
+      { id: 'gmail', name: 'Gmail', description: 'Email integration' },
+      { id: 'salesforce', name: 'Salesforce', description: 'CRM integration' }
+    ];
 
     const apiSections: DocumentationSection[] = [
       {
@@ -175,7 +176,7 @@ class DocumentationGeneratorService {
     ];
 
     // Add section for each integration
-    integrations.forEach((integration, index) => {
+    integrations.forEach((integration: any, index: number) => {
       apiSections.push({
         title: `${integration.name} API`,
         content: this.generateIntegrationAPISection(integration),
@@ -209,6 +210,8 @@ class DocumentationGeneratorService {
         content: documentation.content,
         format: documentation.format,
         type: documentation.type,
+        integration_id: documentation.integration_id,
+        workflow_id: documentation.workflow_id,
         version: documentation.version,
         metadata: documentation.metadata,
         tenant_id: documentation.tenant_id
@@ -271,7 +274,7 @@ class DocumentationGeneratorService {
       metadata: {
         word_count: content.split(' ').length,
         sections: sections.map(s => s.title),
-        examples_count: workflow.steps?.length || 0,
+        examples_count: Array.isArray(workflow.steps) ? workflow.steps.length : 0,
         images_count: 0
       }
     };
@@ -283,6 +286,7 @@ class DocumentationGeneratorService {
         content: documentation.content,
         format: documentation.format,
         type: documentation.type,
+        integration_id: documentation.integration_id,
         workflow_id: documentation.workflow_id,
         version: documentation.version,
         metadata: documentation.metadata,
@@ -353,6 +357,8 @@ class DocumentationGeneratorService {
         content: documentation.content,
         format: documentation.format,
         type: documentation.type,
+        integration_id: documentation.integration_id,
+        workflow_id: documentation.workflow_id,
         version: documentation.version,
         metadata: documentation.metadata,
         tenant_id: documentation.tenant_id

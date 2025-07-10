@@ -153,7 +153,7 @@ class PerformanceOptimizationService {
         .from('load_test_results')
         .insert({
           config_id: configId,
-          result_data: result,
+          result_data: result as any,
           tenant_id: config.tenant_id
         });
 
