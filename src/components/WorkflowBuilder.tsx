@@ -12,6 +12,7 @@ import { useTenant } from '@/contexts/TenantContext';
 import { WorkflowRecord } from '@/types/tenant';
 import { WorkflowInputPanel } from './workflow/WorkflowInputPanel';
 import { WorkflowPreviewPanel } from './workflow/WorkflowPreviewPanel';
+import { VisualWorkflowCanvas } from './workflow/visual/VisualWorkflowCanvas';
 
 interface WorkflowBuilderProps {
   onClose: () => void;
@@ -31,6 +32,7 @@ const WorkflowBuilder = ({ onClose, initialWorkflow }: WorkflowBuilderProps) => 
   } | null>(null);
   const [isDeveloperMode, setIsDeveloperMode] = useState(false);
   const [customCode, setCustomCode] = useState('');
+  const [isVisualMode, setIsVisualMode] = useState(true);
   const { toast } = useToast();
   const { currentTenant } = useTenant();
 
@@ -148,6 +150,16 @@ const WorkflowBuilder = ({ onClose, initialWorkflow }: WorkflowBuilderProps) => 
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
             <Switch
+              id="visual-mode"
+              checked={isVisualMode}
+              onCheckedChange={setIsVisualMode}
+            />
+            <Label htmlFor="visual-mode" className="text-sm font-medium">
+              Visual Mode
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Switch
               id="developer-mode"
               checked={isDeveloperMode}
               onCheckedChange={setIsDeveloperMode}
@@ -163,24 +175,32 @@ const WorkflowBuilder = ({ onClose, initialWorkflow }: WorkflowBuilderProps) => 
       </div>
 
       <div className="flex-1 flex overflow-hidden">
-        <WorkflowInputPanel
-          prompt={prompt}
-          setPrompt={setPrompt}
-          isGenerating={isGenerating}
-          onGenerateWorkflow={handleGenerateWorkflow}
-          explanation={explanation}
-          suggestions={suggestions}
-          complexityAnalysis={complexityAnalysis}
-        />
-        
-        <WorkflowPreviewPanel
-          workflow={workflow}
-          isDeveloperMode={isDeveloperMode}
-          customCode={customCode}
-          setCustomCode={setCustomCode}
-          onSaveWorkflow={handleSaveWorkflow}
-          onDragEnd={handleDragEnd}
-        />
+        {isVisualMode ? (
+          <VisualWorkflowCanvas 
+            onSaveWorkflow={handleSaveWorkflow}
+          />
+        ) : (
+          <>
+            <WorkflowInputPanel
+              prompt={prompt}
+              setPrompt={setPrompt}
+              isGenerating={isGenerating}
+              onGenerateWorkflow={handleGenerateWorkflow}
+              explanation={explanation}
+              suggestions={suggestions}
+              complexityAnalysis={complexityAnalysis}
+            />
+            
+            <WorkflowPreviewPanel
+              workflow={workflow}
+              isDeveloperMode={isDeveloperMode}
+              customCode={customCode}
+              setCustomCode={setCustomCode}
+              onSaveWorkflow={handleSaveWorkflow}
+              onDragEnd={handleDragEnd}
+            />
+          </>
+        )}
       </div>
     </div>
   );
