@@ -1,66 +1,48 @@
-
 import { Bell, ChevronDown, User, Bot, Sparkles, Settings, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { TenantSelector } from './TenantSelector';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-
 interface HeaderProps {
   onChatToggle?: () => void;
   pageTitle?: string;
 }
-
-const Header = ({ onChatToggle, pageTitle = "Dashboard" }: HeaderProps) => {
-  const { user, profile, signOut } = useAuth();
+const Header = ({
+  onChatToggle,
+  pageTitle = "Dashboard"
+}: HeaderProps) => {
+  const {
+    user,
+    profile,
+    signOut
+  } = useAuth();
   const navigate = useNavigate();
-
   const getDisplayName = () => {
     if (profile?.name) return profile.name;
     if (user?.user_metadata?.name) return user.user_metadata.name;
     return 'User';
   };
-
   const getUserEmail = () => {
     return user?.email || '';
   };
-
   const getInitials = () => {
     const name = getDisplayName();
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
-
   const handleProfileSettings = () => {
     navigate('/profile-settings');
   };
-
   const handleSignOut = () => {
     signOut();
   };
-
-  return (
-    <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200/80 h-16 flex items-center justify-between px-6 shadow-sm relative z-50">
+  return <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200/80 h-16 flex items-center justify-between px-6 shadow-sm relative z-50">
       {/* Left - Logo and Page Title */}
       <div className="flex items-center space-x-6">
-        <div className="w-9 h-9 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-sm">
-          <img 
-            src="/src/assets/halo-header-logo.png" 
-            alt="HALO Logo" 
-            className="w-8 h-8 object-contain"
-          />
-        </div>
-        <div className="text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-          HALO
-        </div>
-        <div className="hidden md:block h-6 w-px bg-gray-300"></div>
+        
+        
+        
         <h1 className="text-lg font-semibold text-gray-800 hidden md:block">{pageTitle}</h1>
       </div>
 
@@ -72,12 +54,7 @@ const Header = ({ onChatToggle, pageTitle = "Dashboard" }: HeaderProps) => {
       {/* Right - Actions & Profile */}
       <div className="flex items-center space-x-3">
         {/* Resonant Directive AI Assistant */}
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={onChatToggle}
-          className="relative bg-gradient-to-r from-primary/8 to-blue-500/8 border-primary/25 hover:from-primary/15 hover:to-blue-500/15 hover:border-primary/40 transition-all duration-200 px-3 py-2 shadow-sm"
-        >
+        <Button variant="outline" size="sm" onClick={onChatToggle} className="relative bg-gradient-to-r from-primary/8 to-blue-500/8 border-primary/25 hover:from-primary/15 hover:to-blue-500/15 hover:border-primary/40 transition-all duration-200 px-3 py-2 shadow-sm">
           <div className="flex items-center space-x-2">
             <div className="relative">
               <Bot className="h-4 w-4 text-primary" />
@@ -135,8 +112,6 @@ const Header = ({ onChatToggle, pageTitle = "Dashboard" }: HeaderProps) => {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </header>
-  );
+    </header>;
 };
-
 export default Header;
