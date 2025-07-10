@@ -38,7 +38,12 @@ export type IntegrationCategory =
   | 'logic'
   | 'data_transform'
   | 'flow_control'
-  | 'masp_tools';
+  | 'masp_tools'
+  | 'ecommerce'
+  | 'social_media'
+  | 'marketing'
+  | 'cloud'
+  | 'business';
 
 export interface IntegrationField {
   name: string;

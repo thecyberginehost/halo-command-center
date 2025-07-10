@@ -28,6 +28,11 @@ const categoryIcons: Record<IntegrationCategory, any> = {
   data_transform: ArrowLeftRight,
   flow_control: GitBranch,
   masp_tools: Star,
+  ecommerce: MessageCircle,
+  social_media: MessageCircle,
+  marketing: MessageCircle,
+  cloud: MessageCircle,
+  business: MessageCircle,
 };
 
 const categoryLabels: Record<IntegrationCategory, string> = {
@@ -46,6 +51,11 @@ const categoryLabels: Record<IntegrationCategory, string> = {
   data_transform: 'Data Transform',
   flow_control: 'Flow Control',
   masp_tools: 'MASP Tools',
+  ecommerce: 'E-commerce',
+  social_media: 'Social Media',
+  marketing: 'Marketing',
+  cloud: 'Cloud',
+  business: 'Business',
 };
 
 export function NodePalette({ onAddNode }: NodePaletteProps) {

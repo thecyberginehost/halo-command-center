@@ -204,6 +204,11 @@ export const integrationsByCategory: Record<IntegrationCategory, IntegrationNode
   data_transform: [dataTransformIntegration, dataValidationIntegration, jsonProcessorIntegration, calculatorIntegration],
   flow_control: [routerIntegration, iteratorIntegration, aggregatorIntegration],
   masp_tools: [dataStorageIntegration], // MASP-specific tools for service providers
+  ecommerce: Object.values(EcommerceIntegrations),
+  social_media: Object.values(SocialMediaIntegrations),
+  marketing: Object.values(MarketingIntegrations),
+  cloud: Object.values(CloudIntegrations),
+  business: Object.values(BusinessIntegrations)
 };
 
 export const getIntegrationById = (id: string): IntegrationNode | undefined => {
