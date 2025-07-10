@@ -7,15 +7,25 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
-import { AlertCircle, Loader2 } from "lucide-react";
+import { AlertCircle, Loader2, Check, X } from "lucide-react";
 import { toast } from "sonner";
+
+interface PasswordRequirement {
+  id: string;
+  text: string;
+  met: boolean;
+}
 
 export default function Auth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [name, setName] = useState("");
+  const [company, setCompany] = useState("");
+  const [role, setRole] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [passwordRequirements, setPasswordRequirements] = useState<PasswordRequirement[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,6 +38,38 @@ export default function Auth() {
     };
     checkAuth();
   }, [navigate]);
+
+  useEffect(() => {
+    // Update password requirements
+    const requirements: PasswordRequirement[] = [
+      {
+        id: "length",
+        text: "At least 8 characters",
+        met: password.length >= 8
+      },
+      {
+        id: "uppercase",
+        text: "One uppercase letter",
+        met: /[A-Z]/.test(password)
+      },
+      {
+        id: "lowercase", 
+        text: "One lowercase letter",
+        met: /[a-z]/.test(password)
+      },
+      {
+        id: "number",
+        text: "One number",
+        met: /\d/.test(password)
+      },
+      {
+        id: "special",
+        text: "One special character",
+        met: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+      }
+    ];
+    setPasswordRequirements(requirements);
+  }, [password]);
 
   const cleanupAuthState = () => {
     Object.keys(localStorage).forEach((key) => {
@@ -67,8 +109,19 @@ export default function Auth() {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!name.trim()) {
+      setError("Name is required");
+      return;
+    }
+    
     if (password !== confirmPassword) {
       setError("Passwords don't match");
+      return;
+    }
+    
+    const allRequirementsMet = passwordRequirements.every(req => req.met);
+    if (!allRequirementsMet) {
+      setError("Please meet all password requirements");
       return;
     }
     
@@ -85,7 +138,12 @@ export default function Auth() {
         email,
         password,
         options: {
-          emailRedirectTo: redirectUrl
+          emailRedirectTo: redirectUrl,
+          data: {
+            name: name.trim(),
+            company: company.trim() || null,
+            role: role.trim() || null
+          }
         }
       });
       
@@ -102,21 +160,26 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-gradient-primary">
-            Welcome to HALO
-          </CardTitle>
-          <CardDescription>
-            Hyper-Automation & Logical Orchestration Platform
-          </CardDescription>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
+      <Card className="w-full max-w-lg shadow-2xl border-0 bg-card/80 backdrop-blur-sm">
+        <CardHeader className="text-center space-y-4 pb-8">
+          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-primary to-primary/70 rounded-2xl flex items-center justify-center">
+            <div className="text-2xl font-bold text-primary-foreground">H</div>
+          </div>
+          <div>
+            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+              Welcome to HALO
+            </CardTitle>
+            <CardDescription className="text-base mt-2">
+              Hyper-Automation & Logical Orchestration Platform
+            </CardDescription>
+          </div>
         </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="signin" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+        <CardContent className="px-8 pb-8">
+          <Tabs defaultValue="signin" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-2 h-12">
+              <TabsTrigger value="signin" className="text-sm font-medium">Sign In</TabsTrigger>
+              <TabsTrigger value="signup" className="text-sm font-medium">Sign Up</TabsTrigger>
             </TabsList>
             
             {error && (
@@ -126,75 +189,170 @@ export default function Auth() {
               </Alert>
             )}
 
-            <TabsContent value="signin" className="space-y-4">
-              <form onSubmit={handleSignIn} className="space-y-4">
+            <TabsContent value="signin" className="space-y-6">
+              <form onSubmit={handleSignIn} className="space-y-5">
                 <div className="space-y-2">
-                  <Label htmlFor="signin-email">Email</Label>
+                  <Label htmlFor="signin-email" className="text-sm font-medium">Email Address</Label>
                   <Input
                     id="signin-email"
                     type="email"
-                    placeholder="your@email.com"
+                    placeholder="your@company.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    className="h-11"
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signin-password">Password</Label>
+                  <Label htmlFor="signin-password" className="text-sm font-medium">Password</Label>
                   <Input
                     id="signin-password"
                     type="password"
-                    placeholder="••••••••"
+                    placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    className="h-11"
                     required
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <Button type="submit" className="w-full h-11 text-base font-medium" disabled={loading}>
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Sign In
+                  Sign In to HALO
                 </Button>
               </form>
             </TabsContent>
 
-            <TabsContent value="signup" className="space-y-4">
-              <form onSubmit={handleSignUp} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
-                  <Input
-                    id="signup-email"
-                    type="email"
-                    placeholder="your@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
+            <TabsContent value="signup" className="space-y-6">
+              <form onSubmit={handleSignUp} className="space-y-5">
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-name" className="text-sm font-medium">
+                      Full Name <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="signup-name"
+                      type="text"
+                      placeholder="John Doe"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="h-11"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-email" className="text-sm font-medium">
+                      Email Address <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="signup-email"
+                      type="email"
+                      placeholder="john@company.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="h-11"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-company" className="text-sm font-medium">
+                      Company <span className="text-muted-foreground text-xs">(optional)</span>
+                    </Label>
+                    <Input
+                      id="signup-company"
+                      type="text"
+                      placeholder="Your Company Inc."
+                      value={company}
+                      onChange={(e) => setCompany(e.target.value)}
+                      className="h-11"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-role" className="text-sm font-medium">
+                      Role <span className="text-muted-foreground text-xs">(optional)</span>
+                    </Label>
+                    <Input
+                      id="signup-role"
+                      type="text"
+                      placeholder="Automation Engineer"
+                      value={role}
+                      onChange={(e) => setRole(e.target.value)}
+                      className="h-11"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-password" className="text-sm font-medium">
+                      Password <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="signup-password"
+                      type="password"
+                      placeholder="Create a strong password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="h-11"
+                      required
+                    />
+                    
+                    {password && (
+                      <div className="mt-3 space-y-2">
+                        <div className="text-xs font-medium text-muted-foreground mb-2">
+                          Password Requirements:
+                        </div>
+                        {passwordRequirements.map((req) => (
+                          <div key={req.id} className="flex items-center space-x-2 text-xs">
+                            {req.met ? (
+                              <Check className="h-3 w-3 text-green-500" />
+                            ) : (
+                              <X className="h-3 w-3 text-muted-foreground" />
+                            )}
+                            <span className={req.met ? "text-green-700 dark:text-green-400" : "text-muted-foreground"}>
+                              {req.text}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="confirm-password" className="text-sm font-medium">
+                      Confirm Password <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="confirm-password"
+                      type="password"
+                      placeholder="Confirm your password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="h-11"
+                      required
+                    />
+                    {confirmPassword && password !== confirmPassword && (
+                      <div className="flex items-center space-x-2 text-xs text-destructive">
+                        <X className="h-3 w-3" />
+                        <span>Passwords don't match</span>
+                      </div>
+                    )}
+                    {confirmPassword && password === confirmPassword && password && (
+                      <div className="flex items-center space-x-2 text-xs text-green-700 dark:text-green-400">
+                        <Check className="h-3 w-3" />
+                        <span>Passwords match</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
-                  <Input
-                    id="signup-password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="confirm-password">Confirm Password</Label>
-                  <Input
-                    id="confirm-password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                  />
-                </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+
+                <Button 
+                  type="submit" 
+                  className="w-full h-11 text-base font-medium" 
+                  disabled={loading || !passwordRequirements.every(req => req.met) || password !== confirmPassword}
+                >
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Sign Up
+                  Create HALO Account
                 </Button>
               </form>
             </TabsContent>
