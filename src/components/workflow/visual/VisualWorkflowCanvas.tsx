@@ -93,14 +93,17 @@ export function VisualWorkflowCanvas({
   // Removed drag and drop handlers - now using click-to-add
 
   const addNodeFromIntegration = useCallback((integration: IntegrationNode, position: { x: number; y: number }) => {
-    console.log('addNodeFromIntegration called:', integration.name);
+    console.log('=== NODE ADDITION DEBUG ===');
+    console.log('Integration:', integration.name, integration);
+    console.log('Position requested:', position);
     
     setNodes(prev => {
-      console.log('Current nodes count:', prev.length);
+      console.log('Current nodes before adding:', prev.length, prev);
       
       // Calculate smart position based on existing nodes
       const calculateSmartPosition = (): { x: number; y: number } => {
         if (prev.length === 0) {
+          console.log('First node - using default position');
           return { x: 100, y: 100 };
         }
         
@@ -109,15 +112,28 @@ export function VisualWorkflowCanvas({
           (prevNode.position.x > current.position.x) ? prevNode : current
         );
         
-        return {
+        const newPos = {
           x: rightmostNode.position.x + 200, // Add 200px spacing
           y: rightmostNode.position.y
         };
+        
+        console.log('Smart position calculated:', newPos, 'based on rightmost node:', rightmostNode);
+        return newPos;
       };
 
       const smartPosition = position.x === 100 && position.y === 100 
         ? calculateSmartPosition() 
         : position;
+
+      console.log('Final position for new node:', smartPosition);
+
+      // Validate integration object
+      if (!integration.icon) {
+        console.warn('Integration missing icon:', integration);
+      }
+      if (!integration.color) {
+        console.warn('Integration missing color:', integration);
+      }
 
       const newNode: VisualWorkflowNode = {
         id: `${integration.id}-${Date.now()}`,
@@ -135,17 +151,24 @@ export function VisualWorkflowCanvas({
         deletable: true,
       };
 
-      console.log('Adding node:', newNode);
+      console.log('New node created:', newNode);
+      console.log('Node position:', newNode.position);
+      console.log('Node data:', newNode.data);
+      
       const newNodes = [...prev, newNode];
-      console.log('New nodes array length:', newNodes.length);
+      console.log('New nodes array:', newNodes.length, newNodes);
+      console.log('=== END NODE ADDITION DEBUG ===');
+      
       return newNodes;
     });
     
     // Auto-fit view after adding node
     setTimeout(() => {
       const reactFlowInstance = (window as any).reactFlowInstance;
+      console.log('Auto-fitting view, instance available:', !!reactFlowInstance);
       if (reactFlowInstance && reactFlowInstance.fitView) {
-        reactFlowInstance.fitView({ padding: 0.1 });
+        reactFlowInstance.fitView({ padding: 0.2 });
+        console.log('Fit view executed');
       }
     }, 100);
     
@@ -383,6 +406,7 @@ export function VisualWorkflowCanvas({
             type: 'smoothstep',
           }}
           onInit={(reactFlowInstance) => {
+            console.log('ReactFlow initialized:', reactFlowInstance);
             // Store reference for auto-zoom functionality
             (window as any).reactFlowInstance = reactFlowInstance;
           }}

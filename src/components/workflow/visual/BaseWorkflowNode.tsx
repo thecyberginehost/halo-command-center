@@ -21,8 +21,28 @@ export const BaseWorkflowNode = memo(({
   onDuplicate,
   onDelete 
 }: BaseWorkflowNodeProps) => {
+  console.log('=== NODE RENDER DEBUG ===');
+  console.log('Node ID:', id);
+  console.log('Node data:', data);
+  console.log('Integration:', data.integration);
+  console.log('Selected:', selected);
+  
   const { integration, config, label, isConfigured, hasError, errorMessage } = data;
   const Icon = integration.icon;
+  
+  // Validate required properties
+  if (!integration) {
+    console.error('Node missing integration data:', id);
+    return <div>Error: Missing integration</div>;
+  }
+  
+  if (!Icon) {
+    console.warn('Node missing icon:', id, integration);
+  }
+  
+  console.log('Icon component:', Icon);
+  console.log('Integration color:', integration.color);
+  console.log('=== END NODE RENDER DEBUG ===');
 
   const getStatusColor = () => {
     if (hasError) return 'text-destructive';
@@ -40,7 +60,11 @@ export const BaseWorkflowNode = memo(({
     borderColor: selected ? 'hsl(var(--primary))' : hasError ? 'hsl(var(--destructive))' : 'hsl(var(--border))',
     borderWidth: '2px',
     backgroundColor: 'hsl(var(--card))',
+    minHeight: '60px',
+    minWidth: '90px',
   };
+  
+  console.log('Node style applied:', nodeStyle);
 
   return (
     <NodeContextMenu
@@ -60,12 +84,14 @@ export const BaseWorkflowNode = memo(({
                   className="p-0.5 rounded-sm flex items-center justify-center flex-shrink-0"
                   style={{ backgroundColor: integration.color + '20' }}
                 >
-                  {Icon && (
-                    <Icon 
-                      className="h-2.5 w-2.5" 
-                      style={{ color: integration.color }}
-                    />
-                  )}
+                   {Icon ? (
+                     <Icon 
+                       className="h-2.5 w-2.5" 
+                       style={{ color: integration.color || 'currentColor' }}
+                     />
+                   ) : (
+                     <div className="h-2.5 w-2.5 bg-muted rounded" />
+                   )}
                 </div>
                 <span className="font-medium text-xs text-foreground truncate">{label}</span>
               </div>
