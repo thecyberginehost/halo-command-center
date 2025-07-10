@@ -156,11 +156,10 @@ async function executeAutomation(input) {
       <ResonantDirectiveChat
         isOpen={isChatOpen}
         onClose={() => setIsChatOpen(false)}
-        chatMessages={chatMessages}
-        chatInput={chatInput}
-        setChatInput={setChatInput}
-        onSendMessage={handleSendMessage}
-        isThinking={isThinking}
+        onWorkflowGenerated={(workflowData) => {
+          // Handle workflow generation
+          console.log('Generated workflow:', workflowData);
+        }}
       />
 
     </div>

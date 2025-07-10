@@ -89,10 +89,6 @@ const Layout = ({ children, pageTitle = "Dashboard" }: LayoutProps) => {
       <ResonantDirectiveChat
         isOpen={isChatOpen}
         onClose={handleChatClose}
-        chatMessages={chatMessages}
-        chatInput={inputValue}
-        setChatInput={setInputValue}
-        onSendMessage={onSendMessage}
       />
 
       

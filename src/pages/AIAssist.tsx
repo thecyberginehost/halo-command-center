@@ -163,10 +163,6 @@ export default function AIAssist() {
         <ResonantDirectiveChat
           isOpen={isChatOpen}
           onClose={() => setIsChatOpen(false)}
-          chatMessages={chatMessages}
-          chatInput={inputValue}
-          setChatInput={setInputValue}
-          onSendMessage={onSendMessage}
         />
       </div>
     </Layout>
