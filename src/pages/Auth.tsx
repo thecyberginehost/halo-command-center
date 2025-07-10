@@ -163,8 +163,12 @@ export default function Auth() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
       <Card className="w-full max-w-lg shadow-2xl border-0 bg-card/80 backdrop-blur-sm">
         <CardHeader className="text-center space-y-4 pb-8">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-primary to-primary/70 rounded-2xl flex items-center justify-center">
-            <div className="text-2xl font-bold text-primary-foreground">H</div>
+          <div className="mx-auto w-16 h-16 flex items-center justify-center">
+            <img 
+              src="/src/assets/halo-logo.png" 
+              alt="HALO Logo" 
+              className="w-16 h-16 object-contain"
+            />
           </div>
           <div>
             <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
