@@ -52,7 +52,11 @@ const Header = ({ onChatToggle, pageTitle = "Dashboard" }: HeaderProps) => {
       <div className="flex items-center space-x-8">
         <div className="flex items-center space-x-3">
           <div className="w-9 h-9 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-sm">
-            <div className="w-5 h-5 bg-white/90 rounded-sm"></div>
+            <img 
+              src="/src/assets/halo-header-logo.png" 
+              alt="HALO Logo" 
+              className="w-5 h-5 object-contain"
+            />
           </div>
           <div className="text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
             HALO
