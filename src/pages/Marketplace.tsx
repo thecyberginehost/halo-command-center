@@ -44,102 +44,31 @@ const Marketplace = () => {
         category: selectedCategory === 'all' ? undefined : selectedCategory
       });
       
-      // Add some sample data if none exists
-      if (data.length === 0) {
-        const sampleIntegrations: any[] = [
-          {
-            id: 'email-master',
-            name: 'Email Master Pro',
-            description: 'Advanced email automation with AI-powered personalization and analytics',
-            category: 'email',
-            providerId: 'halo-official',
-            providerName: 'HALO Official',
-            version: '2.1.0',
-            price: 29.99,
-            pricingModel: 'monthly',
-            downloads: 1547,
-            rating: 4.8,
-            reviews: [],
-            isVerified: true,
-            isFeatured: true,
-            tags: ['email', 'automation', 'ai', 'analytics'],
-            screenshots: [],
-            documentation: 'Complete email automation toolkit',
-            supportEmail: 'support@halo.dev',
-            lastUpdated: new Date(),
-            integrationConfig: { nodes: [], templates: [], credentials: [] }
-          },
-          {
-            id: 'crm-sync',
-            name: 'CRM Universal Sync',
-            description: 'Sync data across multiple CRM platforms with real-time updates',
-            category: 'crm',
-            providerId: 'automation-experts',
-            providerName: 'Automation Experts',
-            version: '1.5.2',
-            price: 49.99,
-            pricingModel: 'monthly',
-            downloads: 892,
-            rating: 4.6,
-            reviews: [],
-            isVerified: true,
-            isFeatured: false,
-            tags: ['crm', 'sync', 'salesforce', 'hubspot'],
-            screenshots: [],
-            documentation: 'Universal CRM synchronization',
-            supportEmail: 'help@automationexperts.com',
-            lastUpdated: new Date(),
-            integrationConfig: { nodes: [], templates: [], credentials: [] }
-          },
-          {
-            id: 'ai-content',
-            name: 'AI Content Generator',
-            description: 'Generate high-quality content using advanced AI models',
-            category: 'ai',
-            providerId: 'content-creators',
-            providerName: 'Content Creators Co',
-            version: '3.0.1',
-            price: 0,
-            pricingModel: 'free',
-            downloads: 2341,
-            rating: 4.9,
-            reviews: [],
-            isVerified: true,
-            isFeatured: true,
-            tags: ['ai', 'content', 'gpt', 'writing'],
-            screenshots: [],
-            documentation: 'AI-powered content generation',
-            supportEmail: 'support@contentcreators.co',
-            lastUpdated: new Date(),
-            integrationConfig: { nodes: [], templates: [], credentials: [] }
-          },
-          {
-            id: 'data-transformer',
-            name: 'Data Transformer Suite',
-            description: 'Transform and process data between different formats and systems',
-            category: 'data',
-            providerId: 'data-wizards',
-            providerName: 'Data Wizards Inc',
-            version: '1.8.0',
-            price: 19.99,
-            pricingModel: 'monthly',
-            downloads: 673,
-            rating: 4.4,
-            reviews: [],
-            isVerified: false,
-            isFeatured: false,
-            tags: ['data', 'transform', 'json', 'xml', 'csv'],
-            screenshots: [],
-            documentation: 'Complete data transformation toolkit',
-            supportEmail: 'info@datawizards.com',
-            lastUpdated: new Date(),
-            integrationConfig: { nodes: [], templates: [], credentials: [] }
-          }
-        ];
-        setIntegrations(sampleIntegrations);
-      } else {
-        setIntegrations(data);
-      }
+      // Transform database format to UI format
+      const transformedData = data.map(pkg => ({
+        id: pkg.id,
+        name: pkg.display_name,
+        description: pkg.description,
+        category: pkg.category,
+        providerId: pkg.vendor_name.toLowerCase().replace(/\s+/g, '-'),
+        providerName: pkg.vendor_name,
+        version: pkg.package_version,
+        price: pkg.price_per_month || 0,
+        pricingModel: pkg.pricing_model,
+        downloads: pkg.download_count,
+        rating: pkg.rating || 0,
+        reviews: [],
+        isVerified: pkg.is_verified,
+        isFeatured: pkg.category === 'communication' || pkg.category === 'crm' || pkg.category === 'ai',
+        tags: pkg.tags || [],
+        screenshots: pkg.screenshots || [],
+        documentation: pkg.documentation_url,
+        supportEmail: pkg.vendor_email,
+        lastUpdated: new Date(pkg.updated_at),
+        integrationConfig: pkg.package_config
+      }));
+      
+      setIntegrations(transformedData);
     } catch (error) {
       console.error('Failed to load marketplace integrations:', error);
     } finally {
@@ -155,10 +84,13 @@ const Marketplace = () => {
 
   const categories = [
     { id: 'all', name: 'All Categories', icon: Grid },
-    { id: 'email', name: 'Email', icon: Mail },
+    { id: 'communication', name: 'Communication', icon: Mail },
     { id: 'crm', name: 'CRM', icon: Database },
     { id: 'ai', name: 'AI & ML', icon: Bot },
-    { id: 'data', name: 'Data', icon: Zap }
+    { id: 'email', name: 'Email', icon: Mail },
+    { id: 'database', name: 'Database', icon: Database },
+    { id: 'storage', name: 'Storage', icon: Zap },
+    { id: 'webhook', name: 'Webhook', icon: Zap }
   ];
 
   const handleInstall = async (integrationId: string) => {

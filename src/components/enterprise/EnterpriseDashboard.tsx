@@ -20,6 +20,7 @@ import {
 import { useTenant } from '@/contexts/TenantContext';
 import { enterpriseFeatureService } from '@/services/enterpriseFeatureService';
 import { marketplaceService } from '@/services/marketplaceService';
+import { supabase } from '@/integrations/supabase/client';
 
 export function EnterpriseDashboard() {
   const { currentTenant } = useTenant();
@@ -44,6 +45,55 @@ export function EnterpriseDashboard() {
     }
   }, [currentTenant]);
 
+  const loadMaspProviderData = async () => {
+    // Load MASP provider data from tenant's masp_provider_data field
+    const { data: tenantData } = await supabase
+      .from('tenants')
+      .select('masp_provider_data')
+      .eq('id', currentTenant.id)
+      .single();
+    
+    if (tenantData?.masp_provider_data) {
+      return tenantData.masp_provider_data;
+    }
+    
+    // Return default data if no MASP data exists
+    return {
+      clientCount: 0,
+      automationCount: 0,
+      successRate: 0,
+      specializations: [],
+      billing: {
+        monthlyRevenue: 0,
+        clientSeats: 0,
+        plan: 'starter'
+      }
+    };
+  };
+
+  const loadCertificationData = async () => {
+    // Load certification data from tenant's masp_provider_data
+    const { data: tenantData } = await supabase
+      .from('tenants')
+      .select('masp_provider_data')
+      .eq('id', currentTenant.id)
+      .single();
+    
+    const maspData = tenantData?.masp_provider_data as any;
+    
+    if (maspData?.certification) {
+      return maspData.certification;
+    }
+    
+    // Return default certification status
+    return {
+      isValid: false,
+      level: null,
+      expiresIn: 0,
+      renewalRequired: false
+    };
+  };
+
   const loadEnterpriseData = async () => {
     if (!currentTenant) return;
     
@@ -56,12 +106,12 @@ export function EnterpriseDashboard() {
         whiteLabelData,
         eligibilityData
       ] = await Promise.all([
-        // Mock data since services don't exist yet
-        { clientCount: 24, automationCount: 186, successRate: 98.7 },
-        { isValid: true, level: 'gold', expiresIn: 120 },
-        [],
-        { isEnabled: false },
-        { eligible: false }
+        // Load real enterprise data
+        loadMaspProviderData(),
+        loadCertificationData(),
+        marketplaceServiceInstance.getTenantInstalledPackages(currentTenant.id),
+        whiteLabelService.getWhiteLabelConfig(),
+        whiteLabelService.validateWhiteLabelEligibility()
       ]);
 
       setMaspProvider(providerData);
