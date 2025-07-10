@@ -294,6 +294,51 @@ export type Database = {
           },
         ]
       }
+      generated_documentation: {
+        Row: {
+          content: string
+          created_at: string
+          format: string
+          id: string
+          integration_id: string | null
+          metadata: Json
+          tenant_id: string
+          title: string
+          type: string
+          updated_at: string
+          version: string
+          workflow_id: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          format?: string
+          id?: string
+          integration_id?: string | null
+          metadata?: Json
+          tenant_id: string
+          title: string
+          type: string
+          updated_at?: string
+          version?: string
+          workflow_id?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          format?: string
+          id?: string
+          integration_id?: string | null
+          metadata?: Json
+          tenant_id?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          version?: string
+          workflow_id?: string | null
+        }
+        Relationships: []
+      }
       helper_functions: {
         Row: {
           cache_duration: number | null
@@ -496,6 +541,184 @@ export type Database = {
           },
         ]
       }
+      integration_test_cases: {
+        Row: {
+          created_at: string
+          error_details: string | null
+          execution_time: number | null
+          expected_output: Json
+          id: string
+          input_data: Json
+          integration_id: string
+          last_run: string | null
+          status: string
+          suite_id: string | null
+          tenant_id: string
+          test_config: Json
+          test_name: string
+          test_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          error_details?: string | null
+          execution_time?: number | null
+          expected_output?: Json
+          id?: string
+          input_data?: Json
+          integration_id: string
+          last_run?: string | null
+          status?: string
+          suite_id?: string | null
+          tenant_id: string
+          test_config?: Json
+          test_name: string
+          test_type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          error_details?: string | null
+          execution_time?: number | null
+          expected_output?: Json
+          id?: string
+          input_data?: Json
+          integration_id?: string
+          last_run?: string | null
+          status?: string
+          suite_id?: string | null
+          tenant_id?: string
+          test_config?: Json
+          test_name?: string
+          test_type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "integration_test_cases_suite_id_fkey"
+            columns: ["suite_id"]
+            isOneToOne: false
+            referencedRelation: "integration_test_suites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      integration_test_suites: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          integration_id: string | null
+          name: string
+          schedule: string | null
+          tenant_id: string
+          test_cases: Json
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          integration_id?: string | null
+          name: string
+          schedule?: string | null
+          tenant_id: string
+          test_cases?: Json
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          integration_id?: string | null
+          name?: string
+          schedule?: string | null
+          tenant_id?: string
+          test_cases?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      load_test_configs: {
+        Row: {
+          concurrent_users: number
+          created_at: string
+          environment: string
+          id: string
+          integration_id: string
+          name: string
+          ramp_up_time: number
+          requests_per_second: number
+          tenant_id: string
+          test_data: Json
+          test_duration: number
+          updated_at: string
+        }
+        Insert: {
+          concurrent_users: number
+          created_at?: string
+          environment?: string
+          id?: string
+          integration_id: string
+          name: string
+          ramp_up_time: number
+          requests_per_second: number
+          tenant_id: string
+          test_data?: Json
+          test_duration: number
+          updated_at?: string
+        }
+        Update: {
+          concurrent_users?: number
+          created_at?: string
+          environment?: string
+          id?: string
+          integration_id?: string
+          name?: string
+          ramp_up_time?: number
+          requests_per_second?: number
+          tenant_id?: string
+          test_data?: Json
+          test_duration?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      load_test_results: {
+        Row: {
+          config_id: string | null
+          created_at: string
+          id: string
+          result_data: Json
+          tenant_id: string
+        }
+        Insert: {
+          config_id?: string | null
+          created_at?: string
+          id?: string
+          result_data: Json
+          tenant_id: string
+        }
+        Update: {
+          config_id?: string | null
+          created_at?: string
+          id?: string
+          result_data?: Json
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "load_test_results_config_id_fkey"
+            columns: ["config_id"]
+            isOneToOne: false
+            referencedRelation: "load_test_configs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       marketplace_packages: {
         Row: {
           category: string
@@ -640,6 +863,98 @@ export type Database = {
           },
         ]
       }
+      migration_plans: {
+        Row: {
+          actual_duration: number | null
+          created_at: string
+          description: string | null
+          estimated_duration: number
+          id: string
+          migration_type: string
+          name: string
+          rollback_plan: Json | null
+          scheduled_start: string
+          source_system: string
+          status: string
+          steps: Json
+          target_system: string
+          tenant_id: string
+          updated_at: string
+          validation_rules: Json
+        }
+        Insert: {
+          actual_duration?: number | null
+          created_at?: string
+          description?: string | null
+          estimated_duration: number
+          id?: string
+          migration_type: string
+          name: string
+          rollback_plan?: Json | null
+          scheduled_start: string
+          source_system: string
+          status?: string
+          steps?: Json
+          target_system: string
+          tenant_id: string
+          updated_at?: string
+          validation_rules?: Json
+        }
+        Update: {
+          actual_duration?: number | null
+          created_at?: string
+          description?: string | null
+          estimated_duration?: number
+          id?: string
+          migration_type?: string
+          name?: string
+          rollback_plan?: Json | null
+          scheduled_start?: string
+          source_system?: string
+          status?: string
+          steps?: Json
+          target_system?: string
+          tenant_id?: string
+          updated_at?: string
+          validation_rules?: Json
+        }
+        Relationships: []
+      }
+      migration_reports: {
+        Row: {
+          created_at: string
+          execution_id: string
+          id: string
+          plan_id: string | null
+          report_data: Json
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string
+          execution_id: string
+          id?: string
+          plan_id?: string | null
+          report_data: Json
+          tenant_id: string
+        }
+        Update: {
+          created_at?: string
+          execution_id?: string
+          id?: string
+          plan_id?: string | null
+          report_data?: Json
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "migration_reports_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "migration_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       oauth_configs: {
         Row: {
           client_id: string
@@ -778,6 +1093,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      optimization_rules: {
+        Row: {
+          action: string
+          condition: string
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          parameters: Json
+          priority: number
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          action: string
+          condition: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          parameters?: Json
+          priority?: number
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          action?: string
+          condition?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          parameters?: Json
+          priority?: number
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       performance_alerts: {
         Row: {
