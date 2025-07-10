@@ -45,7 +45,15 @@ export class WebhookService {
       .from('webhooks')
       .insert({
         id: webhookId,
-        ...config,
+        url: config.url,
+        method: config.method,
+        headers: config.headers,
+        body: config.body,
+        timeout: config.timeout,
+        retries: config.retries,
+        is_active: config.isActive,
+        workflow_id: config.workflowId,
+        tenant_id: config.tenantId,
       })
       .select()
       .single();
@@ -54,7 +62,18 @@ export class WebhookService {
       throw new Error(`Failed to register webhook: ${error.message}`);
     }
 
-    return data;
+    return {
+      id: data.id,
+      url: data.url,
+      method: data.method as 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
+      headers: data.headers as Record<string, string>,
+      body: data.body,
+      timeout: data.timeout,
+      retries: data.retries,
+      isActive: data.is_active,
+      workflowId: data.workflow_id,
+      tenantId: data.tenant_id
+    };
   }
 
   /**
@@ -134,7 +153,18 @@ export class WebhookService {
       return null;
     }
 
-    return data;
+    return {
+      id: data.id,
+      url: data.url,
+      method: data.method as 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
+      headers: data.headers as Record<string, string>,
+      body: data.body,
+      timeout: data.timeout,
+      retries: data.retries,
+      isActive: data.is_active,
+      workflowId: data.workflow_id,
+      tenantId: data.tenant_id
+    };
   }
 
   /**
@@ -152,7 +182,18 @@ export class WebhookService {
       throw new Error(`Failed to update webhook: ${error.message}`);
     }
 
-    return data;
+    return {
+      id: data.id,
+      url: data.url,
+      method: data.method as 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
+      headers: data.headers as Record<string, string>,
+      body: data.body,
+      timeout: data.timeout,
+      retries: data.retries,
+      isActive: data.is_active,
+      workflowId: data.workflow_id,
+      tenantId: data.tenant_id
+    };
   }
 
   /**
@@ -184,7 +225,16 @@ export class WebhookService {
       throw new Error(`Failed to get webhook executions: ${error.message}`);
     }
 
-    return data;
+    return data.map(row => ({
+      id: row.id,
+      webhookId: row.webhook_id,
+      status: row.status as 'pending' | 'success' | 'failed' | 'timeout',
+      request: row.request as any,
+      response: row.response as any,
+      error: row.error,
+      executedAt: new Date(row.executed_at),
+      duration: row.duration
+    }));
   }
 
   /**
