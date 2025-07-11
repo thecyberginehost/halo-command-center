@@ -1,5 +1,4 @@
 import React, { useCallback, useRef, useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -12,7 +11,9 @@ import {
   Trash2, 
   Zap,
   ArrowRight,
-  ArrowLeft
+  ArrowLeft,
+  Cpu,
+  Circle
 } from 'lucide-react';
 import { VisualWorkflowNode } from '@/types/visualWorkflow';
 
@@ -51,30 +52,32 @@ export function FlowCard({
   const { integration, config, label, isConfigured, hasError, errorMessage } = node.data;
   const Icon = integration.icon;
   
-  // Check if this is an LLM/AI card for joker styling
-  const isJokerCard = integration.category === 'ai' || integration.name.toLowerCase().includes('gpt') || integration.name.toLowerCase().includes('claude') || integration.name.toLowerCase().includes('llm');
+  // Check if this is an AI node for special Cortex styling
+  const isAINode = integration.category === 'ai' || integration.name.toLowerCase().includes('gpt') || integration.name.toLowerCase().includes('claude') || integration.name.toLowerCase().includes('llm');
 
-  // Card styling based on theme - Playing card inspired
-  const getThemeStyles = () => {
-    const baseStyles = "transition-all duration-300 transform-gpu rounded-xl";
+  // Get orbital ring configuration based on integration type
+  const getOrbitalConfig = () => {
+    if (integration.type === 'trigger') return { rings: 1, size: 'small' };
+    if (isAINode) return { rings: 3, size: 'large' }; // AI Cortex with neural patterns
+    return { rings: 2, size: 'medium' };
+  };
+
+  const orbitalConfig = getOrbitalConfig();
+
+  // Orbital station styling based on theme
+  const getOrbitalStyles = () => {
+    const baseStyles = "transition-all duration-500 transform-gpu";
     
     switch (theme) {
       case 'blueprint':
-        return `${baseStyles} border-2 backdrop-blur-sm bg-gradient-to-br from-card/95 to-card/85 shadow-[0_8px_32px_rgba(0,0,0,0.12)] hover:shadow-[0_16px_48px_rgba(0,0,0,0.2)]`;
+        return `${baseStyles} drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]`;
       case 'circuit':
-        return `${baseStyles} border-2 border-primary/20 bg-gradient-to-br from-card/98 via-card/95 to-card/90 shadow-[0_4px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.15)]`;
+        return `${baseStyles} drop-shadow-[0_0_12px_rgba(16,185,129,0.3)]`;
       case 'organic':
-        return `${baseStyles} rounded-2xl border-2 border-background/20 bg-gradient-to-br from-card/98 to-background/85 shadow-[0_6px_24px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_60px_rgba(0,0,0,0.18)]`;
+        return `${baseStyles} drop-shadow-[0_0_18px_rgba(139,92,246,0.3)]`;
       default:
         return baseStyles;
     }
-  };
-
-  const getCardBorder = () => {
-    if (isSelected) return 'border-primary shadow-primary/20';
-    if (hasError) return 'border-destructive shadow-destructive/20';
-    if (isHovered) return 'border-primary/50 shadow-primary/10';
-    return 'border-border/50';
   };
 
   const getStatusColor = () => {
@@ -160,242 +163,258 @@ export function FlowCard({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Connection Handles */}
+      {/* Orbital Rings */}
+      <div className="absolute inset-0 pointer-events-none">
+        {Array.from({ length: orbitalConfig.rings }).map((_, index) => {
+          const ringSize = 100 + (index * 20);
+          const animationDelay = index * 2;
+          const rotationSpeed = 10 + (index * 5);
+          
+          return (
+            <div
+              key={index}
+              className={`absolute rounded-full border border-dashed animate-spin ${
+                isAINode ? 'border-purple-400/30' : 'border-primary/20'
+              } ${isHovered ? 'border-primary/40' : ''}`}
+              style={{
+                width: `${ringSize}px`,
+                height: `${ringSize}px`,
+                left: `50%`,
+                top: `50%`,
+                transform: 'translate(-50%, -50%)',
+                animationDuration: `${rotationSpeed}s`,
+                animationDelay: `${animationDelay}s`,
+                borderColor: isAINode 
+                  ? `rgba(147, 51, 234, ${0.2 + index * 0.1})` 
+                  : `${integration.color}${Math.round(20 + index * 10).toString(16)}`
+              }}
+            >
+              {/* Orbital particles */}
+              <div
+                className={`absolute w-1.5 h-1.5 rounded-full ${
+                  isAINode ? 'bg-purple-400' : 'bg-primary'
+                } shadow-lg`}
+                style={{
+                  top: '-3px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  backgroundColor: isAINode ? '#a855f7' : integration.color,
+                  boxShadow: `0 0 8px ${isAINode ? '#a855f7' : integration.color}60`
+                }}
+              />
+              {index === 0 && (
+                <div
+                  className="absolute w-1 h-1 rounded-full bg-white/60"
+                  style={{
+                    bottom: '-2px',
+                    right: '25%',
+                  }}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Connection Handles - Docking Ports */}
       {integration.type !== 'trigger' && (
         <div
-          className="absolute -left-3 top-1/2 w-6 h-6 bg-primary rounded-full border-2 border-background 
-                     cursor-crosshair hover:scale-125 transition-transform flex items-center justify-center
-                     shadow-lg hover:shadow-primary/50"
-          style={{ transform: 'translateY(-50%)' }}
+          className="absolute -left-4 top-1/2 w-8 h-8 rounded-full border-2 border-background 
+                     cursor-crosshair hover:scale-125 transition-all duration-300 flex items-center justify-center
+                     shadow-lg backdrop-blur-sm"
+          style={{ 
+            transform: 'translateY(-50%)',
+            background: `linear-gradient(135deg, ${integration.color}40, ${integration.color}20)`,
+            borderColor: integration.color,
+            boxShadow: `0 0 12px ${integration.color}40`
+          }}
           onMouseDown={handleConnectionStart('input')}
           onMouseUp={handleConnectionEnd('input')}
         >
-          <ArrowLeft className="h-3 w-3 text-primary-foreground" />
+          <ArrowLeft className="h-4 w-4" style={{ color: integration.color }} />
+          <div className="absolute inset-0 rounded-full animate-pulse" 
+               style={{ background: `radial-gradient(circle, ${integration.color}20, transparent)` }} />
         </div>
       )}
 
       <div
-        className="absolute -right-3 top-1/2 w-6 h-6 bg-primary rounded-full border-2 border-background 
-                   cursor-crosshair hover:scale-125 transition-transform flex items-center justify-center
-                   shadow-lg hover:shadow-primary/50"
-        style={{ transform: 'translateY(-50%)' }}
+        className="absolute -right-4 top-1/2 w-8 h-8 rounded-full border-2 border-background 
+                   cursor-crosshair hover:scale-125 transition-all duration-300 flex items-center justify-center
+                   shadow-lg backdrop-blur-sm"
+        style={{ 
+          transform: 'translateY(-50%)',
+          background: `linear-gradient(135deg, ${integration.color}40, ${integration.color}20)`,
+          borderColor: integration.color,
+          boxShadow: `0 0 12px ${integration.color}40`
+        }}
         onMouseDown={handleConnectionStart('output')}
         onMouseUp={handleConnectionEnd('output')}
       >
-        <ArrowRight className="h-3 w-3 text-primary-foreground" />
+        <ArrowRight className="h-4 w-4" style={{ color: integration.color }} />
+        <div className="absolute inset-0 rounded-full animate-pulse" 
+             style={{ background: `radial-gradient(circle, ${integration.color}20, transparent)` }} />
       </div>
 
-      {/* Main Card - Playing Card Style (Standing Portrait) */}
-      <Card 
+      {/* Main Orbital Station - Central Core */}
+      <div 
         className={`
-          w-32 h-48 p-3 cursor-grab active:cursor-grabbing relative overflow-hidden
-          ${getThemeStyles()} ${getCardBorder()}
-          ${isHovered ? 'scale-105 rotate-1' : 'scale-100'}
-          ${isDragging ? 'rotate-3 scale-110' : ''}
-          ${isJokerCard ? 'border-2 border-dashed' : ''}
+          w-20 h-20 rounded-full cursor-grab active:cursor-grabbing relative overflow-hidden
+          border-2 backdrop-blur-md transition-all duration-500
+          ${getOrbitalStyles()}
+          ${isHovered ? 'scale-110' : 'scale-100'}
+          ${isDragging ? 'scale-125' : ''}
+          ${isSelected ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''}
         `}
         style={{
-          backgroundColor: isJokerCard
-            ? 'linear-gradient(135deg, #FF6B6B, #4ECDC4, #45B7D1, #96CEB4, #FFEAA7)'
-            : isHovered 
-            ? `${integration.color}10` 
-            : 'hsl(var(--card))',
-          borderColor: isJokerCard
-            ? '#FF6B6B'
-            : isSelected 
-            ? 'hsl(var(--primary))' 
-            : hasError 
-            ? 'hsl(var(--destructive))' 
-            : integration.color + '30',
-          background: isJokerCard 
-            ? 'linear-gradient(135deg, #FF6B6B20, #4ECDC420, #45B7D120, #96CEB420, #FFEAA720)' 
-            : undefined
+          background: isAINode
+            ? 'radial-gradient(circle, rgba(147, 51, 234, 0.2), rgba(147, 51, 234, 0.05), rgba(0, 0, 0, 0.1))'
+            : `radial-gradient(circle, ${integration.color}30, ${integration.color}10, rgba(0, 0, 0, 0.05))`,
+          borderColor: isAINode ? '#a855f7' : integration.color,
+          boxShadow: isAINode 
+            ? '0 0 30px rgba(147, 51, 234, 0.4), inset 0 0 20px rgba(147, 51, 234, 0.1)'
+            : `0 0 20px ${integration.color}40, inset 0 0 15px ${integration.color}20`
         }}
       >
-        {/* Playing Card Corner Decorations */}
-        <div 
-          className="absolute top-1 left-1 flex flex-col items-center text-xs font-bold opacity-70"
-          style={{ color: isJokerCard ? '#FF6B6B' : integration.color }}
-        >
-          <div className="w-3 h-3 flex items-center justify-center">
-            {Icon && <Icon className="w-2 h-2" />}
-          </div>
-          <div className="text-[8px] mt-0.5 leading-none">
-            {isJokerCard ? 'J' : integration.type.substring(0, 1).toUpperCase()}
-          </div>
-        </div>
-        
-        <div 
-          className="absolute bottom-1 right-1 flex flex-col items-center text-xs font-bold opacity-70 rotate-180"
-          style={{ color: isJokerCard ? '#FF6B6B' : integration.color }}
-        >
-          <div className="w-3 h-3 flex items-center justify-center">
-            {Icon && <Icon className="w-2 h-2" />}
-          </div>
-          <div className="text-[8px] mt-0.5 leading-none">
-            {isJokerCard ? 'J' : integration.type.substring(0, 1).toUpperCase()}
-          </div>
-        </div>
-
-        {/* Card Suit/Category Badge */}
-        <div className="absolute top-1 right-1">
-          <Badge 
-            variant="outline"
-            className="text-[8px] px-1 py-0 h-4 border-0"
-            style={{
-              backgroundColor: isJokerCard ? '#FF6B6B20' : integration.color + '20',
-              color: isJokerCard ? '#FF6B6B' : integration.color,
-            }}
-          >
-            {isJokerCard ? 'JOKER' : integration.category.split('_')[0].substring(0, 3).toUpperCase()}
-          </Badge>
-        </div>
-
-        {/* Joker Rainbow Pattern */}
-        {isJokerCard && (
+        {/* AI Cortex Neural Pattern */}
+        {isAINode && (
           <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-2 left-2 text-xs opacity-30">♠</div>
-            <div className="absolute top-2 right-2 text-xs opacity-30">♥</div>
-            <div className="absolute bottom-2 left-2 text-xs opacity-30">♣</div>
-            <div className="absolute bottom-2 right-2 text-xs opacity-30">♦</div>
+            <div className="absolute inset-2 rounded-full border border-purple-400/20 animate-pulse" />
+            <div className="absolute inset-4 rounded-full border border-purple-300/30 animate-pulse delay-500" />
+            <div className="absolute top-1/2 left-1/2 w-0.5 h-6 bg-purple-400/40 transform -translate-x-1/2 -translate-y-1/2 rotate-45" />
+            <div className="absolute top-1/2 left-1/2 w-0.5 h-6 bg-purple-400/40 transform -translate-x-1/2 -translate-y-1/2 -rotate-45" />
+            <div className="absolute top-1/2 left-1/2 w-6 h-0.5 bg-purple-400/40 transform -translate-x-1/2 -translate-y-1/2" />
           </div>
         )}
-        {/* Card Header - Centered like playing card */}
-        <div className="flex flex-col items-center justify-center h-full pt-6 pb-4">
-          {/* Main Icon - Larger and centered */}
+
+        {/* Central Icon Hub */}
+        <div className="absolute inset-0 flex items-center justify-center">
           <div 
-            className={`p-3 rounded-xl flex items-center justify-center shadow-lg mb-3 ${isJokerCard ? 'animate-pulse' : ''}`}
+            className={`p-2 rounded-full ${isAINode ? 'animate-pulse' : ''}`}
             style={{ 
-              backgroundColor: isJokerCard ? '#FF6B6B15' : integration.color + '15',
-              border: `2px solid ${isJokerCard ? '#FF6B6B30' : integration.color + '30'}`,
-              boxShadow: `0 4px 12px ${isJokerCard ? '#FF6B6B20' : integration.color + '20'}`
+              backgroundColor: isAINode ? 'rgba(147, 51, 234, 0.15)' : `${integration.color}15`,
             }}
           >
             {Icon ? (
               <Icon 
-                className={`h-10 w-10 ${isJokerCard ? 'animate-bounce' : ''}`}
-                style={{ color: isJokerCard ? '#FF6B6B' : integration.color }}
+                className={`h-8 w-8 ${isAINode ? 'animate-pulse' : ''}`}
+                style={{ color: isAINode ? '#a855f7' : integration.color }}
               />
             ) : (
               <Zap 
-                className={`h-10 w-10 ${isJokerCard ? 'animate-bounce' : ''}`}
-                style={{ color: isJokerCard ? '#FF6B6B' : integration.color }}
+                className={`h-8 w-8 ${isAINode ? 'animate-pulse' : ''}`}
+                style={{ color: isAINode ? '#a855f7' : integration.color }}
               />
             )}
           </div>
-          
-          {/* Card Title - Centered */}
-          <div className="text-center px-1">
-            <h4 className={`font-bold text-sm text-foreground truncate max-w-24 ${isJokerCard ? 'text-rainbow bg-gradient-to-r from-red-500 via-yellow-500 to-blue-500 bg-clip-text text-transparent' : ''}`}>
-              {isJokerCard ? 'AI JOKER' : label}
-            </h4>
-            <p className="text-xs text-muted-foreground truncate max-w-24 mt-1">
-              {isJokerCard ? integration.name : integration.name}
-            </p>
-          </div>
+        </div>
 
-          {/* Actions Menu - Subtle on hover */}
-          <div className={`absolute top-2 right-6 transition-opacity ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-5 w-5 p-0 hover:bg-primary/10 rounded-full"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <MoreHorizontal className="h-3 w-3" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-32">
-                <DropdownMenuItem onClick={() => onConfigClick(node.id)}>
-                  <Settings className="h-3 w-3 mr-2" />
-                  Configure
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onDuplicate(node.id)}>
-                  <Copy className="h-3 w-3 mr-2" />
-                  Duplicate
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => onDelete(node.id)}
-                  className="text-destructive focus:text-destructive"
-                >
-                  <Trash2 className="h-3 w-3 mr-2" />
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+        {/* Holographic Status Indicators */}
+        <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
+          <div className={`flex items-center justify-center w-4 h-4 rounded-full border ${getStatusColor()}`}
+               style={{ 
+                 backgroundColor: hasError ? 'rgba(239, 68, 68, 0.2)' : isConfigured ? 'rgba(34, 197, 94, 0.2)' : 'rgba(107, 114, 128, 0.2)',
+                 borderColor: hasError ? '#ef4444' : isConfigured ? '#22c55e' : '#6b7280'
+               }}>
+            {React.cloneElement(getStatusIcon(), { className: 'h-2 w-2' })}
           </div>
         </div>
 
-        {/* Card Footer - Status indicators */}
-        <div className="absolute bottom-2 left-2 right-2">
-          <div className="flex items-center justify-between">
-            {/* Status Indicator */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                onConfigClick(node.id);
-              }}
-              className={`h-5 w-5 p-0 ${getStatusColor()} hover:scale-110 transition-transform`}
-            >
-              {getStatusIcon()}
-            </Button>
-
-            {/* Execution Count Badge */}
-            {config.executionCount && (
-              <Badge 
-                variant="outline" 
-                className="text-[10px] px-1 py-0 h-4 border-0"
-                style={{
-                  backgroundColor: isJokerCard ? '#FF6B6B15' : integration.color + '15',
-                  color: isJokerCard ? '#FF6B6B' : integration.color,
-                }}
-              >
-                {config.executionCount}
-              </Badge>
-            )}
+        {/* Technical Readouts */}
+        <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-center">
+          <div className="text-xs font-mono text-muted-foreground/80 truncate max-w-20">
+            {isAINode ? 'AI CORTEX' : label}
           </div>
-
-          {/* Error/Success Status Bar */}
-          {(hasError || isConfigured) && (
-            <div className="mt-1">
-              {hasError ? (
-                <div className="w-full h-1 bg-destructive/20 rounded-full">
-                  <div className="h-full bg-destructive rounded-full w-full animate-pulse" />
-                </div>
-              ) : isConfigured ? (
-                <div className="w-full h-1 bg-green-500/20 rounded-full">
-                  <div className="h-full bg-green-500 rounded-full w-full" />
-                </div>
-              ) : null}
+          {config.executionCount && (
+            <div className="text-[10px] font-mono text-primary/80">
+              {config.executionCount} EXEC
             </div>
           )}
         </div>
 
-        {/* Physics Animation Sparkles */}
+        {/* Actions Menu - Tactical Panel */}
+        <div className={`absolute -top-8 -right-2 transition-opacity ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0 rounded-full backdrop-blur-sm"
+                style={{ 
+                  backgroundColor: `${integration.color}20`,
+                  border: `1px solid ${integration.color}40`
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <MoreHorizontal className="h-3 w-3" style={{ color: integration.color }} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40 backdrop-blur-md bg-background/95">
+              <DropdownMenuItem onClick={() => onConfigClick(node.id)}>
+                <Settings className="h-3 w-3 mr-2" />
+                Configure Node
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onDuplicate(node.id)}>
+                <Copy className="h-3 w-3 mr-2" />
+                Duplicate Station
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => onDelete(node.id)}
+                className="text-destructive focus:text-destructive"
+              >
+                <Trash2 className="h-3 w-3 mr-2" />
+                Decommission
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        {/* Energy Field Effects */}
         {isDragging && (
           <>
-            <div className="absolute -top-1 -left-1 w-1.5 h-1.5 bg-primary rounded-full animate-ping" />
-            <div className="absolute -top-1 -right-1 w-1 h-1 bg-primary/70 rounded-full animate-pulse delay-100" />
-            <div className="absolute -bottom-1 -left-1 w-1 h-1 bg-primary/70 rounded-full animate-pulse delay-200" />
+            <div className="absolute -top-2 -left-2 w-2 h-2 rounded-full animate-ping"
+                 style={{ backgroundColor: integration.color }} />
+            <div className="absolute -top-2 -right-2 w-1.5 h-1.5 rounded-full animate-pulse delay-100"
+                 style={{ backgroundColor: `${integration.color}70` }} />
+            <div className="absolute -bottom-2 -left-2 w-1.5 h-1.5 rounded-full animate-pulse delay-200"
+                 style={{ backgroundColor: `${integration.color}70` }} />
+            <div className="absolute -bottom-2 -right-2 w-1 h-1 rounded-full animate-ping delay-300"
+                 style={{ backgroundColor: `${integration.color}50` }} />
           </>
         )}
-      </Card>
 
-      {/* Playing Card Glow Effect */}
+        {/* Scan Lines */}
+        <div className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
+          <div 
+            className="absolute inset-0 opacity-20"
+            style={{
+              background: `repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                ${integration.color}40 2px,
+                ${integration.color}40 4px
+              )`
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Orbital Station Glow Field */}
       {isHovered && (
         <div 
-          className="absolute inset-0 rounded-xl pointer-events-none animate-pulse"
+          className="absolute inset-0 rounded-full pointer-events-none animate-pulse"
           style={{
-            boxShadow: isJokerCard 
-              ? `0 0 20px #FF6B6B40, inset 0 0 20px #4ECDC410`
-              : `0 0 20px ${integration.color}40, inset 0 0 20px ${integration.color}10`,
-            border: isJokerCard 
-              ? `1px solid #FF6B6B50`
-              : `1px solid ${integration.color}50`
+            width: '120px',
+            height: '120px',
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            background: isAINode 
+              ? 'radial-gradient(circle, rgba(147, 51, 234, 0.2), transparent 70%)'
+              : `radial-gradient(circle, ${integration.color}30, transparent 70%)`,
+            boxShadow: isAINode 
+              ? '0 0 40px rgba(147, 51, 234, 0.3)'
+              : `0 0 30px ${integration.color}40`
           }}
         />
       )}
