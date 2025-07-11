@@ -52,29 +52,30 @@ export function FlowCard({
   const { integration, config, label, isConfigured, hasError, errorMessage } = node.data;
   const Icon = integration.icon;
   
-  // Check if this is an AI node for special Cortex styling
+  // Check if this is an AI node for special Neural Command Center styling
   const isAINode = integration.category === 'ai' || integration.name.toLowerCase().includes('gpt') || integration.name.toLowerCase().includes('claude') || integration.name.toLowerCase().includes('llm');
 
-  // Get orbital ring configuration based on integration type
-  const getOrbitalConfig = () => {
-    if (integration.type === 'trigger') return { rings: 1, size: 'small' };
-    if (isAINode) return { rings: 3, size: 'large' }; // AI Cortex with neural patterns
-    return { rings: 2, size: 'medium' };
+  // Get command station configuration based on integration type
+  const getStationConfig = () => {
+    if (integration.type === 'trigger') return { type: 'trigger', size: 'small', faction: 'unsc' };
+    if (isAINode) return { type: 'ai', size: 'large', faction: 'forerunner' }; // Neural Command Center
+    if (integration.category === 'database') return { type: 'standard', size: 'medium', faction: 'covenant' };
+    return { type: 'standard', size: 'medium', faction: 'unsc' };
   };
 
-  const orbitalConfig = getOrbitalConfig();
+  const stationConfig = getStationConfig();
 
-  // Orbital station styling based on theme
-  const getOrbitalStyles = () => {
+  // Command station styling based on faction and theme
+  const getStationStyles = () => {
     const baseStyles = "transition-all duration-500 transform-gpu";
     
-    switch (theme) {
-      case 'blueprint':
-        return `${baseStyles} drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]`;
-      case 'circuit':
-        return `${baseStyles} drop-shadow-[0_0_12px_rgba(16,185,129,0.3)]`;
-      case 'organic':
-        return `${baseStyles} drop-shadow-[0_0_18px_rgba(139,92,246,0.3)]`;
+    switch (stationConfig.faction) {
+      case 'unsc':
+        return `${baseStyles} drop-shadow-[0_0_20px_rgba(59,130,246,0.4)]`;
+      case 'covenant':
+        return `${baseStyles} drop-shadow-[0_0_18px_rgba(147,51,234,0.4)]`;
+      case 'forerunner':
+        return `${baseStyles} drop-shadow-[0_0_25px_rgba(255,215,0,0.4)]`;
       default:
         return baseStyles;
     }
@@ -163,149 +164,188 @@ export function FlowCard({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Orbital Rings */}
+      {/* Command Station Structure */}
       <div className="absolute inset-0 pointer-events-none">
-        {Array.from({ length: orbitalConfig.rings }).map((_, index) => {
-          const ringSize = 100 + (index * 20);
-          const animationDelay = index * 2;
-          const rotationSpeed = 10 + (index * 5);
-          
-          return (
-            <div
-              key={index}
-              className={`absolute rounded-full border border-dashed animate-spin ${
-                isAINode ? 'border-purple-400/30' : 'border-primary/20'
-              } ${isHovered ? 'border-primary/40' : ''}`}
-              style={{
-                width: `${ringSize}px`,
-                height: `${ringSize}px`,
-                left: `50%`,
-                top: `50%`,
-                transform: 'translate(-50%, -50%)',
-                animationDuration: `${rotationSpeed}s`,
-                animationDelay: `${animationDelay}s`,
-                borderColor: isAINode 
-                  ? `rgba(147, 51, 234, ${0.2 + index * 0.1})` 
-                  : `${integration.color}${Math.round(20 + index * 10).toString(16)}`
-              }}
-            >
-              {/* Orbital particles */}
+        {/* Hexagonal Command Frame */}
+        <div 
+          className={`absolute rounded-lg border-2 ${isHovered ? 'animate-pulse' : ''}`}
+          style={{
+            width: '120px',
+            height: '120px',
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%) rotate(0deg)',
+            clipPath: 'polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%)',
+            borderColor: stationConfig.faction === 'forerunner' ? '#ffd700' : 
+                        stationConfig.faction === 'covenant' ? '#9333ea' : '#3b82f6',
+            backgroundColor: `${stationConfig.faction === 'forerunner' ? '#ffd700' : 
+                             stationConfig.faction === 'covenant' ? '#9333ea' : '#3b82f6'}10`
+          }}
+        />
+        
+        {/* Neural Data Rings for AI nodes */}
+        {isAINode && (
+          <>
+            {[0, 1, 2].map((index) => (
               <div
-                className={`absolute w-1.5 h-1.5 rounded-full ${
-                  isAINode ? 'bg-purple-400' : 'bg-primary'
-                } shadow-lg`}
+                key={index}
+                className="absolute rounded-full border border-dashed animate-spin"
                 style={{
-                  top: '-3px',
+                  width: `${140 + index * 25}px`,
+                  height: `${140 + index * 25}px`,
                   left: '50%',
-                  transform: 'translateX(-50%)',
-                  backgroundColor: isAINode ? '#a855f7' : integration.color,
-                  boxShadow: `0 0 8px ${isAINode ? '#a855f7' : integration.color}60`
+                  top: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  borderColor: `rgba(255, 215, 0, ${0.3 - index * 0.1})`,
+                  animationDuration: `${15 + index * 10}s`,
+                  animationDelay: `${index * 2}s`,
+                  animationDirection: index % 2 === 0 ? 'normal' : 'reverse'
                 }}
-              />
-              {index === 0 && (
+              >
                 <div
-                  className="absolute w-1 h-1 rounded-full bg-white/60"
+                  className="absolute w-2 h-2 rounded-full bg-yellow-400"
                   style={{
-                    bottom: '-2px',
-                    right: '25%',
+                    top: '-4px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    boxShadow: '0 0 10px #ffd700'
                   }}
                 />
-              )}
-            </div>
-          );
-        })}
+              </div>
+            ))}
+          </>
+        )}
+        
+        {/* Tactical Grid Overlay */}
+        <div className="absolute inset-0 opacity-30">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div
+              key={i}
+              className="absolute border-dashed border-l border-b"
+              style={{
+                left: `${i * 20}%`,
+                top: `${i * 20}%`,
+                width: '20%',
+                height: '20%',
+                borderColor: integration.color + '30'
+              }}
+            />
+          ))}
+        </div>
       </div>
 
-      {/* Connection Handles - Docking Ports */}
+      {/* Slipspace Connection Ports */}
       {integration.type !== 'trigger' && (
         <div
-          className="absolute -left-4 top-1/2 w-8 h-8 rounded-full border-2 border-background 
+          className="absolute -left-5 top-1/2 w-10 h-10 border-2 border-background 
                      cursor-crosshair hover:scale-125 transition-all duration-300 flex items-center justify-center
                      shadow-lg backdrop-blur-sm"
           style={{ 
             transform: 'translateY(-50%)',
-            background: `linear-gradient(135deg, ${integration.color}40, ${integration.color}20)`,
+            clipPath: 'polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%)',
+            background: `linear-gradient(135deg, ${integration.color}60, ${integration.color}30)`,
             borderColor: integration.color,
-            boxShadow: `0 0 12px ${integration.color}40`
+            boxShadow: `0 0 15px ${integration.color}50, inset 0 0 10px ${integration.color}20`
           }}
           onMouseDown={handleConnectionStart('input')}
           onMouseUp={handleConnectionEnd('input')}
         >
-          <ArrowLeft className="h-4 w-4" style={{ color: integration.color }} />
-          <div className="absolute inset-0 rounded-full animate-pulse" 
-               style={{ background: `radial-gradient(circle, ${integration.color}20, transparent)` }} />
+          <div className="absolute inset-1 animate-pulse"
+               style={{ 
+                 clipPath: 'polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%)',
+                 background: `radial-gradient(circle, ${integration.color}40, transparent)` 
+               }} />
+          <ArrowLeft className="h-4 w-4 z-10" style={{ color: integration.color }} />
         </div>
       )}
 
       <div
-        className="absolute -right-4 top-1/2 w-8 h-8 rounded-full border-2 border-background 
+        className="absolute -right-5 top-1/2 w-10 h-10 border-2 border-background 
                    cursor-crosshair hover:scale-125 transition-all duration-300 flex items-center justify-center
                    shadow-lg backdrop-blur-sm"
         style={{ 
           transform: 'translateY(-50%)',
-          background: `linear-gradient(135deg, ${integration.color}40, ${integration.color}20)`,
+          clipPath: 'polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%)',
+          background: `linear-gradient(135deg, ${integration.color}60, ${integration.color}30)`,
           borderColor: integration.color,
-          boxShadow: `0 0 12px ${integration.color}40`
+          boxShadow: `0 0 15px ${integration.color}50, inset 0 0 10px ${integration.color}20`
         }}
         onMouseDown={handleConnectionStart('output')}
         onMouseUp={handleConnectionEnd('output')}
       >
-        <ArrowRight className="h-4 w-4" style={{ color: integration.color }} />
-        <div className="absolute inset-0 rounded-full animate-pulse" 
-             style={{ background: `radial-gradient(circle, ${integration.color}20, transparent)` }} />
+        <div className="absolute inset-1 animate-pulse"
+             style={{ 
+               clipPath: 'polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%)',
+               background: `radial-gradient(circle, ${integration.color}40, transparent)` 
+             }} />
+        <ArrowRight className="h-4 w-4 z-10" style={{ color: integration.color }} />
       </div>
 
-      {/* Main Orbital Station - Central Core */}
+      {/* Main Command Station Core */}
       <div 
         className={`
-          w-20 h-20 rounded-full cursor-grab active:cursor-grabbing relative overflow-hidden
+          w-24 h-24 cursor-grab active:cursor-grabbing relative overflow-hidden
           border-2 backdrop-blur-md transition-all duration-500
-          ${getOrbitalStyles()}
+          ${getStationStyles()}
           ${isHovered ? 'scale-110' : 'scale-100'}
           ${isDragging ? 'scale-125' : ''}
           ${isSelected ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''}
         `}
         style={{
+          clipPath: isAINode 
+            ? 'circle(50% at 50% 50%)' 
+            : 'polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%)',
           background: isAINode
-            ? 'radial-gradient(circle, rgba(147, 51, 234, 0.2), rgba(147, 51, 234, 0.05), rgba(0, 0, 0, 0.1))'
-            : `radial-gradient(circle, ${integration.color}30, ${integration.color}10, rgba(0, 0, 0, 0.05))`,
-          borderColor: isAINode ? '#a855f7' : integration.color,
+            ? 'radial-gradient(circle, rgba(255, 215, 0, 0.3), rgba(255, 215, 0, 0.1), rgba(0, 0, 0, 0.1))'
+            : `linear-gradient(135deg, ${integration.color}40, ${integration.color}20, rgba(0, 0, 0, 0.05))`,
+          borderColor: isAINode ? '#ffd700' : integration.color,
           boxShadow: isAINode 
-            ? '0 0 30px rgba(147, 51, 234, 0.4), inset 0 0 20px rgba(147, 51, 234, 0.1)'
-            : `0 0 20px ${integration.color}40, inset 0 0 15px ${integration.color}20`
+            ? '0 0 35px rgba(255, 215, 0, 0.5), inset 0 0 25px rgba(255, 215, 0, 0.2)'
+            : `0 0 25px ${integration.color}50, inset 0 0 20px ${integration.color}30`
         }}
       >
-        {/* AI Cortex Neural Pattern */}
+        {/* Neural Command Center Pattern */}
         {isAINode && (
           <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute inset-2 rounded-full border border-purple-400/20 animate-pulse" />
-            <div className="absolute inset-4 rounded-full border border-purple-300/30 animate-pulse delay-500" />
-            <div className="absolute top-1/2 left-1/2 w-0.5 h-6 bg-purple-400/40 transform -translate-x-1/2 -translate-y-1/2 rotate-45" />
-            <div className="absolute top-1/2 left-1/2 w-0.5 h-6 bg-purple-400/40 transform -translate-x-1/2 -translate-y-1/2 -rotate-45" />
-            <div className="absolute top-1/2 left-1/2 w-6 h-0.5 bg-purple-400/40 transform -translate-x-1/2 -translate-y-1/2" />
+            <div className="absolute inset-2 rounded-full border border-yellow-400/30 animate-pulse" />
+            <div className="absolute inset-4 rounded-full border border-yellow-300/40 animate-pulse delay-500" />
+            {/* Forerunner-style neural pathways */}
+            <div className="absolute top-1/2 left-1/2 w-0.5 h-8 bg-yellow-400/50 transform -translate-x-1/2 -translate-y-1/2 rotate-0" />
+            <div className="absolute top-1/2 left-1/2 w-0.5 h-8 bg-yellow-400/50 transform -translate-x-1/2 -translate-y-1/2 rotate-60" />
+            <div className="absolute top-1/2 left-1/2 w-0.5 h-8 bg-yellow-400/50 transform -translate-x-1/2 -translate-y-1/2 rotate-120" />
+            <div className="absolute top-1/2 left-1/2 w-2 h-2 rounded-full bg-yellow-400 transform -translate-x-1/2 -translate-y-1/2 animate-pulse" />
           </div>
         )}
 
-        {/* Central Icon Hub */}
+        {/* Holographic Command Interface */}
         <div className="absolute inset-0 flex items-center justify-center">
           <div 
-            className={`p-2 rounded-full ${isAINode ? 'animate-pulse' : ''}`}
+            className={`p-3 ${isAINode ? 'rounded-full animate-pulse' : ''}`}
             style={{ 
-              backgroundColor: isAINode ? 'rgba(147, 51, 234, 0.15)' : `${integration.color}15`,
+              backgroundColor: isAINode ? 'rgba(255, 215, 0, 0.15)' : `${integration.color}20`,
+              clipPath: isAINode ? 'circle(50% at 50% 50%)' : 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)'
             }}
           >
             {Icon ? (
               <Icon 
-                className={`h-8 w-8 ${isAINode ? 'animate-pulse' : ''}`}
-                style={{ color: isAINode ? '#a855f7' : integration.color }}
+                className={`h-6 w-6 ${isAINode ? 'animate-pulse' : ''}`}
+                style={{ color: isAINode ? '#ffd700' : integration.color }}
               />
             ) : (
               <Zap 
-                className={`h-8 w-8 ${isAINode ? 'animate-pulse' : ''}`}
-                style={{ color: isAINode ? '#a855f7' : integration.color }}
+                className={`h-6 w-6 ${isAINode ? 'animate-pulse' : ''}`}
+                style={{ color: isAINode ? '#ffd700' : integration.color }}
               />
             )}
           </div>
+        </div>
+        
+        {/* Tactical Readouts */}
+        <div className="absolute inset-0 text-[8px] font-mono text-white/60 overflow-hidden">
+          <div className="absolute top-1 left-1">PWR</div>
+          <div className="absolute top-1 right-1">SYS</div>
+          <div className="absolute bottom-1 left-1">COM</div>
+          <div className="absolute bottom-1 right-1">RDY</div>
         </div>
 
         {/* Holographic Status Indicators */}
@@ -319,14 +359,17 @@ export function FlowCard({
           </div>
         </div>
 
-        {/* Technical Readouts */}
-        <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-center">
-          <div className="text-xs font-mono text-muted-foreground/80 truncate max-w-20">
-            {isAINode ? 'AI CORTEX' : label}
+        {/* Command Station Designation */}
+        <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-center">
+          <div className="text-xs font-mono text-muted-foreground/80 truncate max-w-24">
+            {isAINode ? 'NEURAL-CMD' : `CMD-${label.slice(0, 8).toUpperCase()}`}
+          </div>
+          <div className="text-[10px] font-mono text-primary/60">
+            {stationConfig.faction.toUpperCase()} CLASS
           </div>
           {config.executionCount && (
-            <div className="text-[10px] font-mono text-primary/80">
-              {config.executionCount} EXEC
+            <div className="text-[9px] font-mono text-green-400/80">
+              OP: {config.executionCount}
             </div>
           )}
         </div>
@@ -382,39 +425,54 @@ export function FlowCard({
           </>
         )}
 
-        {/* Scan Lines */}
-        <div className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
+        {/* Holographic Scan Lines */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div 
-            className="absolute inset-0 opacity-20"
+            className="absolute inset-0 opacity-30"
             style={{
               background: `repeating-linear-gradient(
-                0deg,
+                45deg,
+                transparent,
+                transparent 3px,
+                ${integration.color}30 3px,
+                ${integration.color}30 4px
+              )`
+            }}
+          />
+          <div 
+            className="absolute inset-0 opacity-20 animate-pulse"
+            style={{
+              background: `repeating-linear-gradient(
+                -45deg,
                 transparent,
                 transparent 2px,
-                ${integration.color}40 2px,
-                ${integration.color}40 4px
+                ${integration.color}20 2px,
+                ${integration.color}20 3px
               )`
             }}
           />
         </div>
       </div>
 
-      {/* Orbital Station Glow Field */}
+      {/* Command Station Energy Field */}
       {isHovered && (
         <div 
-          className="absolute inset-0 rounded-full pointer-events-none animate-pulse"
+          className="absolute inset-0 pointer-events-none animate-pulse"
           style={{
-            width: '120px',
-            height: '120px',
+            width: '140px',
+            height: '140px',
             left: '50%',
             top: '50%',
             transform: 'translate(-50%, -50%)',
+            clipPath: isAINode 
+              ? 'circle(50% at 50% 50%)' 
+              : 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)',
             background: isAINode 
-              ? 'radial-gradient(circle, rgba(147, 51, 234, 0.2), transparent 70%)'
-              : `radial-gradient(circle, ${integration.color}30, transparent 70%)`,
+              ? 'radial-gradient(circle, rgba(255, 215, 0, 0.3), transparent 70%)'
+              : `radial-gradient(circle, ${integration.color}40, transparent 70%)`,
             boxShadow: isAINode 
-              ? '0 0 40px rgba(147, 51, 234, 0.3)'
-              : `0 0 30px ${integration.color}40`
+              ? '0 0 50px rgba(255, 215, 0, 0.4)'
+              : `0 0 40px ${integration.color}50`
           }}
         />
       )}

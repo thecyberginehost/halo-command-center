@@ -330,7 +330,27 @@ export function FlowDeckCanvas({
   }, [selectedNodeIds, deleteNode]);
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-gradient-to-br from-background via-background/90 to-background/80">
+    <div className="relative w-full h-full overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800">
+      {/* Deep Space Background */}
+      <div className="absolute inset-0 opacity-30">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `
+            radial-gradient(2px 2px at 20px 30px, #fff, transparent),
+            radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+            radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+            radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.6), transparent),
+            radial-gradient(2px 2px at 160px 30px, #fff, transparent)
+          `,
+          backgroundRepeat: 'repeat',
+          backgroundSize: '200px 100px'
+        }} />
+      </div>
+      
+      {/* Nebula Effect */}
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000" />
+      </div>
       {/* Canvas Controls */}
       <div className="absolute top-4 right-4 z-20 flex space-x-2">
         <Button 
