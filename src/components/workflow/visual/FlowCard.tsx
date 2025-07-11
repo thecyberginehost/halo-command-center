@@ -50,6 +50,9 @@ export function FlowCard({
   
   const { integration, config, label, isConfigured, hasError, errorMessage } = node.data;
   const Icon = integration.icon;
+  
+  // Check if this is an LLM/AI card for joker styling
+  const isJokerCard = integration.category === 'ai' || integration.name.toLowerCase().includes('gpt') || integration.name.toLowerCase().includes('claude') || integration.name.toLowerCase().includes('llm');
 
   // Card styling based on theme - Playing card inspired
   const getThemeStyles = () => {
@@ -182,47 +185,55 @@ export function FlowCard({
         <ArrowRight className="h-3 w-3 text-primary-foreground" />
       </div>
 
-      {/* Main Card - Playing Card Style */}
+      {/* Main Card - Playing Card Style (Standing Portrait) */}
       <Card 
         className={`
-          w-48 h-32 p-3 cursor-grab active:cursor-grabbing relative overflow-hidden
+          w-32 h-48 p-3 cursor-grab active:cursor-grabbing relative overflow-hidden
           ${getThemeStyles()} ${getCardBorder()}
           ${isHovered ? 'scale-105 rotate-1' : 'scale-100'}
           ${isDragging ? 'rotate-3 scale-110' : ''}
+          ${isJokerCard ? 'border-2 border-dashed' : ''}
         `}
         style={{
-          backgroundColor: isHovered 
+          backgroundColor: isJokerCard
+            ? 'linear-gradient(135deg, #FF6B6B, #4ECDC4, #45B7D1, #96CEB4, #FFEAA7)'
+            : isHovered 
             ? `${integration.color}10` 
             : 'hsl(var(--card))',
-          borderColor: isSelected 
+          borderColor: isJokerCard
+            ? '#FF6B6B'
+            : isSelected 
             ? 'hsl(var(--primary))' 
             : hasError 
             ? 'hsl(var(--destructive))' 
             : integration.color + '30',
+          background: isJokerCard 
+            ? 'linear-gradient(135deg, #FF6B6B20, #4ECDC420, #45B7D120, #96CEB420, #FFEAA720)' 
+            : undefined
         }}
       >
         {/* Playing Card Corner Decorations */}
         <div 
           className="absolute top-1 left-1 flex flex-col items-center text-xs font-bold opacity-70"
-          style={{ color: integration.color }}
+          style={{ color: isJokerCard ? '#FF6B6B' : integration.color }}
         >
           <div className="w-3 h-3 flex items-center justify-center">
             {Icon && <Icon className="w-2 h-2" />}
           </div>
           <div className="text-[8px] mt-0.5 leading-none">
-            {integration.type.substring(0, 1).toUpperCase()}
+            {isJokerCard ? 'J' : integration.type.substring(0, 1).toUpperCase()}
           </div>
         </div>
         
         <div 
           className="absolute bottom-1 right-1 flex flex-col items-center text-xs font-bold opacity-70 rotate-180"
-          style={{ color: integration.color }}
+          style={{ color: isJokerCard ? '#FF6B6B' : integration.color }}
         >
           <div className="w-3 h-3 flex items-center justify-center">
             {Icon && <Icon className="w-2 h-2" />}
           </div>
           <div className="text-[8px] mt-0.5 leading-none">
-            {integration.type.substring(0, 1).toUpperCase()}
+            {isJokerCard ? 'J' : integration.type.substring(0, 1).toUpperCase()}
           </div>
         </div>
 
@@ -232,44 +243,54 @@ export function FlowCard({
             variant="outline"
             className="text-[8px] px-1 py-0 h-4 border-0"
             style={{
-              backgroundColor: integration.color + '20',
-              color: integration.color,
+              backgroundColor: isJokerCard ? '#FF6B6B20' : integration.color + '20',
+              color: isJokerCard ? '#FF6B6B' : integration.color,
             }}
           >
-            {integration.category.split('_')[0].substring(0, 3).toUpperCase()}
+            {isJokerCard ? 'JOKER' : integration.category.split('_')[0].substring(0, 3).toUpperCase()}
           </Badge>
         </div>
+
+        {/* Joker Rainbow Pattern */}
+        {isJokerCard && (
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-2 left-2 text-xs opacity-30">♠</div>
+            <div className="absolute top-2 right-2 text-xs opacity-30">♥</div>
+            <div className="absolute bottom-2 left-2 text-xs opacity-30">♣</div>
+            <div className="absolute bottom-2 right-2 text-xs opacity-30">♦</div>
+          </div>
+        )}
         {/* Card Header - Centered like playing card */}
-        <div className="flex flex-col items-center justify-center h-full pt-4 pb-2">
+        <div className="flex flex-col items-center justify-center h-full pt-6 pb-4">
           {/* Main Icon - Larger and centered */}
           <div 
-            className="p-2.5 rounded-xl flex items-center justify-center shadow-lg mb-2"
+            className={`p-3 rounded-xl flex items-center justify-center shadow-lg mb-3 ${isJokerCard ? 'animate-pulse' : ''}`}
             style={{ 
-              backgroundColor: integration.color + '15',
-              border: `2px solid ${integration.color}30`,
-              boxShadow: `0 4px 12px ${integration.color}20`
+              backgroundColor: isJokerCard ? '#FF6B6B15' : integration.color + '15',
+              border: `2px solid ${isJokerCard ? '#FF6B6B30' : integration.color + '30'}`,
+              boxShadow: `0 4px 12px ${isJokerCard ? '#FF6B6B20' : integration.color + '20'}`
             }}
           >
             {Icon ? (
               <Icon 
-                className="h-8 w-8" 
-                style={{ color: integration.color }}
+                className={`h-10 w-10 ${isJokerCard ? 'animate-bounce' : ''}`}
+                style={{ color: isJokerCard ? '#FF6B6B' : integration.color }}
               />
             ) : (
               <Zap 
-                className="h-8 w-8"
-                style={{ color: integration.color }}
+                className={`h-10 w-10 ${isJokerCard ? 'animate-bounce' : ''}`}
+                style={{ color: isJokerCard ? '#FF6B6B' : integration.color }}
               />
             )}
           </div>
           
           {/* Card Title - Centered */}
-          <div className="text-center">
-            <h4 className="font-bold text-sm text-foreground truncate max-w-32">
-              {label}
+          <div className="text-center px-1">
+            <h4 className={`font-bold text-sm text-foreground truncate max-w-24 ${isJokerCard ? 'text-rainbow bg-gradient-to-r from-red-500 via-yellow-500 to-blue-500 bg-clip-text text-transparent' : ''}`}>
+              {isJokerCard ? 'AI JOKER' : label}
             </h4>
-            <p className="text-xs text-muted-foreground truncate max-w-32">
-              {integration.name}
+            <p className="text-xs text-muted-foreground truncate max-w-24 mt-1">
+              {isJokerCard ? integration.name : integration.name}
             </p>
           </div>
 
@@ -329,8 +350,8 @@ export function FlowCard({
                 variant="outline" 
                 className="text-[10px] px-1 py-0 h-4 border-0"
                 style={{
-                  backgroundColor: integration.color + '15',
-                  color: integration.color,
+                  backgroundColor: isJokerCard ? '#FF6B6B15' : integration.color + '15',
+                  color: isJokerCard ? '#FF6B6B' : integration.color,
                 }}
               >
                 {config.executionCount}
@@ -369,8 +390,12 @@ export function FlowCard({
         <div 
           className="absolute inset-0 rounded-xl pointer-events-none animate-pulse"
           style={{
-            boxShadow: `0 0 20px ${integration.color}40, inset 0 0 20px ${integration.color}10`,
-            border: `1px solid ${integration.color}50`
+            boxShadow: isJokerCard 
+              ? `0 0 20px #FF6B6B40, inset 0 0 20px #4ECDC410`
+              : `0 0 20px ${integration.color}40, inset 0 0 20px ${integration.color}10`,
+            border: isJokerCard 
+              ? `1px solid #FF6B6B50`
+              : `1px solid ${integration.color}50`
           }}
         />
       )}
