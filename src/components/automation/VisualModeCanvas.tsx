@@ -1,4 +1,4 @@
-import { VisualWorkflowCanvas } from '../workflow/visual/VisualWorkflowCanvas';
+import { FlowDeckCanvas } from '../workflow/visual/FlowDeckCanvas';
 
 interface VisualModeCanvasProps {
   onAddStepClick: () => void;
@@ -12,7 +12,7 @@ interface VisualModeCanvasProps {
 export function VisualModeCanvas({ onAddStepClick, onSaveWorkflow, onWorkflowChange, initialNodes, initialEdges, onChatToggle }: VisualModeCanvasProps) {
   return (
     <div className="w-full h-full">
-      <VisualWorkflowCanvas 
+      <FlowDeckCanvas 
         onSaveWorkflow={onSaveWorkflow} 
         onWorkflowChange={onWorkflowChange}
         initialNodes={initialNodes}
