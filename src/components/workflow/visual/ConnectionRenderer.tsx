@@ -30,12 +30,16 @@ export function ConnectionRenderer({ edges, nodes, connectionState }: Connection
     const node = nodes.find(n => n.id === nodeId);
     if (!node) return { x: 0, y: 0 };
     
-    const baseY = node.position.y + 56; // Middle of card
+    // Station center
+    const centerX = node.position.x + 48; // Center of 96px wide station
+    const centerY = node.position.y + 48; // Center of 96px tall station
     
     if (handle === 'input') {
-      return { x: node.position.x + 15, y: baseY }; // Connect to left connection port
+      // Left edge of station hull for input connections
+      return { x: node.position.x + 8, y: centerY };
     } else {
-      return { x: node.position.x + 161, y: baseY }; // Connect to right connection port
+      // Right edge of station hull for output connections  
+      return { x: node.position.x + 88, y: centerY };
     }
   };
 
@@ -263,54 +267,59 @@ export function ConnectionRenderer({ edges, nodes, connectionState }: Connection
         </g>
       )}
       
-      {/* Connection Ports */}
-      {nodes.map(node => (
-        <g key={`handles-${node.id}`}>
-          {/* Input Port */}
-          {node.data.integration.type !== 'trigger' && (
+      {/* Docking Port Indicators */}
+      {nodes.map(node => {
+        const inputPos = getHandlePosition(node.id, 'input');
+        const outputPos = getHandlePosition(node.id, 'output');
+        
+        return (
+          <g key={`docking-${node.id}`}>
+            {/* Input Docking Port */}
+            {node.data.integration.type !== 'trigger' && (
+              <g>
+                <circle
+                  cx={inputPos.x}
+                  cy={inputPos.y}
+                  r="6"
+                  fill="none"
+                  stroke={node.data.integration.color || '#3b82f6'}
+                  strokeWidth="2"
+                  opacity="0.8"
+                  className="animate-pulse"
+                />
+                <circle
+                  cx={inputPos.x}
+                  cy={inputPos.y}
+                  r="3"
+                  fill={node.data.integration.color || '#3b82f6'}
+                  opacity="0.6"
+                />
+              </g>
+            )}
+            
+            {/* Output Docking Port */}
             <g>
               <circle
-                cx={node.position.x + 15}
-                cy={node.position.y + 56}
-                r="8"
+                cx={outputPos.x}
+                cy={outputPos.y}
+                r="6"
                 fill="none"
-                stroke="#3b82f6"
+                stroke={node.data.integration.color || '#3b82f6'}
                 strokeWidth="2"
                 opacity="0.8"
                 className="animate-pulse"
               />
               <circle
-                cx={node.position.x + 15}
-                cy={node.position.y + 56}
-                r="4"
-                fill="#3b82f6"
+                cx={outputPos.x}
+                cy={outputPos.y}
+                r="3"
+                fill={node.data.integration.color || '#3b82f6'}
                 opacity="0.6"
               />
             </g>
-          )}
-          
-          {/* Output Port */}
-          <g>
-            <circle
-              cx={node.position.x + 161}
-              cy={node.position.y + 56}
-              r="8"
-              fill="none"
-              stroke="#3b82f6"
-              strokeWidth="2"
-              opacity="0.8"
-              className="animate-pulse"
-            />
-            <circle
-              cx={node.position.x + 161}
-              cy={node.position.y + 56}
-              r="4"
-              fill="#3b82f6"
-              opacity="0.6"
-            />
           </g>
-        </g>
-      ))}
+        );
+      })}
     </g>
   );
 }
