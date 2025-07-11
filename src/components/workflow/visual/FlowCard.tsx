@@ -51,17 +51,17 @@ export function FlowCard({
   const { integration, config, label, isConfigured, hasError, errorMessage } = node.data;
   const Icon = integration.icon;
 
-  // Card styling based on theme
+  // Card styling based on theme - Playing card inspired
   const getThemeStyles = () => {
-    const baseStyles = "transition-all duration-300 transform-gpu";
+    const baseStyles = "transition-all duration-300 transform-gpu rounded-xl";
     
     switch (theme) {
       case 'blueprint':
-        return `${baseStyles} border-2 backdrop-blur-sm bg-gradient-to-br from-card/90 to-card/70 shadow-lg hover:shadow-xl`;
+        return `${baseStyles} border-2 backdrop-blur-sm bg-gradient-to-br from-card/95 to-card/85 shadow-[0_8px_32px_rgba(0,0,0,0.12)] hover:shadow-[0_16px_48px_rgba(0,0,0,0.2)]`;
       case 'circuit':
-        return `${baseStyles} border border-primary/30 bg-gradient-to-r from-card via-card/95 to-card shadow-md hover:shadow-lg`;
+        return `${baseStyles} border-2 border-primary/20 bg-gradient-to-br from-card/98 via-card/95 to-card/90 shadow-[0_4px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.15)]`;
       case 'organic':
-        return `${baseStyles} rounded-2xl border-0 bg-gradient-to-br from-card/95 to-background/80 shadow-md hover:shadow-xl`;
+        return `${baseStyles} rounded-2xl border-2 border-background/20 bg-gradient-to-br from-card/98 to-background/85 shadow-[0_6px_24px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_60px_rgba(0,0,0,0.18)]`;
       default:
         return baseStyles;
     }
@@ -182,109 +182,134 @@ export function FlowCard({
         <ArrowRight className="h-3 w-3 text-primary-foreground" />
       </div>
 
-      {/* Main Card */}
+      {/* Main Card - Playing Card Style */}
       <Card 
         className={`
-          w-44 min-h-28 p-4 cursor-grab active:cursor-grabbing
+          w-48 h-32 p-3 cursor-grab active:cursor-grabbing relative overflow-hidden
           ${getThemeStyles()} ${getCardBorder()}
-          ${isHovered ? 'scale-105' : 'scale-100'}
-          ${isDragging ? 'rotate-1 scale-110' : ''}
+          ${isHovered ? 'scale-105 rotate-1' : 'scale-100'}
+          ${isDragging ? 'rotate-3 scale-110' : ''}
         `}
         style={{
           backgroundColor: isHovered 
-            ? `${integration.color}08` 
+            ? `${integration.color}10` 
             : 'hsl(var(--card))',
           borderColor: isSelected 
             ? 'hsl(var(--primary))' 
             : hasError 
             ? 'hsl(var(--destructive))' 
-            : integration.color + '40',
+            : integration.color + '30',
         }}
       >
-        {/* Card Header */}
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center space-x-2 flex-1 min-w-0">
-            <div 
-              className="p-2 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm"
-              style={{ 
-                backgroundColor: integration.color + '20',
-                border: `1px solid ${integration.color}40`
-              }}
-            >
-              {Icon ? (
-                <Icon 
-                  className="h-5 w-5" 
-                  style={{ color: integration.color }}
-                />
-              ) : (
-                <Zap 
-                  className="h-5 w-5"
-                  style={{ color: integration.color }}
-                />
-              )}
-            </div>
-            <div className="flex-1 min-w-0">
-              <h4 className="font-semibold text-sm text-foreground truncate">
-                {label}
-              </h4>
-              <p className="text-xs text-muted-foreground truncate">
-                {integration.description || integration.name}
-              </p>
-            </div>
+        {/* Playing Card Corner Decorations */}
+        <div 
+          className="absolute top-1 left-1 flex flex-col items-center text-xs font-bold opacity-70"
+          style={{ color: integration.color }}
+        >
+          <div className="w-3 h-3 flex items-center justify-center">
+            {Icon && <Icon className="w-2 h-2" />}
           </div>
-
-          {/* Actions Menu */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0 hover:bg-primary/10"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <MoreHorizontal className="h-3 w-3" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-32">
-              <DropdownMenuItem onClick={() => onConfigClick(node.id)}>
-                <Settings className="h-3 w-3 mr-2" />
-                Configure
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onDuplicate(node.id)}>
-                <Copy className="h-3 w-3 mr-2" />
-                Duplicate
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => onDelete(node.id)}
-                className="text-destructive focus:text-destructive"
-              >
-                <Trash2 className="h-3 w-3 mr-2" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="text-[8px] mt-0.5 leading-none">
+            {integration.type.substring(0, 1).toUpperCase()}
+          </div>
+        </div>
+        
+        <div 
+          className="absolute bottom-1 right-1 flex flex-col items-center text-xs font-bold opacity-70 rotate-180"
+          style={{ color: integration.color }}
+        >
+          <div className="w-3 h-3 flex items-center justify-center">
+            {Icon && <Icon className="w-2 h-2" />}
+          </div>
+          <div className="text-[8px] mt-0.5 leading-none">
+            {integration.type.substring(0, 1).toUpperCase()}
+          </div>
         </div>
 
-        {/* Card Content */}
-        <div className="space-y-2">
-          {/* Type Badge */}
-          <div className="flex items-center justify-between">
-            <Badge 
-              variant={integration.type === 'trigger' ? 'default' : 'secondary'}
-              className="text-xs px-2 py-0.5"
-              style={{
-                backgroundColor: integration.type === 'trigger' 
-                  ? integration.color + '20' 
-                  : 'hsl(var(--muted))',
-                color: integration.type === 'trigger' 
-                  ? integration.color 
-                  : 'hsl(var(--muted-foreground))',
-                border: `1px solid ${integration.color}30`
-              }}
-            >
-              {integration.type}
-            </Badge>
+        {/* Card Suit/Category Badge */}
+        <div className="absolute top-1 right-1">
+          <Badge 
+            variant="outline"
+            className="text-[8px] px-1 py-0 h-4 border-0"
+            style={{
+              backgroundColor: integration.color + '20',
+              color: integration.color,
+            }}
+          >
+            {integration.category.split('_')[0].substring(0, 3).toUpperCase()}
+          </Badge>
+        </div>
+        {/* Card Header - Centered like playing card */}
+        <div className="flex flex-col items-center justify-center h-full pt-4 pb-2">
+          {/* Main Icon - Larger and centered */}
+          <div 
+            className="p-2.5 rounded-xl flex items-center justify-center shadow-lg mb-2"
+            style={{ 
+              backgroundColor: integration.color + '15',
+              border: `2px solid ${integration.color}30`,
+              boxShadow: `0 4px 12px ${integration.color}20`
+            }}
+          >
+            {Icon ? (
+              <Icon 
+                className="h-8 w-8" 
+                style={{ color: integration.color }}
+              />
+            ) : (
+              <Zap 
+                className="h-8 w-8"
+                style={{ color: integration.color }}
+              />
+            )}
+          </div>
+          
+          {/* Card Title - Centered */}
+          <div className="text-center">
+            <h4 className="font-bold text-sm text-foreground truncate max-w-32">
+              {label}
+            </h4>
+            <p className="text-xs text-muted-foreground truncate max-w-32">
+              {integration.name}
+            </p>
+          </div>
 
+          {/* Actions Menu - Subtle on hover */}
+          <div className={`absolute top-2 right-6 transition-opacity ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-5 w-5 p-0 hover:bg-primary/10 rounded-full"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <MoreHorizontal className="h-3 w-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-32">
+                <DropdownMenuItem onClick={() => onConfigClick(node.id)}>
+                  <Settings className="h-3 w-3 mr-2" />
+                  Configure
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onDuplicate(node.id)}>
+                  <Copy className="h-3 w-3 mr-2" />
+                  Duplicate
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => onDelete(node.id)}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <Trash2 className="h-3 w-3 mr-2" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+
+        {/* Card Footer - Status indicators */}
+        <div className="absolute bottom-2 left-2 right-2">
+          <div className="flex items-center justify-between">
             {/* Status Indicator */}
             <Button
               variant="ghost"
@@ -293,43 +318,61 @@ export function FlowCard({
                 e.stopPropagation();
                 onConfigClick(node.id);
               }}
-              className={`h-6 w-6 p-0 ${getStatusColor()}`}
+              className={`h-5 w-5 p-0 ${getStatusColor()} hover:scale-110 transition-transform`}
             >
               {getStatusIcon()}
             </Button>
+
+            {/* Execution Count Badge */}
+            {config.executionCount && (
+              <Badge 
+                variant="outline" 
+                className="text-[10px] px-1 py-0 h-4 border-0"
+                style={{
+                  backgroundColor: integration.color + '15',
+                  color: integration.color,
+                }}
+              >
+                {config.executionCount}
+              </Badge>
+            )}
           </div>
 
-          {/* Configuration Status */}
-          {isConfigured && (
-            <div className="text-xs text-green-600 bg-green-50 dark:bg-green-950 px-2 py-1 rounded">
-              Configured
-            </div>
-          )}
-
-          {/* Error Message */}
-          {hasError && errorMessage && (
-            <div className="text-xs text-destructive bg-destructive/10 px-2 py-1 rounded">
-              {errorMessage}
-            </div>
-          )}
-
-          {/* Execution Count (if available) */}
-          {config.executionCount && (
-            <div className="text-xs text-muted-foreground">
-              Executions: {config.executionCount}
+          {/* Error/Success Status Bar */}
+          {(hasError || isConfigured) && (
+            <div className="mt-1">
+              {hasError ? (
+                <div className="w-full h-1 bg-destructive/20 rounded-full">
+                  <div className="h-full bg-destructive rounded-full w-full animate-pulse" />
+                </div>
+              ) : isConfigured ? (
+                <div className="w-full h-1 bg-green-500/20 rounded-full">
+                  <div className="h-full bg-green-500 rounded-full w-full" />
+                </div>
+              ) : null}
             </div>
           )}
         </div>
 
-        {/* Physics Animation Indicator */}
+        {/* Physics Animation Sparkles */}
         {isDragging && (
-          <div className="absolute -top-2 -left-2 w-2 h-2 bg-primary rounded-full animate-pulse" />
+          <>
+            <div className="absolute -top-1 -left-1 w-1.5 h-1.5 bg-primary rounded-full animate-ping" />
+            <div className="absolute -top-1 -right-1 w-1 h-1 bg-primary/70 rounded-full animate-pulse delay-100" />
+            <div className="absolute -bottom-1 -left-1 w-1 h-1 bg-primary/70 rounded-full animate-pulse delay-200" />
+          </>
         )}
       </Card>
 
-      {/* Magnetic Snap Indicator */}
+      {/* Playing Card Glow Effect */}
       {isHovered && (
-        <div className="absolute inset-0 border-2 border-dashed border-primary/30 rounded-lg pointer-events-none animate-pulse" />
+        <div 
+          className="absolute inset-0 rounded-xl pointer-events-none animate-pulse"
+          style={{
+            boxShadow: `0 0 20px ${integration.color}40, inset 0 0 20px ${integration.color}10`,
+            border: `1px solid ${integration.color}50`
+          }}
+        />
       )}
     </div>
   );
