@@ -33,9 +33,9 @@ export function ConnectionRenderer({ edges, nodes, connectionState }: Connection
     const baseY = node.position.y + 56; // Middle of card
     
     if (handle === 'input') {
-      return { x: node.position.x, y: baseY };
+      return { x: node.position.x + 15, y: baseY }; // Connect to left connection port
     } else {
-      return { x: node.position.x + 176, y: baseY }; // Right side of card
+      return { x: node.position.x + 161, y: baseY }; // Connect to right connection port
     }
   };
 
@@ -263,32 +263,52 @@ export function ConnectionRenderer({ edges, nodes, connectionState }: Connection
         </g>
       )}
       
-      {/* Connection Points for Debugging */}
+      {/* Connection Ports */}
       {nodes.map(node => (
         <g key={`handles-${node.id}`}>
-          {/* Input Handle */}
+          {/* Input Port */}
           {node.data.integration.type !== 'trigger' && (
-            <circle
-              cx={node.position.x}
-              cy={node.position.y + 56}
-              r="4"
-              fill="hsl(var(--primary))"
-              stroke="hsl(var(--background))"
-              strokeWidth="2"
-              opacity="0.7"
-            />
+            <g>
+              <circle
+                cx={node.position.x + 15}
+                cy={node.position.y + 56}
+                r="8"
+                fill="none"
+                stroke="#3b82f6"
+                strokeWidth="2"
+                opacity="0.8"
+                className="animate-pulse"
+              />
+              <circle
+                cx={node.position.x + 15}
+                cy={node.position.y + 56}
+                r="4"
+                fill="#3b82f6"
+                opacity="0.6"
+              />
+            </g>
           )}
           
-          {/* Output Handle */}
-          <circle
-            cx={node.position.x + 176}
-            cy={node.position.y + 56}
-            r="4"
-            fill="hsl(var(--primary))"
-            stroke="hsl(var(--background))"
-            strokeWidth="2"
-            opacity="0.7"
-          />
+          {/* Output Port */}
+          <g>
+            <circle
+              cx={node.position.x + 161}
+              cy={node.position.y + 56}
+              r="8"
+              fill="none"
+              stroke="#3b82f6"
+              strokeWidth="2"
+              opacity="0.8"
+              className="animate-pulse"
+            />
+            <circle
+              cx={node.position.x + 161}
+              cy={node.position.y + 56}
+              r="4"
+              fill="#3b82f6"
+              opacity="0.6"
+            />
+          </g>
         </g>
       ))}
     </g>

@@ -13,7 +13,25 @@ import {
   ArrowRight,
   ArrowLeft,
   Cpu,
-  Circle
+  Circle,
+  Mail,
+  Users,
+  Database,
+  Calendar,
+  FileText,
+  MessageSquare,
+  Phone,
+  DollarSign,
+  BarChart3,
+  Clock,
+  Globe,
+  Shield,
+  Code,
+  Workflow,
+  Bot,
+  Webhook,
+  Cloud,
+  Server
 } from 'lucide-react';
 import { VisualWorkflowNode } from '@/types/visualWorkflow';
 
@@ -29,6 +47,84 @@ interface FlowCardProps {
   onDelete: (nodeId: string) => void;
   theme: 'blueprint' | 'circuit' | 'organic';
   zoomLevel: number;
+}
+
+function getIntegrationIcon(integration: any) {
+  const iconName = integration.id || integration.displayName?.toLowerCase() || '';
+  
+  // Email integrations
+  if (iconName.includes('gmail') || iconName.includes('email') || iconName.includes('mail')) {
+    return <Mail size={14} className="text-cyan-400" />;
+  }
+  
+  // CRM integrations
+  if (iconName.includes('salesforce') || iconName.includes('hubspot') || iconName.includes('crm')) {
+    return <Users size={14} className="text-orange-400" />;
+  }
+  
+  // Database integrations
+  if (iconName.includes('database') || iconName.includes('sql') || iconName.includes('postgres')) {
+    return <Database size={14} className="text-green-400" />;
+  }
+  
+  // Calendar integrations
+  if (iconName.includes('calendar') || iconName.includes('google-calendar')) {
+    return <Calendar size={14} className="text-blue-400" />;
+  }
+  
+  // Document integrations
+  if (iconName.includes('notion') || iconName.includes('document') || iconName.includes('docs')) {
+    return <FileText size={14} className="text-purple-400" />;
+  }
+  
+  // Communication integrations
+  if (iconName.includes('slack') || iconName.includes('teams') || iconName.includes('discord')) {
+    return <MessageSquare size={14} className="text-violet-400" />;
+  }
+  
+  // Phone/SMS integrations
+  if (iconName.includes('twilio') || iconName.includes('sms') || iconName.includes('phone')) {
+    return <Phone size={14} className="text-pink-400" />;
+  }
+  
+  // Payment integrations
+  if (iconName.includes('stripe') || iconName.includes('payment') || iconName.includes('paypal')) {
+    return <DollarSign size={14} className="text-yellow-400" />;
+  }
+  
+  // Analytics integrations
+  if (iconName.includes('analytics') || iconName.includes('mixpanel') || iconName.includes('amplitude')) {
+    return <BarChart3 size={14} className="text-indigo-400" />;
+  }
+  
+  // Scheduling integrations
+  if (iconName.includes('schedule') || iconName.includes('cron') || iconName.includes('timer')) {
+    return <Clock size={14} className="text-amber-400" />;
+  }
+  
+  // AI integrations
+  if (iconName.includes('openai') || iconName.includes('ai') || iconName.includes('gpt')) {
+    return <Bot size={14} className="text-emerald-400" />;
+  }
+  
+  // Webhook integrations
+  if (iconName.includes('webhook') || iconName.includes('http')) {
+    return <Webhook size={14} className="text-teal-400" />;
+  }
+  
+  // Cloud storage
+  if (iconName.includes('aws') || iconName.includes('cloud') || iconName.includes('s3')) {
+    return <Cloud size={14} className="text-sky-400" />;
+  }
+  
+  // Default based on integration type
+  if (integration.type === 'trigger') {
+    return <Zap size={14} className="text-yellow-400" />;
+  } else if (integration.type === 'action') {
+    return <Settings size={14} className="text-blue-400" />;
+  } else {
+    return <Workflow size={14} className="text-gray-400" />;
+  }
 }
 
 export function FlowCard({
@@ -320,23 +416,25 @@ export function FlowCard({
         {/* Holographic Command Interface */}
         <div className="absolute inset-0 flex items-center justify-center">
           <div 
-            className={`p-3 ${isAINode ? 'rounded-full animate-pulse' : ''}`}
+            className={`p-3 ${isAINode ? 'rounded-full animate-pulse' : ''} flex items-center justify-center`}
             style={{ 
               backgroundColor: isAINode ? 'rgba(255, 215, 0, 0.15)' : `${integration.color}20`,
               clipPath: isAINode ? 'circle(50% at 50% 50%)' : 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)'
             }}
           >
-            {Icon ? (
-              <Icon 
-                className={`h-6 w-6 ${isAINode ? 'animate-pulse' : ''}`}
-                style={{ color: isAINode ? '#ffd700' : integration.color }}
-              />
-            ) : (
-              <Zap 
-                className={`h-6 w-6 ${isAINode ? 'animate-pulse' : ''}`}
-                style={{ color: isAINode ? '#ffd700' : integration.color }}
-              />
-            )}
+            {/* Integration-specific icon */}
+            <div className="relative">
+              {getIntegrationIcon(integration)}
+              {/* Fallback to original icon if needed */}
+              {Icon && (
+                <div className="absolute inset-0 opacity-30">
+                  <Icon 
+                    className={`h-4 w-4 ${isAINode ? 'animate-pulse' : ''}`}
+                    style={{ color: isAINode ? '#ffd700' : integration.color }}
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </div>
         
