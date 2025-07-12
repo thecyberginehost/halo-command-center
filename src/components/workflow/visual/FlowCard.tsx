@@ -52,197 +52,185 @@ interface FlowCardProps {
 function getBrandConfig(integration: any) {
   const iconName = integration.id || integration.displayName?.toLowerCase() || '';
   
-  // Gmail - Red envelope command station
+  // Gmail - Email Processing Unit
   if (iconName.includes('gmail')) {
     return {
-      shape: 'envelope',
+      shape: 'processor',
       primaryColor: '#EA4335',
       secondaryColor: '#FBBC04',
-      icon: <Mail size={18} className="text-white" />,
-      brandName: 'GMAIL'
+      icon: <Mail size={20} className="text-white" />,
+      brandName: 'GMAIL',
+      processingType: 'email'
     };
   }
   
-  // HubSpot - Orange gear command station  
+  // HubSpot - CRM Processing Unit
   if (iconName.includes('hubspot')) {
     return {
-      shape: 'gear',
+      shape: 'processor',
       primaryColor: '#FF7A59',
       secondaryColor: '#FF5C35',
-      icon: <Users size={18} className="text-white" />,
-      brandName: 'HUBSPOT'
+      icon: <Users size={20} className="text-white" />,
+      brandName: 'HUBSPOT',
+      processingType: 'crm'
     };
   }
   
-  // Salesforce - Blue cloud command station
+  // Salesforce - Customer Data Processor
   if (iconName.includes('salesforce')) {
     return {
-      shape: 'cloud',
+      shape: 'processor',
       primaryColor: '#00A1E0',
       secondaryColor: '#1798C1',
-      icon: <Users size={18} className="text-white" />,
-      brandName: 'SALESFORCE'
+      icon: <Users size={20} className="text-white" />,
+      brandName: 'SALESFORCE',
+      processingType: 'customer'
     };
   }
   
-  // Slack - Purple hash command station
+  // Slack - Communication Processor
   if (iconName.includes('slack')) {
     return {
-      shape: 'hash',
+      shape: 'processor',
       primaryColor: '#4A154B',
       secondaryColor: '#611F69',
-      icon: <MessageSquare size={18} className="text-white" />,
-      brandName: 'SLACK'
+      icon: <MessageSquare size={20} className="text-white" />,
+      brandName: 'SLACK',
+      processingType: 'messaging'
     };
   }
   
-  // Notion - Clean minimalist command station
+  // Notion - Document Processor
   if (iconName.includes('notion')) {
     return {
-      shape: 'clean',
+      shape: 'processor',
       primaryColor: '#000000',
       secondaryColor: '#37352F',
-      icon: <FileText size={18} className="text-white" />,
-      brandName: 'NOTION'
+      icon: <FileText size={20} className="text-white" />,
+      brandName: 'NOTION',
+      processingType: 'document'
     };
   }
   
-  // Stripe - Purple gradient command station
+  // Stripe - Payment Processor
   if (iconName.includes('stripe')) {
     return {
-      shape: 'stripe',
+      shape: 'processor',
       primaryColor: '#635BFF',
       secondaryColor: '#0A2540',
-      icon: <DollarSign size={18} className="text-white" />,
-      brandName: 'STRIPE'
+      icon: <DollarSign size={20} className="text-white" />,
+      brandName: 'STRIPE',
+      processingType: 'payment'
     };
   }
   
-  // Google Calendar - Blue calendar command station
+  // Google Calendar - Schedule Processor
   if (iconName.includes('calendar') || iconName.includes('google-calendar')) {
     return {
-      shape: 'calendar',
+      shape: 'processor',
       primaryColor: '#4285F4',
       secondaryColor: '#34A853',
-      icon: <Calendar size={18} className="text-white" />,
-      brandName: 'CALENDAR'
+      icon: <Calendar size={20} className="text-white" />,
+      brandName: 'CALENDAR',
+      processingType: 'schedule'
     };
   }
   
-  // Database stations - Green data vault
+  // Database - Data Storage Unit
   if (iconName.includes('database') || iconName.includes('sql') || iconName.includes('postgres')) {
     return {
-      shape: 'vault',
+      shape: 'storage',
       primaryColor: '#22C55E',
       secondaryColor: '#16A34A',
-      icon: <Database size={18} className="text-white" />,
-      brandName: 'DATABASE'
+      icon: <Database size={20} className="text-white" />,
+      brandName: 'DATABASE',
+      processingType: 'storage'
     };
   }
   
-  // Analytics - Indigo chart command station
+  // Analytics - Analysis Engine
   if (iconName.includes('analytics') || iconName.includes('mixpanel') || iconName.includes('amplitude')) {
     return {
-      shape: 'chart',
+      shape: 'analyzer',
       primaryColor: '#6366F1',
       secondaryColor: '#4F46E5',
-      icon: <BarChart3 size={18} className="text-white" />,
-      brandName: 'ANALYTICS'
+      icon: <BarChart3 size={20} className="text-white" />,
+      brandName: 'ANALYTICS',
+      processingType: 'analysis'
     };
   }
   
-  // AI integrations - Keep existing neural design
+  // AI integrations - AI Processing Unit
   if (iconName.includes('openai') || iconName.includes('ai') || iconName.includes('gpt')) {
     return {
-      shape: 'neural',
+      shape: 'ai-processor',
       primaryColor: '#10B981',
       secondaryColor: '#059669',
-      icon: <Bot size={18} className="text-white" />,
-      brandName: 'AI'
+      icon: <Bot size={20} className="text-white" />,
+      brandName: 'AI ENGINE',
+      processingType: 'intelligence'
     };
   }
   
-  // Default configurations
+  // Triggers - Input Controller
   if (integration.type === 'trigger') {
     return {
-      shape: 'trigger',
+      shape: 'controller',
       primaryColor: '#EAB308',
       secondaryColor: '#F59E0B',
-      icon: <Zap size={18} className="text-white" />,
-      brandName: 'TRIGGER'
+      icon: <Zap size={20} className="text-white" />,
+      brandName: 'TRIGGER',
+      processingType: 'input'
     };
   }
   
   return {
-    shape: 'standard',
+    shape: 'processor',
     primaryColor: integration.color || '#3B82F6',
     secondaryColor: integration.color || '#2563EB',
-    icon: <Workflow size={18} className="text-white" />,
-    brandName: 'STANDARD'
+    icon: <Workflow size={20} className="text-white" />,
+    brandName: 'PROCESSOR',
+    processingType: 'general'
   };
 }
 
-function getStationShape(shape: string) {
+function getIndustrialShape(shape: string) {
   switch (shape) {
-    case 'envelope':
+    case 'processor':
       return {
-        clipPath: 'polygon(0% 25%, 50% 0%, 100% 25%, 100% 100%, 0% 100%)',
-        transform: 'none'
+        borderRadius: '12px',
+        clipPath: 'none',
+        shape: 'rectangular'
       };
-    case 'gear':
+    case 'storage':
       return {
-        clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)',
-        transform: 'none'
+        borderRadius: '6px',
+        clipPath: 'none', 
+        shape: 'vault'
       };
-    case 'cloud':
+    case 'analyzer':
       return {
-        clipPath: 'polygon(25% 60%, 5% 60%, 5% 40%, 10% 25%, 25% 10%, 45% 10%, 55% 15%, 70% 10%, 90% 25%, 95% 40%, 95% 60%, 75% 60%, 75% 75%, 25% 75%)',
-        transform: 'none'
+        borderRadius: '8px',
+        clipPath: 'polygon(15% 0%, 85% 0%, 100% 15%, 100% 85%, 85% 100%, 15% 100%, 0% 85%, 0% 15%)',
+        shape: 'angular'
       };
-    case 'hash':
+    case 'ai-processor':
       return {
-        clipPath: 'polygon(20% 0%, 40% 0%, 45% 35%, 80% 35%, 80% 55%, 45% 55%, 50% 90%, 30% 90%, 25% 55%, 0% 55%, 0% 35%, 25% 35%)',
-        transform: 'none'
+        borderRadius: '50%',
+        clipPath: 'none',
+        shape: 'circular'
       };
-    case 'clean':
+    case 'controller':
       return {
-        clipPath: 'polygon(10% 0%, 90% 0%, 100% 10%, 100% 90%, 90% 100%, 10% 100%, 0% 90%, 0% 10%)',
-        transform: 'none'
-      };
-    case 'stripe':
-      return {
-        clipPath: 'polygon(15% 0%, 100% 0%, 85% 100%, 0% 100%)',
-        transform: 'none'
-      };
-    case 'calendar':
-      return {
-        clipPath: 'polygon(10% 15%, 90% 15%, 90% 25%, 100% 25%, 100% 90%, 90% 100%, 10% 100%, 0% 90%, 0% 25%, 10% 25%)',
-        transform: 'none'
-      };
-    case 'vault':
-      return {
+        borderRadius: '8px',
         clipPath: 'polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)',
-        transform: 'none'
-      };
-    case 'chart':
-      return {
-        clipPath: 'polygon(0% 100%, 0% 60%, 25% 40%, 50% 20%, 75% 30%, 100% 10%, 100% 100%)',
-        transform: 'none'
-      };
-    case 'neural':
-      return {
-        clipPath: 'circle(50% at 50% 50%)',
-        transform: 'none'
-      };
-    case 'trigger':
-      return {
-        clipPath: 'polygon(50% 0%, 80% 30%, 60% 30%, 60% 70%, 80% 70%, 50% 100%, 20% 70%, 40% 70%, 40% 30%, 20% 30%)',
-        transform: 'none'
+        shape: 'octagonal'
       };
     default:
       return {
-        clipPath: 'polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%)',
-        transform: 'none'
+        borderRadius: '12px',
+        clipPath: 'none',
+        shape: 'rectangular'
       };
   }
 }
@@ -270,10 +258,10 @@ export function FlowCard({
   
   // Get brand-specific configuration
   const brandConfig = getBrandConfig(integration);
-  const stationShape = getStationShape(brandConfig.shape);
+  const industrialShape = getIndustrialShape(brandConfig.shape);
   
-  // Check if this is an AI node for special Neural Command Center styling
-  const isAINode = brandConfig.shape === 'neural';
+  // Check if this is an AI node for special processing unit styling
+  const isAINode = brandConfig.shape === 'ai-processor';
 
   // Get command station configuration based on brand
   const getStationConfig = () => {
@@ -384,304 +372,287 @@ export function FlowCard({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Command Station Structure */}
+      {/* Enterprise Processing Unit Structure */}
       <div className="absolute inset-0 pointer-events-none">
-        {/* Brand-Specific Command Frame */}
+        {/* Industrial Frame with Metallic Finish */}
         <div 
-          className={`absolute rounded-lg border-2 ${isHovered ? 'animate-pulse' : ''}`}
+          className={`absolute border ${isHovered ? 'shadow-lg' : 'shadow-md'} transition-all duration-300`}
           style={{
-            width: '120px',
-            height: '120px',
+            width: '160px',
+            height: '80px',
             left: '50%',
             top: '50%',
-            transform: 'translate(-50%, -50%) rotate(0deg)',
-            clipPath: stationShape.clipPath,
-            borderColor: brandConfig.primaryColor,
-            backgroundColor: `${brandConfig.primaryColor}20`
+            transform: 'translate(-50%, -50%)',
+            borderRadius: industrialShape.borderRadius,
+            clipPath: industrialShape.clipPath,
+            borderColor: '#64748b',
+            background: `linear-gradient(135deg, 
+              #f8fafc 0%, 
+              #e2e8f0 25%, 
+              #cbd5e1 50%, 
+              #94a3b8 75%, 
+              #64748b 100%)`,
+            boxShadow: `0 2px 8px rgba(0,0,0,0.1), 
+                       inset 0 1px 0 rgba(255,255,255,0.2),
+                       0 0 0 1px ${brandConfig.primaryColor}40`
           }}
         />
         
-        {/* Neural Data Rings for AI nodes */}
-        {isAINode && (
-          <>
-            {[0, 1, 2].map((index) => (
-              <div
-                key={index}
-                className="absolute rounded-full border border-dashed animate-spin"
-                style={{
-                  width: `${140 + index * 25}px`,
-                  height: `${140 + index * 25}px`,
-                  left: '50%',
-                  top: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  borderColor: `rgba(255, 215, 0, ${0.3 - index * 0.1})`,
-                  animationDuration: `${15 + index * 10}s`,
-                  animationDelay: `${index * 2}s`,
-                  animationDirection: index % 2 === 0 ? 'normal' : 'reverse'
-                }}
-              >
-                <div
-                  className="absolute w-2 h-2 rounded-full bg-yellow-400"
-                  style={{
-                    top: '-4px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    boxShadow: '0 0 10px #ffd700'
-                  }}
-                />
-              </div>
-            ))}
-          </>
-        )}
+        {/* Brand Accent Strip */}
+        <div 
+          className="absolute"
+          style={{
+            width: '160px',
+            height: '4px',
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%) translateY(-38px)',
+            borderRadius: '2px',
+            background: `linear-gradient(90deg, 
+              transparent 0%, 
+              ${brandConfig.primaryColor} 20%, 
+              ${brandConfig.primaryColor} 80%, 
+              transparent 100%)`,
+            boxShadow: `0 0 6px ${brandConfig.primaryColor}60`
+          }}
+        />
         
-        {/* Tactical Grid Overlay */}
-        <div className="absolute inset-0 opacity-30">
-          {Array.from({ length: 5 }).map((_, i) => (
+        {/* Processing Status Indicators */}
+        <div className="absolute flex space-x-1" style={{
+          left: '50%',
+          top: '50%',
+          transform: 'translate(-50%, -50%) translateY(25px)'
+        }}>
+          {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="absolute border-dashed border-l border-b"
+              className={`w-1.5 h-1.5 rounded-full ${isConfigured ? 'animate-pulse' : ''}`}
               style={{
-                left: `${i * 20}%`,
-                top: `${i * 20}%`,
-                width: '20%',
-                height: '20%',
-                borderColor: brandConfig.primaryColor + '30'
+                backgroundColor: hasError ? '#ef4444' : 
+                               isConfigured ? brandConfig.primaryColor : '#94a3b8',
+                opacity: hasError ? 1 : isConfigured ? 0.8 : 0.4,
+                animationDelay: `${i * 200}ms`
               }}
             />
           ))}
         </div>
+        
+        {/* AI Processing Rings */}
+        {isAINode && (
+          <div className="absolute inset-0">
+            {[0, 1].map((index) => (
+              <div
+                key={index}
+                className="absolute rounded-full border animate-spin"
+                style={{
+                  width: `${120 + index * 20}px`,
+                  height: `${120 + index * 20}px`,
+                  left: '50%',
+                  top: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  borderColor: `${brandConfig.primaryColor}30`,
+                  borderStyle: 'dashed',
+                  animationDuration: `${8 + index * 4}s`,
+                  animationDirection: index % 2 === 0 ? 'normal' : 'reverse'
+                }}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Slipspace Connection Ports - Docked to Station Hull */}
+      {/* Industrial Connection Ports */}
       {integration.type !== 'trigger' && (
         <div
-          className="absolute left-0 top-1/2 w-8 h-8 border-2 border-background 
-                     cursor-crosshair hover:scale-125 transition-all duration-300 flex items-center justify-center
-                     shadow-lg backdrop-blur-sm"
+          className="absolute left-0 top-1/2 w-6 h-6 border border-slate-400 
+                     cursor-crosshair hover:scale-110 transition-all duration-200 flex items-center justify-center
+                     shadow-sm"
           style={{ 
-            transform: 'translateY(-50%)',
-            clipPath: 'circle(50% at 50% 50%)',
-            background: `radial-gradient(circle, ${brandConfig.primaryColor}60, ${brandConfig.primaryColor}30)`,
-            borderColor: brandConfig.primaryColor,
-            boxShadow: `0 0 15px ${brandConfig.primaryColor}50, inset 0 0 10px ${brandConfig.primaryColor}20`
+            transform: 'translateY(-50%) translateX(-3px)',
+            borderRadius: '3px',
+            background: `linear-gradient(135deg, #f8fafc, #e2e8f0)`,
+            boxShadow: `inset 0 1px 2px rgba(0,0,0,0.1), 0 0 3px ${brandConfig.primaryColor}40`
           }}
           onMouseDown={handleConnectionStart('input')}
           onMouseUp={handleConnectionEnd('input')}
         >
-          <div className="absolute inset-1 animate-pulse rounded-full"
-               style={{ 
-                 background: `radial-gradient(circle, ${brandConfig.primaryColor}40, transparent)` 
-               }} />
-          <ArrowLeft className="h-3 w-3 z-10" style={{ color: brandConfig.primaryColor }} />
+          <div className="w-3 h-3 border border-slate-300 rounded-sm bg-white/80 flex items-center justify-center">
+            <div className="w-1 h-1 rounded-full" style={{ backgroundColor: brandConfig.primaryColor }} />
+          </div>
         </div>
       )}
 
       <div
-        className="absolute right-0 top-1/2 w-8 h-8 border-2 border-background 
-                   cursor-crosshair hover:scale-125 transition-all duration-300 flex items-center justify-center
-                   shadow-lg backdrop-blur-sm"
+        className="absolute right-0 top-1/2 w-6 h-6 border border-slate-400 
+                   cursor-crosshair hover:scale-110 transition-all duration-200 flex items-center justify-center
+                   shadow-sm"
         style={{ 
-          transform: 'translateY(-50%)',
-          clipPath: 'circle(50% at 50% 50%)',
-          background: `radial-gradient(circle, ${brandConfig.primaryColor}60, ${brandConfig.primaryColor}30)`,
-          borderColor: brandConfig.primaryColor,
-          boxShadow: `0 0 15px ${brandConfig.primaryColor}50, inset 0 0 10px ${brandConfig.primaryColor}20`
+          transform: 'translateY(-50%) translateX(3px)',
+          borderRadius: '3px',
+          background: `linear-gradient(135deg, #f8fafc, #e2e8f0)`,
+          boxShadow: `inset 0 1px 2px rgba(0,0,0,0.1), 0 0 3px ${brandConfig.primaryColor}40`
         }}
         onMouseDown={handleConnectionStart('output')}
         onMouseUp={handleConnectionEnd('output')}
       >
-        <div className="absolute inset-1 animate-pulse rounded-full"
-             style={{ 
-               background: `radial-gradient(circle, ${brandConfig.primaryColor}40, transparent)` 
-             }} />
-        <ArrowRight className="h-3 w-3 z-10" style={{ color: brandConfig.primaryColor }} />
+        <div className="w-3 h-3 border border-slate-300 rounded-sm bg-white/80 flex items-center justify-center">
+          <div className="w-1 h-1 rounded-full" style={{ backgroundColor: brandConfig.primaryColor }} />
+        </div>
       </div>
 
-      {/* Main Command Station Core */}
+      {/* Enterprise Processing Unit Core */}
       <div 
         className={`
-          w-24 h-24 cursor-grab active:cursor-grabbing relative overflow-hidden
-          border-2 backdrop-blur-md transition-all duration-500
-          ${getStationStyles()}
-          ${isHovered ? 'scale-110' : 'scale-100'}
-          ${isDragging ? 'scale-125' : ''}
-          ${isSelected ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''}
+          w-36 h-16 cursor-grab active:cursor-grabbing relative overflow-hidden
+          transition-all duration-300
+          ${isHovered ? 'scale-105' : 'scale-100'}
+          ${isDragging ? 'scale-110' : ''}
+          ${isSelected ? 'ring-2 ring-primary ring-offset-1 ring-offset-background' : ''}
         `}
         style={{
-          clipPath: stationShape.clipPath,
-          background: isAINode
-            ? 'radial-gradient(circle, rgba(255, 215, 0, 0.3), rgba(255, 215, 0, 0.1), rgba(0, 0, 0, 0.1))'
-            : `linear-gradient(135deg, ${brandConfig.primaryColor}40, ${brandConfig.secondaryColor}20, rgba(0, 0, 0, 0.05))`,
-          borderColor: brandConfig.primaryColor,
-          boxShadow: isAINode 
-            ? '0 0 35px rgba(255, 215, 0, 0.5), inset 0 0 25px rgba(255, 215, 0, 0.2)'
-            : `0 0 25px ${brandConfig.primaryColor}50, inset 0 0 20px ${brandConfig.primaryColor}30`
+          borderRadius: industrialShape.borderRadius,
+          clipPath: industrialShape.clipPath,
+          background: `linear-gradient(135deg, 
+            #f8fafc 0%, 
+            #e2e8f0 25%, 
+            #cbd5e1 50%, 
+            #94a3b8 100%)`,
+          border: '1px solid #64748b',
+          boxShadow: `0 2px 8px rgba(0,0,0,0.1), 
+                     inset 0 1px 0 rgba(255,255,255,0.3),
+                     0 0 0 1px ${brandConfig.primaryColor}60`
         }}
       >
-        {/* Neural Command Center Pattern */}
-        {isAINode && (
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute inset-2 rounded-full border border-yellow-400/30 animate-pulse" />
-            <div className="absolute inset-4 rounded-full border border-yellow-300/40 animate-pulse delay-500" />
-            {/* Forerunner-style neural pathways */}
-            <div className="absolute top-1/2 left-1/2 w-0.5 h-8 bg-yellow-400/50 transform -translate-x-1/2 -translate-y-1/2 rotate-0" />
-            <div className="absolute top-1/2 left-1/2 w-0.5 h-8 bg-yellow-400/50 transform -translate-x-1/2 -translate-y-1/2 rotate-60" />
-            <div className="absolute top-1/2 left-1/2 w-0.5 h-8 bg-yellow-400/50 transform -translate-x-1/2 -translate-y-1/2 rotate-120" />
-            <div className="absolute top-1/2 left-1/2 w-2 h-2 rounded-full bg-yellow-400 transform -translate-x-1/2 -translate-y-1/2 animate-pulse" />
-          </div>
-        )}
-
-        {/* Holographic Command Interface */}
+        {/* Industrial Processing Display */}
         <div className="absolute inset-0 flex items-center justify-center">
           <div 
-            className={`p-3 ${isAINode ? 'rounded-full animate-pulse' : ''} flex items-center justify-center`}
+            className="w-8 h-8 flex items-center justify-center rounded-lg border"
             style={{ 
-              backgroundColor: isAINode ? 'rgba(255, 215, 0, 0.15)' : `${brandConfig.primaryColor}20`,
-              clipPath: stationShape.clipPath
+              backgroundColor: `${brandConfig.primaryColor}15`,
+              borderColor: `${brandConfig.primaryColor}40`,
+              boxShadow: `inset 0 1px 2px ${brandConfig.primaryColor}20`
             }}
           >
-            {/* Brand-specific icon */}
-            <div className="relative flex items-center justify-center">
-              {brandConfig.icon}
-              {/* Brand name indicator */}
-              <div className="absolute -bottom-4 text-[8px] font-mono text-white/80 whitespace-nowrap">
-                {brandConfig.brandName}
-              </div>
-            </div>
+            {brandConfig.icon}
           </div>
         </div>
         
-        {/* Tactical Readouts */}
-        <div className="absolute inset-0 text-[8px] font-mono text-white/60 overflow-hidden">
-          <div className="absolute top-1 left-1">PWR</div>
-          <div className="absolute top-1 right-1">SYS</div>
-          <div className="absolute bottom-1 left-1">COM</div>
-          <div className="absolute bottom-1 right-1">RDY</div>
-        </div>
-
-        {/* Holographic Status Indicators */}
-        <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
-          <div className={`flex items-center justify-center w-4 h-4 rounded-full border ${getStatusColor()}`}
-               style={{ 
-                 backgroundColor: hasError ? 'rgba(239, 68, 68, 0.2)' : isConfigured ? 'rgba(34, 197, 94, 0.2)' : 'rgba(107, 114, 128, 0.2)',
-                 borderColor: hasError ? '#ef4444' : isConfigured ? '#22c55e' : '#6b7280'
-               }}>
-            {React.cloneElement(getStatusIcon(), { className: 'h-2 w-2' })}
+        {/* Processing Type Label */}
+        <div className="absolute bottom-0 left-0 right-0 text-center pb-1">
+          <div className="text-[9px] font-mono font-semibold text-slate-600 uppercase tracking-wide">
+            {brandConfig.processingType}
           </div>
         </div>
 
-        {/* Command Station Designation */}
-        <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-center">
-          <div className="text-xs font-mono text-muted-foreground/80 truncate max-w-24">
-            {isAINode ? 'NEURAL-CMD' : `CMD-${label.slice(0, 8).toUpperCase()}`}
+        {/* Brand Label */}
+        <div className="absolute top-0 left-0 right-0 text-center pt-1">
+          <div className="text-[8px] font-mono font-bold text-slate-700 uppercase tracking-wider">
+            {brandConfig.brandName}
           </div>
-          <div className="text-[10px] font-mono text-primary/60">
-            {stationConfig.faction.toUpperCase()} CLASS
-          </div>
-          {config.executionCount && (
-            <div className="text-[9px] font-mono text-green-400/80">
-              OP: {config.executionCount}
-            </div>
-          )}
         </div>
 
-        {/* Actions Menu - Tactical Panel */}
-        <div className={`absolute -top-8 -right-2 transition-opacity ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+        {/* Status Indicator */}
+        <div className="absolute top-1 right-1">
+          <div 
+            className="w-2 h-2 rounded-full border"
+            style={{ 
+              backgroundColor: hasError ? '#ef4444' : isConfigured ? brandConfig.primaryColor : '#94a3b8',
+              borderColor: hasError ? '#dc2626' : isConfigured ? brandConfig.primaryColor : '#64748b',
+              boxShadow: hasError ? '0 0 4px #ef4444' : isConfigured ? `0 0 4px ${brandConfig.primaryColor}` : 'none'
+            }}
+          />
+        </div>
+
+        {/* AI Processing Indicators */}
+        {isAINode && (
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-1 left-1 w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
+            <div className="absolute bottom-1 right-1 w-1 h-1 rounded-full bg-emerald-400 animate-pulse delay-500" />
+            <div className="absolute top-1/2 left-1 w-1 h-1 rounded-full bg-yellow-400 animate-pulse delay-1000" />
+          </div>
+        )}
+
+        {/* Data Flow Animation */}
+        {isConfigured && (
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div 
+              className="absolute top-1/2 left-0 w-1 h-0.5 animate-pulse"
+              style={{ 
+                backgroundColor: brandConfig.primaryColor,
+                transform: 'translateY(-50%)',
+                animation: 'pulse 2s infinite'
+              }}
+            />
+            <div 
+              className="absolute top-1/2 right-0 w-1 h-0.5 animate-pulse"
+              style={{ 
+                backgroundColor: brandConfig.primaryColor,
+                transform: 'translateY(-50%)',
+                animation: 'pulse 2s infinite 0.5s'
+              }}
+            />
+          </div>
+        )}
+
+        {/* Professional Actions Menu */}
+        <div className={`absolute -top-7 -right-1 transition-opacity ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 w-6 p-0 rounded-full backdrop-blur-sm"
-                style={{ 
-                  backgroundColor: `${brandConfig.primaryColor}20`,
-                  border: `1px solid ${brandConfig.primaryColor}40`
-                }}
+                className="h-5 w-5 p-0 rounded border bg-white/90 hover:bg-white"
                 onClick={(e) => e.stopPropagation()}
               >
-                <MoreHorizontal className="h-3 w-3" style={{ color: brandConfig.primaryColor }} />
+                <MoreHorizontal className="h-3 w-3 text-slate-600" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40 backdrop-blur-md bg-background/95">
+            <DropdownMenuContent align="end" className="w-40">
               <DropdownMenuItem onClick={() => onConfigClick(node.id)}>
                 <Settings className="h-3 w-3 mr-2" />
-                Configure Node
+                Configure
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onDuplicate(node.id)}>
                 <Copy className="h-3 w-3 mr-2" />
-                Duplicate Station
+                Duplicate
               </DropdownMenuItem>
               <DropdownMenuItem 
                 onClick={() => onDelete(node.id)}
                 className="text-destructive focus:text-destructive"
               >
                 <Trash2 className="h-3 w-3 mr-2" />
-                Decommission
+                Remove
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
 
-        {/* Energy Field Effects */}
-        {isDragging && (
-          <>
-            <div className="absolute -top-2 -left-2 w-2 h-2 rounded-full animate-ping"
-                 style={{ backgroundColor: brandConfig.primaryColor }} />
-            <div className="absolute -top-2 -right-2 w-1.5 h-1.5 rounded-full animate-pulse delay-100"
-                 style={{ backgroundColor: `${brandConfig.primaryColor}70` }} />
-            <div className="absolute -bottom-2 -left-2 w-1.5 h-1.5 rounded-full animate-pulse delay-200"
-                 style={{ backgroundColor: `${brandConfig.primaryColor}70` }} />
-            <div className="absolute -bottom-2 -right-2 w-1 h-1 rounded-full animate-ping delay-300"
-                 style={{ backgroundColor: `${brandConfig.primaryColor}50` }} />
-          </>
-        )}
-
-        {/* Holographic Scan Lines */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div 
-            className="absolute inset-0 opacity-30"
-            style={{
-              background: `repeating-linear-gradient(
-                45deg,
-                transparent,
-                transparent 3px,
-                ${brandConfig.primaryColor}30 3px,
-                ${brandConfig.primaryColor}30 4px
-              )`
-            }}
-          />
-          <div 
-            className="absolute inset-0 opacity-20 animate-pulse"
-            style={{
-              background: `repeating-linear-gradient(
-                -45deg,
-                transparent,
-                transparent 2px,
-                ${brandConfig.primaryColor}20 2px,
-                ${brandConfig.primaryColor}20 3px
-              )`
-            }}
-          />
+        {/* Unit Label */}
+        <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-center">
+          <div className="text-xs font-medium text-slate-700 truncate max-w-32">
+            {label}
+          </div>
+          {config.executionCount && (
+            <div className="text-[9px] text-slate-500">
+              Processed: {config.executionCount}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Command Station Energy Field */}
+      {/* Professional Hover Effect */}
       {isHovered && (
         <div 
-          className="absolute inset-0 pointer-events-none animate-pulse"
+          className="absolute inset-0 pointer-events-none"
           style={{
-            width: '140px',
-            height: '140px',
+            width: '170px',
+            height: '90px',
             left: '50%',
             top: '50%',
             transform: 'translate(-50%, -50%)',
-            clipPath: stationShape.clipPath,
-            background: isAINode 
-              ? 'radial-gradient(circle, rgba(255, 215, 0, 0.3), transparent 70%)'
-              : `radial-gradient(circle, ${brandConfig.primaryColor}40, transparent 70%)`,
-            boxShadow: isAINode 
-              ? '0 0 50px rgba(255, 215, 0, 0.4)'
-              : `0 0 40px ${brandConfig.primaryColor}50`
+            borderRadius: industrialShape.borderRadius,
+            background: `radial-gradient(circle, ${brandConfig.primaryColor}15, transparent 70%)`,
+            boxShadow: `0 0 20px ${brandConfig.primaryColor}30`
           }}
         />
       )}
