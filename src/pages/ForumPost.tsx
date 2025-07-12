@@ -91,7 +91,9 @@ const ForumPost = () => {
   const loadPost = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      
+      // First get the post
+      const { data: postData, error: postError } = await supabase
         .from('forum_posts')
         .select(`
           *,
@@ -100,25 +102,38 @@ const ForumPost = () => {
         .eq('id', postId)
         .single();
 
-      if (error) throw error;
+      if (postError) throw postError;
 
-      if (data) {
+      let authorData = null;
+      
+      // Then get the author profile if author_id exists
+      if (postData?.author_id) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('name, email')
+          .eq('user_id', postData.author_id)
+          .single();
+        
+        authorData = profile;
+      }
+
+      if (postData) {
         setPost({
-          id: data.id,
-          title: data.title,
-          content: data.content,
-          category_id: data.category_id,
-          author_id: data.author_id,
-          is_pinned: data.is_pinned,
-          is_locked: data.is_locked,
-          is_solved: data.is_solved,
-          priority: data.priority,
-          tags: data.tags || [],
-          view_count: data.view_count,
-          vote_score: data.vote_score,
-          created_at: data.created_at,
-          category: data.category,
-          author: null
+          id: postData.id,
+          title: postData.title,
+          content: postData.content,
+          category_id: postData.category_id,
+          author_id: postData.author_id,
+          is_pinned: postData.is_pinned,
+          is_locked: postData.is_locked,
+          is_solved: postData.is_solved,
+          priority: postData.priority,
+          tags: postData.tags || [],
+          view_count: postData.view_count,
+          vote_score: postData.vote_score,
+          created_at: postData.created_at,
+          category: postData.category,
+          author: authorData
         });
       }
     } catch (error) {
@@ -203,14 +218,31 @@ const ForumPost = () => {
 
   const loadComments = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: commentsData, error } = await supabase
         .from('forum_comments')
         .select('*')
         .eq('post_id', postId)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      setComments(data || []);
+
+      // Get author profiles for all comments
+      const commentsWithAuthors = await Promise.all(
+        (commentsData || []).map(async (comment) => {
+          let author = null;
+          if (comment.author_id) {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('name, email')
+              .eq('user_id', comment.author_id)
+              .single();
+            author = profile;
+          }
+          return { ...comment, author };
+        })
+      );
+
+      setComments(commentsWithAuthors);
     } catch (error) {
       console.error('Failed to load comments:', error);
     }
