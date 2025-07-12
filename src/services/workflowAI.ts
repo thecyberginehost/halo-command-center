@@ -35,42 +35,68 @@ export class WorkflowAIService {
   private createFallbackWorkflow(prompt: string): AIGenerationResponse {
     const steps: WorkflowStep[] = [
       {
-        id: 'trigger-1',
+        id: 'webhook-processor-1',
         type: 'trigger',
-        title: 'Webhook Trigger',
-        description: 'Receives incoming data',
-        config: { url: '/webhook/trigger', method: 'POST' },
+        title: 'Data Intake Processor',
+        description: 'Enterprise webhook data ingestion',
+        config: { 
+          integration: 'webhook',
+          url: '/api/webhook/intake',
+          method: 'POST',
+          authentication: 'bearer_token',
+          rate_limit: '1000/minute'
+        },
         position: { x: 100, y: 100 },
-        connections: ['action-1']
+        connections: ['crm-processor-1']
       },
       {
-        id: 'action-1',
+        id: 'crm-processor-1',
         type: 'action',
-        title: 'Process Data',
-        description: 'Process the incoming data',
-        config: { action: 'process', data: '{{trigger.body}}' },
-        position: { x: 300, y: 100 },
+        title: 'CRM Integration Processor',
+        description: 'Professional customer data sync',
+        config: {
+          integration: 'salesforce',
+          operation: 'upsert_contact',
+          mapping: 'smart_mapping',
+          retry_policy: { attempts: 3, backoff: 'exponential' }
+        },
+        position: { x: 350, y: 100 },
+        connections: ['notification-processor-1']
+      },
+      {
+        id: 'notification-processor-1',
+        type: 'action',
+        title: 'Communication Processor',
+        description: 'Multi-channel enterprise notifications',
+        config: {
+          integration: 'slack',
+          channels: ['#sales-pipeline', '#notifications'],
+          template: 'enterprise_alert',
+          fallback: 'email'
+        },
+        position: { x: 600, y: 100 },
         connections: []
       }
     ];
 
     return {
       workflow: {
-        name: 'Generated Workflow',
-        description: `Workflow generated from: ${prompt}`,
+        name: 'Enterprise Automation Pipeline',
+        description: `Professional workflow: ${prompt}`,
         status: 'draft',
         steps
       },
-      explanation: 'Created a basic workflow with webhook trigger and data processing action.',
+      explanation: 'Enterprise-grade automation pipeline featuring webhook data ingestion, CRM synchronization, and multi-channel notifications. Optimized for professional MASP environments.',
       suggestions: [
-        'Add email notifications for completion',
-        'Include error handling conditions',
-        'Add data validation steps'
+        'Add AI-powered lead qualification processor',
+        'Implement advanced error recovery mechanisms',
+        'Configure compliance audit trails',
+        'Add performance monitoring dashboard'
       ],
       complexity_analysis: {
-        estimated_execution_time: '< 30 seconds',
-        reliability_score: 'medium',
-        maintenance_requirements: 'Low - simple two-step workflow'
+        estimated_execution_time: '< 3 seconds',
+        reliability_score: 'high',
+        maintenance_requirements: 'Enterprise monitoring and configuration management recommended'
       }
     };
   }

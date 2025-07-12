@@ -34,6 +34,7 @@ import {
   Server
 } from 'lucide-react';
 import { VisualWorkflowNode } from '@/types/visualWorkflow';
+import { getProcessorTypeForIntegration, getIntegrationByType } from '@/lib/workflow/enterpriseIntegrations';
 
 interface FlowCardProps {
   node: VisualWorkflowNode;
@@ -50,7 +51,71 @@ interface FlowCardProps {
 }
 
 function getBrandConfig(integration: any) {
-  const iconName = integration.id || integration.displayName?.toLowerCase() || '';
+  const integrationId = integration.id || integration.displayName?.toLowerCase() || '';
+  
+  // Get enterprise integration configuration
+  const enterpriseIntegration = getIntegrationByType(integrationId);
+  const processorType = getProcessorTypeForIntegration(integrationId);
+  
+  if (enterpriseIntegration) {
+    // Map enterprise integration to visual brand config
+    const brandConfig = {
+      shape: 'processor',
+      primaryColor: '#3B82F6',
+      secondaryColor: '#2563EB',
+      icon: <Workflow size={20} className="text-white" />,
+      brandName: enterpriseIntegration.name.toUpperCase(),
+      processingType: enterpriseIntegration.category
+    };
+
+    // Override with specific brand colors and icons
+    switch (enterpriseIntegration.category) {
+      case 'communication':
+        brandConfig.primaryColor = '#4A154B';
+        brandConfig.secondaryColor = '#611F69';
+        brandConfig.icon = <MessageSquare size={20} className="text-white" />;
+        break;
+      case 'crm':
+        brandConfig.primaryColor = '#FF7A59';
+        brandConfig.secondaryColor = '#FF5C35';
+        brandConfig.icon = <Users size={20} className="text-white" />;
+        break;
+      case 'email':
+        brandConfig.primaryColor = '#EA4335';
+        brandConfig.secondaryColor = '#FBBC04';
+        brandConfig.icon = <Mail size={20} className="text-white" />;
+        break;
+      case 'database':
+        brandConfig.shape = 'storage';
+        brandConfig.primaryColor = '#22C55E';
+        brandConfig.secondaryColor = '#16A34A';
+        brandConfig.icon = <Database size={20} className="text-white" />;
+        break;
+      case 'storage':
+        brandConfig.shape = 'storage';
+        brandConfig.primaryColor = '#0891B2';
+        brandConfig.secondaryColor = '#0E7490';
+        brandConfig.icon = <Cloud size={20} className="text-white" />;
+        break;
+      case 'ai':
+        brandConfig.shape = 'ai-processor';
+        brandConfig.primaryColor = '#10B981';
+        brandConfig.secondaryColor = '#059669';
+        brandConfig.icon = <Bot size={20} className="text-white" />;
+        break;
+      case 'trigger':
+        brandConfig.shape = 'controller';
+        brandConfig.primaryColor = '#EAB308';
+        brandConfig.secondaryColor = '#F59E0B';
+        brandConfig.icon = <Webhook size={20} className="text-white" />;
+        break;
+    }
+
+    return brandConfig;
+  }
+
+  // Fallback configurations for legacy integrations
+  const iconName = integrationId;
   
   // Gmail - Email Processing Unit
   if (iconName.includes('gmail')) {
@@ -61,114 +126,6 @@ function getBrandConfig(integration: any) {
       icon: <Mail size={20} className="text-white" />,
       brandName: 'GMAIL',
       processingType: 'email'
-    };
-  }
-  
-  // HubSpot - CRM Processing Unit
-  if (iconName.includes('hubspot')) {
-    return {
-      shape: 'processor',
-      primaryColor: '#FF7A59',
-      secondaryColor: '#FF5C35',
-      icon: <Users size={20} className="text-white" />,
-      brandName: 'HUBSPOT',
-      processingType: 'crm'
-    };
-  }
-  
-  // Salesforce - Customer Data Processor
-  if (iconName.includes('salesforce')) {
-    return {
-      shape: 'processor',
-      primaryColor: '#00A1E0',
-      secondaryColor: '#1798C1',
-      icon: <Users size={20} className="text-white" />,
-      brandName: 'SALESFORCE',
-      processingType: 'customer'
-    };
-  }
-  
-  // Slack - Communication Processor
-  if (iconName.includes('slack')) {
-    return {
-      shape: 'processor',
-      primaryColor: '#4A154B',
-      secondaryColor: '#611F69',
-      icon: <MessageSquare size={20} className="text-white" />,
-      brandName: 'SLACK',
-      processingType: 'messaging'
-    };
-  }
-  
-  // Notion - Document Processor
-  if (iconName.includes('notion')) {
-    return {
-      shape: 'processor',
-      primaryColor: '#000000',
-      secondaryColor: '#37352F',
-      icon: <FileText size={20} className="text-white" />,
-      brandName: 'NOTION',
-      processingType: 'document'
-    };
-  }
-  
-  // Stripe - Payment Processor
-  if (iconName.includes('stripe')) {
-    return {
-      shape: 'processor',
-      primaryColor: '#635BFF',
-      secondaryColor: '#0A2540',
-      icon: <DollarSign size={20} className="text-white" />,
-      brandName: 'STRIPE',
-      processingType: 'payment'
-    };
-  }
-  
-  // Google Calendar - Schedule Processor
-  if (iconName.includes('calendar') || iconName.includes('google-calendar')) {
-    return {
-      shape: 'processor',
-      primaryColor: '#4285F4',
-      secondaryColor: '#34A853',
-      icon: <Calendar size={20} className="text-white" />,
-      brandName: 'CALENDAR',
-      processingType: 'schedule'
-    };
-  }
-  
-  // Database - Data Storage Unit
-  if (iconName.includes('database') || iconName.includes('sql') || iconName.includes('postgres')) {
-    return {
-      shape: 'storage',
-      primaryColor: '#22C55E',
-      secondaryColor: '#16A34A',
-      icon: <Database size={20} className="text-white" />,
-      brandName: 'DATABASE',
-      processingType: 'storage'
-    };
-  }
-  
-  // Analytics - Analysis Engine
-  if (iconName.includes('analytics') || iconName.includes('mixpanel') || iconName.includes('amplitude')) {
-    return {
-      shape: 'analyzer',
-      primaryColor: '#6366F1',
-      secondaryColor: '#4F46E5',
-      icon: <BarChart3 size={20} className="text-white" />,
-      brandName: 'ANALYTICS',
-      processingType: 'analysis'
-    };
-  }
-  
-  // AI integrations - AI Processing Unit
-  if (iconName.includes('openai') || iconName.includes('ai') || iconName.includes('gpt')) {
-    return {
-      shape: 'ai-processor',
-      primaryColor: '#10B981',
-      secondaryColor: '#059669',
-      icon: <Bot size={20} className="text-white" />,
-      brandName: 'AI ENGINE',
-      processingType: 'intelligence'
     };
   }
   

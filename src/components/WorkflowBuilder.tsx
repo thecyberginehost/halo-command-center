@@ -5,13 +5,14 @@ import { Label } from '@/components/ui/label';
 import { Wand2 } from 'lucide-react';
 import { DragEndEvent } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
-import { Workflow, WorkflowStep } from '@/types/workflow';
+import { Workflow, WorkflowStep, AIGenerationResponse } from '@/types/workflow';
 import { WorkflowAIService } from '@/services/workflowAI';
 import { useToast } from '@/hooks/use-toast';
 import { useTenant } from '@/contexts/TenantContext';
 import { WorkflowRecord } from '@/types/tenant';
 import { WorkflowInputPanel } from './workflow/WorkflowInputPanel';
 import { WorkflowPreviewPanel } from './workflow/WorkflowPreviewPanel';
+import { EnterpriseAIWorkflowGenerator } from './workflow/EnterpriseAIWorkflowGenerator';
 import { VisualWorkflowCanvas } from './workflow/visual/VisualWorkflowCanvas';
 
 interface WorkflowBuilderProps {
@@ -33,6 +34,7 @@ const WorkflowBuilder = ({ onClose, initialWorkflow }: WorkflowBuilderProps) => 
   const [isDeveloperMode, setIsDeveloperMode] = useState(false);
   const [customCode, setCustomCode] = useState('');
   const [isVisualMode, setIsVisualMode] = useState(true);
+  const [isAIGeneratorMode, setIsAIGeneratorMode] = useState(true);
   const { toast } = useToast();
   const { currentTenant } = useTenant();
 
@@ -124,6 +126,26 @@ const WorkflowBuilder = ({ onClose, initialWorkflow }: WorkflowBuilderProps) => 
     }
   };
 
+  const handleAIWorkflowGenerated = (response: AIGenerationResponse) => {
+    const newWorkflow: Workflow = {
+      ...response.workflow,
+      id: `workflow-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      createdBy: 'current-user',
+      executionCount: 0
+    };
+
+    setWorkflow(newWorkflow);
+    setExplanation(response.explanation);
+    setSuggestions(response.suggestions);
+    setComplexityAnalysis(response.complexity_analysis || null);
+    
+    // Switch to visual mode to show the generated pipeline
+    setIsVisualMode(true);
+    setIsAIGeneratorMode(false);
+  };
+
   const handleSaveWorkflow = () => {
     if (!workflow) return;
     
@@ -175,7 +197,14 @@ const WorkflowBuilder = ({ onClose, initialWorkflow }: WorkflowBuilderProps) => 
       </div>
 
       <div className="flex-1 flex overflow-hidden">
-        {isVisualMode ? (
+        {isAIGeneratorMode ? (
+          <div className="flex-1 p-6 overflow-auto">
+            <EnterpriseAIWorkflowGenerator 
+              onWorkflowGenerated={handleAIWorkflowGenerated}
+              onClose={() => setIsAIGeneratorMode(false)}
+            />
+          </div>
+        ) : isVisualMode ? (
           <VisualWorkflowCanvas 
             onSaveWorkflow={handleSaveWorkflow}
           />
