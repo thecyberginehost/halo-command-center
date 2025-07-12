@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -80,6 +81,7 @@ const iconMap = {
 const Forum = () => {
   usePageTitle('Community Forum');
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [categories, setCategories] = useState<ForumCategory[]>([]);
   const [posts, setPosts] = useState<ForumPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -651,23 +653,30 @@ const Forum = () => {
                           {post.is_locked && <Lock className="h-4 w-4 text-gray-600" />}
                           {post.is_solved && <CheckCircle className="h-4 w-4 text-green-600" />}
                            <h3 
-                             className="text-lg font-semibold hover:text-primary cursor-pointer"
-                             onClick={() => {
-                               setSelectedPost(post);
-                               setShowPostDetail(true);
-                             }}
-                           >
-                             {post.title}
-                           </h3>
+                              className="text-lg font-semibold hover:text-primary cursor-pointer"
+                              onClick={() => navigate(`/forum/${post.id}`)}
+                            >
+                              {post.title}
+                            </h3>
                         </div>
                         <Badge className={getPriorityColor(post.priority)}>
                           {post.priority.toUpperCase()}
                         </Badge>
                       </div>
 
-                      <p className="text-muted-foreground mb-3 line-clamp-2">
-                        {post.content}
-                      </p>
+                      <div className="text-muted-foreground mb-3">
+                        <p className="line-clamp-2">{post.content}</p>
+                        {post.content.length > 200 && (
+                          <Button 
+                            variant="link" 
+                            size="sm" 
+                            className="p-0 h-auto mt-1 text-primary hover:text-primary/80"
+                            onClick={() => navigate(`/forum/${post.id}`)}
+                          >
+                            See more...
+                          </Button>
+                        )}
+                      </div>
 
                        <div className="flex items-center justify-between">
                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
