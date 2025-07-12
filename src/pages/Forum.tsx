@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { 
   Search, 
   Plus, 
@@ -25,13 +26,18 @@ import {
   Calendar,
   User,
   ArrowUp,
-  ArrowDown
+  ArrowDown,
+  Edit,
+  Trash2,
+  Reply,
+  MoreHorizontal
 } from 'lucide-react';
 import Layout from '@/components/Layout';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, isAfter, subHours } from 'date-fns';
+import { PostDetail } from '@/components/forum/PostDetail';
 
 interface ForumCategory {
   id: string;
@@ -81,6 +87,11 @@ const Forum = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'newest' | 'popular' | 'votes'>('newest');
   const [showCreatePost, setShowCreatePost] = useState(false);
+  const [editingPost, setEditingPost] = useState<ForumPost | null>(null);
+  const [showEditPost, setShowEditPost] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [selectedPost, setSelectedPost] = useState<ForumPost | null>(null);
+  const [showPostDetail, setShowPostDetail] = useState(false);
   
   // Create post form
   const [newPost, setNewPost] = useState({
@@ -91,10 +102,25 @@ const Forum = () => {
     tags: [] as string[]
   });
 
+  // Edit post form
+  const [editPost, setEditPost] = useState({
+    title: '',
+    content: '',
+    category_id: '',
+    priority: 'normal',
+    tags: [] as string[]
+  });
+
   useEffect(() => {
     loadCategories();
     loadPosts();
+    getCurrentUser();
   }, [selectedCategory, sortBy]);
+
+  const getCurrentUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setCurrentUser(user);
+  };
 
   const loadCategories = async () => {
     try {
@@ -280,6 +306,93 @@ const Forum = () => {
     }
   };
 
+  const editPostFunction = async () => {
+    try {
+      if (!editingPost) return;
+
+      const { error } = await supabase
+        .from('forum_posts')
+        .update({
+          title: editPost.title,
+          content: editPost.content,
+          category_id: editPost.category_id,
+          priority: editPost.priority,
+          tags: editPost.tags
+        })
+        .eq('id', editingPost.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Post updated successfully!",
+      });
+
+      setShowEditPost(false);
+      setEditingPost(null);
+      loadPosts();
+    } catch (error) {
+      console.error('Failed to edit post:', error);
+      toast({
+        title: "Error",
+        description: "Failed to edit post",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const deletePost = async (postId: string) => {
+    try {
+      const { error } = await supabase
+        .from('forum_posts')
+        .delete()
+        .eq('id', postId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Post deleted successfully!",
+      });
+
+      loadPosts();
+    } catch (error) {
+      console.error('Failed to delete post:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete post",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const openEditDialog = (post: ForumPost) => {
+    setEditingPost(post);
+    setEditPost({
+      title: post.title,
+      content: post.content,
+      category_id: post.category_id,
+      priority: post.priority,
+      tags: post.tags
+    });
+    setShowEditPost(true);
+  };
+
+  const canEditPost = (post: ForumPost) => {
+    if (!currentUser) return false;
+    if (currentUser.id !== post.author_id) return false;
+    
+    // Check if post was created within 24 hours
+    const postDate = new Date(post.created_at);
+    const twentyFourHoursAgo = subHours(new Date(), 24);
+    return isAfter(postDate, twentyFourHoursAgo);
+  };
+
+  const canDeletePost = (post: ForumPost) => {
+    if (!currentUser) return false;
+    return currentUser.id === post.author_id;
+  };
+
   const filteredPosts = posts.filter(post =>
     post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     post.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -372,6 +485,69 @@ const Forum = () => {
                   </Button>
                   <Button onClick={createPost} disabled={!newPost.title || !newPost.content || !newPost.category_id}>
                     Create Post
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* Edit Post Dialog */}
+          <Dialog open={showEditPost} onOpenChange={setShowEditPost}>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Edit Post</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <Input
+                  placeholder="Post title..."
+                  value={editPost.title}
+                  onChange={(e) => setEditPost({ ...editPost, title: e.target.value })}
+                />
+                
+                <Select 
+                  value={editPost.category_id} 
+                  onValueChange={(value) => setEditPost({ ...editPost, category_id: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select 
+                  value={editPost.priority} 
+                  onValueChange={(value) => setEditPost({ ...editPost, priority: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Priority" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="normal">Normal</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="urgent">Urgent</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                <Textarea
+                  placeholder="Write your post content..."
+                  value={editPost.content}
+                  onChange={(e) => setEditPost({ ...editPost, content: e.target.value })}
+                  rows={6}
+                />
+                
+                <div className="flex justify-end gap-2">
+                  <Button variant="outline" onClick={() => setShowEditPost(false)}>
+                    Cancel
+                  </Button>
+                  <Button onClick={editPostFunction} disabled={!editPost.title || !editPost.content || !editPost.category_id}>
+                    Update Post
                   </Button>
                 </div>
               </div>
@@ -472,9 +648,15 @@ const Forum = () => {
                           {post.is_pinned && <Pin className="h-4 w-4 text-blue-600" />}
                           {post.is_locked && <Lock className="h-4 w-4 text-gray-600" />}
                           {post.is_solved && <CheckCircle className="h-4 w-4 text-green-600" />}
-                          <h3 className="text-lg font-semibold hover:text-primary cursor-pointer">
-                            {post.title}
-                          </h3>
+                           <h3 
+                             className="text-lg font-semibold hover:text-primary cursor-pointer"
+                             onClick={() => {
+                               setSelectedPost(post);
+                               setShowPostDetail(true);
+                             }}
+                           >
+                             {post.title}
+                           </h3>
                         </div>
                         <Badge className={getPriorityColor(post.priority)}>
                           {post.priority.toUpperCase()}
@@ -485,46 +667,108 @@ const Forum = () => {
                         {post.content}
                       </p>
 
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          {CategoryIcon && (
-                            <div className="flex items-center gap-1">
-                              <CategoryIcon className="h-4 w-4" />
-                              <span>{post.category?.name}</span>
-                            </div>
-                          )}
-                          
-                          <div className="flex items-center gap-1">
-                            <User className="h-4 w-4" />
-                            <span>{post.author?.name || 'Anonymous'}</span>
-                          </div>
+                       <div className="flex items-center justify-between">
+                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                           {CategoryIcon && (
+                             <div className="flex items-center gap-1">
+                               <CategoryIcon className="h-4 w-4" />
+                               <span>{post.category?.name}</span>
+                             </div>
+                           )}
+                           
+                           <div className="flex items-center gap-1">
+                             <User className="h-4 w-4" />
+                             <span>{post.author?.name || 'Anonymous'}</span>
+                           </div>
 
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-4 w-4" />
-                            <span>{formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}</span>
-                          </div>
+                           <div className="flex items-center gap-1">
+                             <Calendar className="h-4 w-4" />
+                             <span>{formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}</span>
+                           </div>
 
-                          <div className="flex items-center gap-1">
-                            <Eye className="h-4 w-4" />
-                            <span>{post.view_count} views</span>
-                          </div>
+                           <div className="flex items-center gap-1">
+                             <Eye className="h-4 w-4" />
+                             <span>{post.view_count} views</span>
+                           </div>
 
-                          <div className="flex items-center gap-1">
-                            <MessageSquare className="h-4 w-4" />
-                            <span>{post.comment_count || 0} replies</span>
-                          </div>
-                        </div>
+                           <div className="flex items-center gap-1">
+                             <MessageSquare className="h-4 w-4" />
+                             <span>{post.comment_count || 0} replies</span>
+                           </div>
+                         </div>
 
-                        {post.tags.length > 0 && (
-                          <div className="flex gap-1">
-                            {post.tags.slice(0, 3).map((tag) => (
-                              <Badge key={tag} variant="outline" className="text-xs">
-                                {tag}
-                              </Badge>
-                            ))}
+                         <div className="flex items-center gap-2">
+                           {post.tags.length > 0 && (
+                             <div className="flex gap-1">
+                               {post.tags.slice(0, 3).map((tag) => (
+                                 <Badge key={tag} variant="outline" className="text-xs">
+                                   {tag}
+                                 </Badge>
+                               ))}
+                             </div>
+                           )}
+                         </div>
+                       </div>
+
+                       {/* Action Buttons */}
+                       <div className="flex items-center justify-between pt-3 mt-3 border-t">
+                          <div className="flex items-center gap-2">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => {
+                                setSelectedPost(post);
+                                setShowPostDetail(true);
+                              }}
+                            >
+                              <Reply className="h-4 w-4 mr-1" />
+                              Reply
+                            </Button>
                           </div>
-                        )}
-                      </div>
+                         
+                         {(canEditPost(post) || canDeletePost(post)) && (
+                           <div className="flex items-center gap-2">
+                             {canEditPost(post) && (
+                               <Button 
+                                 variant="ghost" 
+                                 size="sm"
+                                 onClick={() => openEditDialog(post)}
+                               >
+                                 <Edit className="h-4 w-4 mr-1" />
+                                 Edit
+                               </Button>
+                             )}
+                             
+                             {canDeletePost(post) && (
+                               <AlertDialog>
+                                 <AlertDialogTrigger asChild>
+                                   <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700">
+                                     <Trash2 className="h-4 w-4 mr-1" />
+                                     Delete
+                                   </Button>
+                                 </AlertDialogTrigger>
+                                 <AlertDialogContent>
+                                   <AlertDialogHeader>
+                                     <AlertDialogTitle>Delete Post</AlertDialogTitle>
+                                     <AlertDialogDescription>
+                                       Are you sure you want to delete this post? This action cannot be undone.
+                                     </AlertDialogDescription>
+                                   </AlertDialogHeader>
+                                   <AlertDialogFooter>
+                                     <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                     <AlertDialogAction 
+                                       onClick={() => deletePost(post.id)}
+                                       className="bg-red-600 hover:bg-red-700"
+                                     >
+                                       Delete
+                                     </AlertDialogAction>
+                                   </AlertDialogFooter>
+                                 </AlertDialogContent>
+                               </AlertDialog>
+                             )}
+                           </div>
+                         )}
+                       </div>
                     </div>
                   </div>
                 </CardContent>
@@ -533,6 +777,16 @@ const Forum = () => {
           })
         )}
       </div>
+
+      {/* Post Detail Modal */}
+      {selectedPost && (
+        <PostDetail
+          post={selectedPost}
+          open={showPostDetail}
+          onOpenChange={setShowPostDetail}
+          onPostUpdate={loadPosts}
+        />
+      )}
     </Layout>
   );
 };
