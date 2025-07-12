@@ -10,7 +10,7 @@ export interface VisualWorkflowNode extends Node {
     hasError?: boolean;
     errorMessage?: string;
   };
-  type: 'integrationNode' | 'conditionNode' | 'startNode';
+  type: 'integrationNode';
 }
 
 export interface VisualWorkflowEdge extends Edge {

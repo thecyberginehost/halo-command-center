@@ -21,28 +21,23 @@ export const BaseWorkflowNode = memo(({
   onDuplicate,
   onDelete 
 }: BaseWorkflowNodeProps) => {
-  console.log('=== NODE RENDER DEBUG ===');
-  console.log('Node ID:', id);
-  console.log('Node data:', data);
-  console.log('Integration:', data.integration);
-  console.log('Selected:', selected);
-  
   const { integration, config, label, isConfigured, hasError, errorMessage } = data;
-  const Icon = integration.icon;
   
   // Validate required properties
   if (!integration) {
     console.error('Node missing integration data:', id);
-    return <div>Error: Missing integration</div>;
+    return (
+      <Card className="min-w-[90px] max-w-[110px] shadow-md border-destructive">
+        <div className="p-2 text-center">
+          <AlertCircle className="h-4 w-4 text-destructive mx-auto mb-1" />
+          <span className="text-xs text-destructive">Invalid Node</span>
+        </div>
+      </Card>
+    );
   }
   
-  if (!Icon) {
-    console.warn('Node missing icon:', id, integration);
-  }
-  
-  console.log('Icon component:', Icon);
-  console.log('Integration color:', integration.color);
-  console.log('=== END NODE RENDER DEBUG ===');
+  const Icon = integration.icon;
+  const nodeColor = integration.color || '#6b7280'; // fallback color
 
   const getStatusColor = () => {
     if (hasError) return 'text-destructive';
@@ -63,9 +58,6 @@ export const BaseWorkflowNode = memo(({
     minHeight: '60px',
     minWidth: '90px',
   };
-  
-  console.log('Node style applied:', nodeStyle);
-
   return (
     <NodeContextMenu
       onDuplicate={() => onDuplicate?.(id)}
@@ -82,15 +74,18 @@ export const BaseWorkflowNode = memo(({
               <div className="flex items-center space-x-1 flex-1 min-w-0">
                 <div 
                   className="p-0.5 rounded-sm flex items-center justify-center flex-shrink-0"
-                  style={{ backgroundColor: integration.color + '20' }}
+                  style={{ backgroundColor: nodeColor + '20' }}
                 >
                    {Icon ? (
                      <Icon 
                        className="h-2.5 w-2.5" 
-                       style={{ color: integration.color || 'currentColor' }}
+                       style={{ color: nodeColor }}
                      />
                    ) : (
-                     <div className="h-2.5 w-2.5 bg-muted rounded" />
+                     <div 
+                       className="h-2.5 w-2.5 rounded" 
+                       style={{ backgroundColor: nodeColor + '40' }}
+                     />
                    )}
                 </div>
                 <span className="font-medium text-xs text-foreground truncate">{label}</span>

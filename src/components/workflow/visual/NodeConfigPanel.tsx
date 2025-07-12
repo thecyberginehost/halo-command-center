@@ -13,6 +13,7 @@ import { VisualWorkflowNode } from '@/types/visualWorkflow';
 import { IntegrationField } from '@/types/integrations';
 import { useTenant } from '@/contexts/TenantContext';
 import { CredentialsService, TenantCredential } from '@/services/credentialsService';
+import { useToast } from '@/hooks/use-toast';
 
 interface NodeConfigPanelProps {
   node: VisualWorkflowNode;
@@ -22,6 +23,7 @@ interface NodeConfigPanelProps {
 
 export function NodeConfigPanel({ node, onConfigChange, onClose }: NodeConfigPanelProps) {
   const { currentTenant } = useTenant();
+  const { toast } = useToast();
   const [config, setConfig] = useState(node.data.config || {});
   const [isValid, setIsValid] = useState(false);
   const [availableCredentials, setAvailableCredentials] = useState<TenantCredential[]>([]);
@@ -77,6 +79,22 @@ export function NodeConfigPanel({ node, onConfigChange, onClose }: NodeConfigPan
   };
 
   const handleSave = () => {
+    // Validate required fields before saving
+    const integrationFields = node.data.integration.fields || [];
+    const requiredFields = integrationFields.filter(field => field.required);
+    const missingFields = requiredFields.filter(field => 
+      !config[field.name] || config[field.name] === ''
+    );
+
+    if (missingFields.length > 0) {
+      toast({
+        title: "Validation Error",
+        description: `Please fill required fields: ${missingFields.map(f => f.label).join(', ')}`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     onConfigChange(node.id, config);
     onClose();
   };
