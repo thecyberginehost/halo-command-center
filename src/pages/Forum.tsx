@@ -162,7 +162,7 @@ const Forum = () => {
         .select(`
           *,
           category:forum_categories(*),
-          author:profiles!forum_posts_author_id_fkey(name, avatar_url)
+          author:profiles(name, avatar_url)
         `);
 
       if (selectedCategory !== 'all') {
