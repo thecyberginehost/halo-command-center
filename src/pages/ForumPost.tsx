@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
 import { 
   ArrowLeft,
   Pin,
@@ -14,7 +15,8 @@ import {
   ThumbsUp,
   ThumbsDown,
   ArrowUp,
-  ArrowDown
+  ArrowDown,
+  MessageSquare
 } from 'lucide-react';
 import Layout from '@/components/Layout';
 import { usePageTitle } from '@/hooks/usePageTitle';
@@ -47,6 +49,18 @@ interface ForumPost {
   author?: { name: string; email: string } | null;
 }
 
+interface ForumComment {
+  id: string;
+  content: string;
+  author_id: string;
+  post_id: string;
+  parent_comment_id: string | null;
+  is_solution: boolean;
+  vote_score: number;
+  created_at: string;
+  author?: { name: string; email: string } | null;
+}
+
 const ForumPost = () => {
   const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
@@ -54,6 +68,9 @@ const ForumPost = () => {
   const [post, setPost] = useState<ForumPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [comments, setComments] = useState<ForumComment[]>([]);
+  const [newComment, setNewComment] = useState('');
+  const [submittingComment, setSubmittingComment] = useState(false);
 
   usePageTitle(post ? post.title : 'Forum Post');
 
@@ -62,6 +79,7 @@ const ForumPost = () => {
       loadPost();
       getCurrentUser();
       incrementViewCount();
+      loadComments();
     }
   }, [postId]);
 
@@ -183,6 +201,64 @@ const ForumPost = () => {
     }
   };
 
+  const loadComments = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('forum_comments')
+        .select('*')
+        .eq('post_id', postId)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+      setComments(data || []);
+    } catch (error) {
+      console.error('Failed to load comments:', error);
+    }
+  };
+
+  const submitComment = async () => {
+    if (!newComment.trim()) return;
+
+    try {
+      setSubmittingComment(true);
+
+      if (!currentUser) {
+        toast({
+          title: "Authentication Required",
+          description: "Please sign in to reply",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { error } = await supabase
+        .from('forum_comments')
+        .insert([{
+          content: newComment.trim(),
+          post_id: postId,
+          author_id: currentUser.id
+        }]);
+
+      if (error) throw error;
+
+      setNewComment('');
+      loadComments();
+      toast({
+        title: "Success",
+        description: "Reply posted successfully",
+      });
+    } catch (error) {
+      console.error('Failed to submit comment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to post reply",
+        variant: "destructive",
+      });
+    } finally {
+      setSubmittingComment(false);
+    }
+  };
+
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'urgent': return 'bg-red-100 text-red-800';
@@ -299,6 +375,93 @@ const ForumPost = () => {
                 </div>
               )}
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Comments Section */}
+      <Card className="mt-6">
+        <CardContent className="p-6">
+          <div className="flex items-center gap-2 mb-6">
+            <MessageSquare className="h-5 w-5" />
+            <h2 className="text-xl font-semibold">
+              Replies ({comments.length})
+            </h2>
+          </div>
+
+          {/* Add Reply Form */}
+          {!post.is_locked && (
+            <div className="mb-6 p-4 border rounded-lg bg-muted/30">
+              <h3 className="font-medium mb-3">Add a reply</h3>
+              <Textarea
+                placeholder="Write your reply..."
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                className="mb-3"
+                rows={4}
+              />
+              <Button
+                onClick={submitComment}
+                disabled={!newComment.trim() || submittingComment}
+              >
+                {submittingComment ? 'Posting...' : 'Post Reply'}
+              </Button>
+            </div>
+          )}
+
+          {/* Comments List */}
+          <div className="space-y-4">
+            {comments.length === 0 ? (
+              <p className="text-muted-foreground text-center py-8">
+                No replies yet. Be the first to reply!
+              </p>
+            ) : (
+              comments.map((comment) => (
+                <div key={comment.id} className="border rounded-lg p-4">
+                  <div className="flex items-start gap-4">
+                    <div className="flex flex-col items-center gap-1 min-w-12">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0"
+                      >
+                        <ArrowUp className="h-3 w-3" />
+                      </Button>
+                      <span className="text-xs font-medium">{comment.vote_score}</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0"
+                      >
+                        <ArrowDown className="h-3 w-3" />
+                      </Button>
+                    </div>
+
+                    <div className="flex-1">
+                      <div className="prose max-w-none mb-3">
+                        <p className="whitespace-pre-wrap">{comment.content}</p>
+                      </div>
+
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <User className="h-3 w-3" />
+                          <span>{comment.author?.name || 'Anonymous'}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          <span>{formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}</span>
+                        </div>
+                        {comment.is_solution && (
+                          <Badge className="bg-green-100 text-green-800">
+                            Solution
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </CardContent>
       </Card>
