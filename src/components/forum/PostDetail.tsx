@@ -66,6 +66,7 @@ export const PostDetail = ({ post, open, onOpenChange, onPostUpdate }: PostDetai
   const [comments, setComments] = useState<ForumComment[]>([]);
   const [loading, setLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
   const [newComment, setNewComment] = useState('');
   const [replyToComment, setReplyToComment] = useState<string | null>(null);
   const [editingComment, setEditingComment] = useState<ForumComment | null>(null);
@@ -82,6 +83,15 @@ export const PostDetail = ({ post, open, onOpenChange, onPostUpdate }: PostDetai
   const getCurrentUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     setCurrentUser(user);
+    
+    if (user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+      setUserProfile(profile);
+    }
   };
 
   const incrementViewCount = async () => {
@@ -296,6 +306,36 @@ export const PostDetail = ({ post, open, onOpenChange, onPostUpdate }: PostDetai
     setEditCommentContent(comment.content);
   };
 
+  const canPinPost = () => {
+    if (!currentUser || !userProfile) return false;
+    return userProfile.name === 'Anthony Amore' || userProfile.role?.toLowerCase().includes('admin');
+  };
+
+  const togglePinPost = async () => {
+    try {
+      const { error } = await supabase
+        .from('forum_posts')
+        .update({ is_pinned: !post.is_pinned })
+        .eq('id', post.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: post.is_pinned ? "Post unpinned" : "Post pinned",
+      });
+
+      onPostUpdate();
+    } catch (error) {
+      console.error('Failed to toggle pin:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update post",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'urgent': return 'bg-red-100 text-red-800';
@@ -457,12 +497,25 @@ export const PostDetail = ({ post, open, onOpenChange, onPostUpdate }: PostDetai
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            {post.is_pinned && <Pin className="h-4 w-4 text-blue-600" />}
-            {post.is_locked && <Lock className="h-4 w-4 text-gray-600" />}
-            {post.is_solved && <CheckCircle className="h-4 w-4 text-green-600" />}
-            {post.title}
-          </DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogTitle className="flex items-center gap-2">
+              {post.is_pinned && <Pin className="h-4 w-4 text-blue-600" />}
+              {post.is_locked && <Lock className="h-4 w-4 text-gray-600" />}
+              {post.is_solved && <CheckCircle className="h-4 w-4 text-green-600" />}
+              {post.title}
+            </DialogTitle>
+            {canPinPost() && (
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={togglePinPost}
+                className={post.is_pinned ? "text-blue-600 hover:text-blue-700" : ""}
+              >
+                <Pin className="h-4 w-4 mr-1" />
+                {post.is_pinned ? 'Unpin' : 'Pin'}
+              </Button>
+            )}
+          </div>
         </DialogHeader>
         
         <div className="space-y-6">

@@ -92,6 +92,7 @@ const Forum = () => {
   const [editingPost, setEditingPost] = useState<ForumPost | null>(null);
   const [showEditPost, setShowEditPost] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
   const [selectedPost, setSelectedPost] = useState<ForumPost | null>(null);
   const [showPostDetail, setShowPostDetail] = useState(false);
   
@@ -122,6 +123,15 @@ const Forum = () => {
   const getCurrentUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     setCurrentUser(user);
+    
+    if (user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+      setUserProfile(profile);
+    }
   };
 
   const loadCategories = async () => {
@@ -395,6 +405,36 @@ const Forum = () => {
   const canDeletePost = (post: ForumPost) => {
     if (!currentUser) return false;
     return currentUser.id === post.author_id;
+  };
+
+  const canPinPost = () => {
+    if (!currentUser || !userProfile) return false;
+    return userProfile.name === 'Anthony Amore' || userProfile.role?.toLowerCase().includes('admin');
+  };
+
+  const togglePinPost = async (post: ForumPost) => {
+    try {
+      const { error } = await supabase
+        .from('forum_posts')
+        .update({ is_pinned: !post.is_pinned })
+        .eq('id', post.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: post.is_pinned ? "Post unpinned" : "Post pinned",
+      });
+
+      loadPosts();
+    } catch (error) {
+      console.error('Failed to toggle pin:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update post",
+        variant: "destructive",
+      });
+    }
   };
 
   const filteredPosts = posts.filter(post =>
@@ -737,48 +777,58 @@ const Forum = () => {
                             </Button>
                           </div>
                          
-                         {(canEditPost(post) || canDeletePost(post)) && (
-                           <div className="flex items-center gap-2">
-                             {canEditPost(post) && (
-                               <Button 
-                                 variant="ghost" 
-                                 size="sm"
-                                 onClick={() => openEditDialog(post)}
-                               >
-                                 <Edit className="h-4 w-4 mr-1" />
-                                 Edit
-                               </Button>
-                             )}
-                             
-                             {canDeletePost(post) && (
-                               <AlertDialog>
-                                 <AlertDialogTrigger asChild>
-                                   <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700">
-                                     <Trash2 className="h-4 w-4 mr-1" />
-                                     Delete
-                                   </Button>
-                                 </AlertDialogTrigger>
-                                 <AlertDialogContent>
-                                   <AlertDialogHeader>
-                                     <AlertDialogTitle>Delete Post</AlertDialogTitle>
-                                     <AlertDialogDescription>
-                                       Are you sure you want to delete this post? This action cannot be undone.
-                                     </AlertDialogDescription>
-                                   </AlertDialogHeader>
-                                   <AlertDialogFooter>
-                                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                     <AlertDialogAction 
-                                       onClick={() => deletePost(post.id)}
-                                       className="bg-red-600 hover:bg-red-700"
-                                     >
-                                       Delete
-                                     </AlertDialogAction>
-                                   </AlertDialogFooter>
-                                 </AlertDialogContent>
-                               </AlertDialog>
-                             )}
-                           </div>
-                         )}
+                          <div className="flex items-center gap-2">
+                            {canPinPost() && (
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => togglePinPost(post)}
+                                className={post.is_pinned ? "text-blue-600 hover:text-blue-700" : ""}
+                              >
+                                <Pin className="h-4 w-4 mr-1" />
+                                {post.is_pinned ? 'Unpin' : 'Pin'}
+                              </Button>
+                            )}
+                            
+                            {canEditPost(post) && (
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => openEditDialog(post)}
+                              >
+                                <Edit className="h-4 w-4 mr-1" />
+                                Edit
+                              </Button>
+                            )}
+                            
+                            {canDeletePost(post) && (
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700">
+                                    <Trash2 className="h-4 w-4 mr-1" />
+                                    Delete
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Delete Post</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Are you sure you want to delete this post? This action cannot be undone.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction 
+                                      onClick={() => deletePost(post.id)}
+                                      className="bg-red-600 hover:bg-red-700"
+                                    >
+                                      Delete
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            )}
+                          </div>
                        </div>
                     </div>
                   </div>
