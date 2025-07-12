@@ -157,12 +157,12 @@ const Forum = () => {
   const loadPosts = async () => {
     try {
       setLoading(true);
+      // First get posts
       let query = supabase
         .from('forum_posts')
         .select(`
           *,
-          category:forum_categories(*),
-          author:profiles(name, avatar_url)
+          category:forum_categories(*)
         `);
 
       if (selectedCategory !== 'all') {
@@ -188,6 +188,28 @@ const Forum = () => {
       
       if (error) throw error;
       
+      // Get unique author IDs
+      const authorIds = [...new Set((data || []).map(post => post.author_id).filter(Boolean))];
+      
+      // Fetch author profiles
+      let authorProfiles = {};
+      if (authorIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('user_id, name, avatar_url')
+          .in('user_id', authorIds);
+        
+        if (profiles) {
+          authorProfiles = profiles.reduce((acc, profile) => {
+            acc[profile.user_id] = {
+              name: profile.name,
+              avatar_url: profile.avatar_url
+            };
+            return acc;
+          }, {});
+        }
+      }
+      
       // Transform data to match our interface
       const transformedPosts = (data || []).map((post: any) => ({
         id: post.id,
@@ -204,7 +226,7 @@ const Forum = () => {
         vote_score: post.vote_score,
         created_at: post.created_at,
         category: post.category,
-        author: post.author,
+        author: authorProfiles[post.author_id] || null,
         comment_count: 0
       }));
       
