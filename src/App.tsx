@@ -22,6 +22,7 @@ import Documentation from "./pages/Documentation";
 import Enterprise from "./pages/Enterprise";
 import Performance from "./pages/Performance";
 import Marketplace from "./pages/Marketplace";
+import Forum from "./pages/Forum";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -53,6 +54,7 @@ const App = () => (
                   <Route path="/enterprise" element={<ProtectedRoute><Enterprise /></ProtectedRoute>} />
                   <Route path="/performance" element={<ProtectedRoute><Performance /></ProtectedRoute>} />
                   <Route path="/marketplace" element={<ProtectedRoute><Marketplace /></ProtectedRoute>} />
+                  <Route path="/forum" element={<ProtectedRoute><Forum /></ProtectedRoute>} />
                   <Route path="/organizations/create" element={<ProtectedRoute><CreateOrganization /></ProtectedRoute>} />
                   <Route path="/workflow-builder/:workflowId" element={<ProtectedRoute><WorkflowBuilderPage /></ProtectedRoute>} />
                   

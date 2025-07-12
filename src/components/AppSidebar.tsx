@@ -9,7 +9,9 @@ import {
   User,
   ChevronUp,
   Key,
-  BookOpen
+  BookOpen,
+  MessageSquare,
+  Package
 } from 'lucide-react';
 import {
   Sidebar,
@@ -35,11 +37,17 @@ const menuSections = [
     ]
   },
   {
+    title: "COMMUNITY",
+    items: [
+      { title: "Forum", icon: MessageSquare, path: "/forum" },
+      { title: "Add-ons Marketplace", icon: Package, path: "/marketplace" },
+    ]
+  },
+  {
     title: "ENTERPRISE",
     items: [
       { title: "Enterprise Dashboard", icon: BarChart, path: "/enterprise" },
       { title: "Performance", icon: Users, path: "/performance" },
-      { title: "Marketplace", icon: Settings, path: "/marketplace" },
     ]
   },
   {
