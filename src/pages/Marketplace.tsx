@@ -13,10 +13,17 @@ import {
   Filter,
   Grid,
   List as ListIcon,
-  Mail,
-  Database,
-  Bot,
-  Zap
+  Music,
+  Gamepad2,
+  PenTool,
+  Palette,
+  Clock,
+  MessageSquare,
+  BarChart3,
+  Coffee,
+  Headphones,
+  Timer,
+  Moon
 } from 'lucide-react';
 import Layout from '@/components/Layout';
 import { usePageTitle } from '@/hooks/usePageTitle';
@@ -59,7 +66,7 @@ const Marketplace = () => {
         rating: pkg.rating || 0,
         reviews: [],
         isVerified: pkg.is_verified,
-        isFeatured: pkg.category === 'communication' || pkg.category === 'crm' || pkg.category === 'ai',
+        isFeatured: pkg.category === 'music' || pkg.category === 'productivity' || pkg.category === 'entertainment',
         tags: pkg.tags || [],
         screenshots: pkg.screenshots || [],
         documentation: pkg.documentation_url,
@@ -83,14 +90,14 @@ const Marketplace = () => {
   );
 
   const categories = [
-    { id: 'all', name: 'All Categories', icon: Grid },
-    { id: 'communication', name: 'Communication', icon: Mail },
-    { id: 'crm', name: 'CRM', icon: Database },
-    { id: 'ai', name: 'AI & ML', icon: Bot },
-    { id: 'email', name: 'Email', icon: Mail },
-    { id: 'database', name: 'Database', icon: Database },
-    { id: 'storage', name: 'Storage', icon: Zap },
-    { id: 'webhook', name: 'Webhook', icon: Zap }
+    { id: 'all', name: 'All Add-ons', icon: Grid },
+    { id: 'music', name: 'Music & Audio', icon: Music },
+    { id: 'productivity', name: 'Productivity', icon: Clock },
+    { id: 'entertainment', name: 'Entertainment', icon: Gamepad2 },
+    { id: 'design', name: 'Design & UI', icon: Palette },
+    { id: 'communication', name: 'Communication', icon: MessageSquare },
+    { id: 'analytics', name: 'Analytics', icon: BarChart3 },
+    { id: 'wellness', name: 'Wellness', icon: Coffee }
   ];
 
   const handleInstall = async (integrationId: string) => {
@@ -114,10 +121,10 @@ const Marketplace = () => {
       {/* Header */}
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-foreground mb-2">
-          Integration Marketplace
+          Developer Add-ons Marketplace
         </h2>
         <p className="text-muted-foreground">
-          Discover and install powerful integrations to extend your automation capabilities
+          Enhance your HALO experience with productivity tools, entertainment, and lifestyle add-ons
         </p>
       </div>
 
@@ -126,7 +133,7 @@ const Marketplace = () => {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search integrations..."
+            placeholder="Search add-ons..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -172,7 +179,7 @@ const Marketplace = () => {
       {/* Featured Section */}
       {selectedCategory === 'all' && (
         <div className="mb-8">
-          <h3 className="text-xl font-semibold mb-4">Featured Integrations</h3>
+          <h3 className="text-xl font-semibold mb-4">Featured Add-ons</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {integrations
               .filter(integration => integration.isFeatured)
@@ -252,7 +259,7 @@ const Marketplace = () => {
       {/* All Integrations */}
       <div className="mb-8">
         <h3 className="text-xl font-semibold mb-4">
-          {selectedCategory === 'all' ? 'All Integrations' : `${categories.find(c => c.id === selectedCategory)?.name} Integrations`}
+          {selectedCategory === 'all' ? 'All Add-ons' : `${categories.find(c => c.id === selectedCategory)?.name} Add-ons`}
         </h3>
         
         {loading ? (
