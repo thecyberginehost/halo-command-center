@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
@@ -64,7 +65,7 @@ interface ForumPost {
   vote_score: number;
   created_at: string;
   category?: ForumCategory;
-  author?: { name: string; email: string } | null;
+  author?: { name: string; avatar_url: string } | null;
   comment_count?: any;
 }
 
@@ -160,7 +161,8 @@ const Forum = () => {
         .from('forum_posts')
         .select(`
           *,
-          category:forum_categories(*)
+          category:forum_categories(*),
+          author:profiles!forum_posts_author_id_fkey(name, avatar_url)
         `);
 
       if (selectedCategory !== 'all') {
@@ -687,6 +689,21 @@ const Forum = () => {
 
                     {/* Post Content */}
                     <div className="flex-1">
+                      {/* Author info at top left */}
+                      <div className="flex items-center gap-3 mb-3">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={post.author?.avatar_url} />
+                          <AvatarFallback>
+                            {post.author?.name?.charAt(0)?.toUpperCase() || 'U'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <span className="font-medium text-foreground">{post.author?.name || 'Anonymous'}</span>
+                          <span>•</span>
+                          <span>{formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}</span>
+                        </div>
+                      </div>
+
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-2">
                           {post.is_pinned && <Pin className="h-4 w-4 text-blue-600" />}
@@ -718,35 +735,25 @@ const Forum = () => {
                         )}
                       </div>
 
-                       <div className="flex items-center justify-between">
-                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                           {CategoryIcon && (
-                             <div className="flex items-center gap-1">
-                               <CategoryIcon className="h-4 w-4" />
-                               <span>{post.category?.name}</span>
-                             </div>
-                           )}
-                           
-                           <div className="flex items-center gap-1">
-                             <User className="h-4 w-4" />
-                             <span>{post.author?.name || 'Anonymous'}</span>
-                           </div>
+                         <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                            {CategoryIcon && (
+                              <div className="flex items-center gap-1">
+                                <CategoryIcon className="h-4 w-4" />
+                                <span>{post.category?.name}</span>
+                              </div>
+                            )}
 
-                           <div className="flex items-center gap-1">
-                             <Calendar className="h-4 w-4" />
-                             <span>{formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}</span>
-                           </div>
+                            <div className="flex items-center gap-1">
+                              <Eye className="h-4 w-4" />
+                              <span>{post.view_count} views</span>
+                            </div>
 
-                           <div className="flex items-center gap-1">
-                             <Eye className="h-4 w-4" />
-                             <span>{post.view_count} views</span>
-                           </div>
-
-                           <div className="flex items-center gap-1">
-                             <MessageSquare className="h-4 w-4" />
-                             <span>{post.comment_count || 0} replies</span>
-                           </div>
-                         </div>
+                            <div className="flex items-center gap-1">
+                              <MessageSquare className="h-4 w-4" />
+                              <span>{post.comment_count || 0} replies</span>
+                            </div>
+                          </div>
 
                          <div className="flex items-center gap-2">
                            {post.tags.length > 0 && (
