@@ -148,15 +148,17 @@ const Forum = () => {
         .from('forum_posts')
         .select(`
           *,
-          category:forum_categories(*),
-          author:profiles(name, email)
+          category:forum_categories(*)
         `);
 
       if (selectedCategory !== 'all') {
         query = query.eq('category_id', selectedCategory);
       }
 
-      // Add sorting
+      // Add sorting - pinned posts first
+      query = query.order('is_pinned', { ascending: false });
+      
+      // Then add secondary sorting
       switch (sortBy) {
         case 'popular':
           query = query.order('view_count', { ascending: false });
