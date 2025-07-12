@@ -51,7 +51,7 @@ interface ForumPost {
   vote_score: number;
   created_at: string;
   category?: any;
-  author?: { name: string; email: string } | null;
+  author?: { name: string; avatar_url: string } | null;
 }
 
 interface PostDetailProps {
