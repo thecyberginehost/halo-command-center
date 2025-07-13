@@ -14,6 +14,7 @@ import { ResonantDirectiveChat } from '@/components/automation/ResonantDirective
 
 import { useAutomationChat } from '@/hooks/useAutomationChat';
 import { useWorkflowOperations } from '@/hooks/useWorkflowOperations';
+import { WorkflowExecutionService } from '@/services/workflowExecution';
 
 const CreateAutomation = () => {
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ const CreateAutomation = () => {
   const [isDeveloperMode, setIsDeveloperMode] = useState(false);
   const [showStepSelector, setShowStepSelector] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [testingWorkflow, setTestingWorkflow] = useState(false);
   const [scriptCode, setScriptCode] = useState(`// Automation Script
 // This will be executed when your automation runs
 
@@ -63,6 +65,8 @@ async function executeAutomation(input) {
     workflowEdges,
     onWorkflowGeneration: handleAIWorkflowGeneration
   });
+
+  const workflowExecutionService = new WorkflowExecutionService();
 
   useEffect(() => {
     const fetchWorkflow = async () => {
@@ -108,6 +112,51 @@ async function executeAutomation(input) {
     ]);
   };
 
+  const handleTestWorkflow = async () => {
+    if (!workflow || !currentTenant) return;
+    
+    setTestingWorkflow(true);
+    try {
+      const testData = { test: true, timestamp: new Date().toISOString() };
+      
+      if (isDeveloperMode) {
+        // Test traditional workflow
+        const executionId = await workflowExecutionService.executeWorkflow(
+          workflow.id,
+          testData,
+          currentTenant.id
+        );
+        
+        toast({
+          title: "Workflow Test Started",
+          description: `Execution ID: ${executionId}`,
+        });
+      } else {
+        // Test visual workflow
+        const executionId = await workflowExecutionService.executeVisualWorkflow(
+          workflow.id,
+          workflowNodes,
+          workflowEdges,
+          testData,
+          currentTenant.id
+        );
+        
+        toast({
+          title: "Visual Workflow Test Started", 
+          description: `Execution ID: ${executionId}`,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Test Failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    } finally {
+      setTestingWorkflow(false);
+    }
+  };
+
   return (
     <div className="flex min-h-screen w-full">
       <AppSidebar />
@@ -120,6 +169,8 @@ async function executeAutomation(input) {
           setIsDeveloperMode={setIsDeveloperMode}
           onExport={handleExport}
           onSave={() => handleSaveWorkflow(workflowName)}
+          onTest={handleTestWorkflow}
+          isTestingWorkflow={testingWorkflow}
         />
 
         <div className={`flex-1 transition-all duration-300 ${isChatOpen ? 'mr-96' : ''} flex flex-col`}>

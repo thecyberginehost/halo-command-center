@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { ChevronLeft, Download, Save } from 'lucide-react';
+import { ChevronLeft, Download, Save, TestTube } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { WorkflowRecord } from '@/types/tenant';
@@ -19,6 +19,8 @@ interface AutomationHeaderProps {
   setIsDeveloperMode: (enabled: boolean) => void;
   onExport?: () => void;
   onSave?: () => void;
+  onTest?: () => void;
+  isTestingWorkflow?: boolean;
 }
 
 export function AutomationHeader({
@@ -28,7 +30,9 @@ export function AutomationHeader({
   isDeveloperMode,
   setIsDeveloperMode,
   onExport,
-  onSave
+  onSave,
+  onTest,
+  isTestingWorkflow = false
 }: AutomationHeaderProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -121,6 +125,17 @@ export function AutomationHeader({
             Developer Mode
           </Label>
         </div>
+        {onTest && (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={onTest}
+            disabled={isTestingWorkflow}
+          >
+            <TestTube className="h-4 w-4 mr-2" />
+            {isTestingWorkflow ? 'Testing...' : 'Test'}
+          </Button>
+        )}
         {onSave && (
           <Button variant="default" size="sm" onClick={onSave}>
             <Save className="h-4 w-4 mr-2" />

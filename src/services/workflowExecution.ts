@@ -2,16 +2,19 @@ import { supabase } from '@/integrations/supabase/client';
 import { WorkflowStep } from '@/types/workflow';
 import { ExecutionContext, ExecutionResult, IntegrationNode } from '@/types/integrations';
 import { getIntegrationById } from '@/lib/integrations';
+import { CredentialsService } from './credentialsService';
 
 export class WorkflowExecutionService {
-  async executeWorkflow(workflowId: string, triggerData: Record<string, any>): Promise<string> {
+  private credentialsService = new CredentialsService();
+
+  async executeWorkflow(workflowId: string, triggerData: Record<string, any>, tenantId?: string): Promise<string> {
     try {
       // Start workflow execution
       const { data: execution, error } = await supabase
         .from('workflow_executions')
         .insert({
           workflow_id: workflowId,
-          tenant_id: 'default-tenant', // TODO: Get from context
+          tenant_id: tenantId || 'default-tenant',
           status: 'running',
           input: triggerData,
           started_at: new Date().toISOString()
@@ -22,7 +25,7 @@ export class WorkflowExecutionService {
       if (error) throw error;
 
       // Execute workflow steps in background
-      this.executeStepsInBackground(execution.id, workflowId, triggerData);
+      this.executeStepsInBackground(execution.id, workflowId, triggerData, tenantId || 'default-tenant');
 
       return execution.id;
     } catch (error) {
@@ -34,7 +37,8 @@ export class WorkflowExecutionService {
   private async executeStepsInBackground(
     executionId: string, 
     workflowId: string, 
-    triggerData: Record<string, any>
+    triggerData: Record<string, any>,
+    tenantId: string
   ) {
     try {
       // Get workflow steps
@@ -54,12 +58,16 @@ export class WorkflowExecutionService {
         try {
           await this.updateExecutionStatus(executionId, 'running', step.id);
           
+          // Get credentials for this step's integration
+          const credentials = await this.getCredentialsForStep(step, tenantId);
+          
           const result = await this.executeStep(step, {
             workflowId,
             stepId: step.id,
             input: triggerData,
-            credentials: {}, // TODO: Get from secure storage
-            previousStepOutputs: previousOutputs
+            credentials,
+            previousStepOutputs: previousOutputs,
+            tenantId
           });
 
           if (!result.success) {
@@ -100,7 +108,7 @@ export class WorkflowExecutionService {
           config: step.config,
           context: {
             ...context,
-            tenantId: 'default-tenant' // TODO: Get actual tenant ID
+            tenantId: context.tenantId || 'default-tenant'
           }
         }
       });
@@ -122,8 +130,40 @@ export class WorkflowExecutionService {
     }
   }
 
+  // Get credentials for a specific step
+  private async getCredentialsForStep(step: WorkflowStep, tenantId: string): Promise<Record<string, any>> {
+    try {
+      // Get integration details to determine service type
+      const integration = getIntegrationById(step.type);
+      if (!integration) return {};
+
+      // Map integration IDs to service types
+      const serviceTypeMap = {
+        'openai': 'openai',
+        'anthropic': 'anthropic', 
+        'gmail': 'gmail',
+        'slack': 'slack',
+        'salesforce': 'salesforce',
+        'hubspot': 'hubspot'
+      };
+
+      const serviceType = serviceTypeMap[integration.id];
+      if (!serviceType) return {};
+
+      // Get credentials for this service type
+      const credentials = await this.credentialsService.getCredentialsByService(tenantId, serviceType);
+      if (credentials.length === 0) return {};
+
+      // Return the first available credential (or could be configured per step)
+      return credentials[0].credentials;
+    } catch (error) {
+      console.error('Failed to get credentials for step:', error);
+      return {};
+    }
+  }
+
   // New method to execute visual workflows
-  async executeVisualWorkflow(workflowId: string, nodes: any[], edges: any[], triggerData: Record<string, any>): Promise<string> {
+  async executeVisualWorkflow(workflowId: string, nodes: any[], edges: any[], triggerData: Record<string, any>, tenantId?: string): Promise<string> {
     try {
       // Convert visual workflow to traditional workflow steps
       const steps = nodes.filter(node => node.data.integration.type !== 'trigger').map(node => ({
@@ -141,7 +181,7 @@ export class WorkflowExecutionService {
         .from('workflow_executions')
         .insert({
           workflow_id: workflowId,
-          tenant_id: 'default-tenant', // TODO: Get from context
+          tenant_id: tenantId || 'default-tenant',
           status: 'running',
           input: triggerData,
           started_at: new Date().toISOString()
@@ -152,7 +192,7 @@ export class WorkflowExecutionService {
       if (error) throw error;
 
       // Execute steps in background
-      this.executeVisualStepsInBackground(execution.id, steps, triggerData);
+      this.executeVisualStepsInBackground(execution.id, steps, triggerData, tenantId || 'default-tenant');
 
       return execution.id;
     } catch (error) {
@@ -164,7 +204,8 @@ export class WorkflowExecutionService {
   private async executeVisualStepsInBackground(
     executionId: string,
     steps: any[],
-    triggerData: Record<string, any>
+    triggerData: Record<string, any>,
+    tenantId: string
   ) {
     try {
       let previousOutputs: Record<string, any> = { trigger: triggerData };
@@ -173,12 +214,16 @@ export class WorkflowExecutionService {
         try {
           await this.updateExecutionStatus(executionId, 'running', step.id);
           
+          // Get credentials for this step's integration
+          const credentials = await this.getCredentialsForStep(step, tenantId);
+          
           const result = await this.executeStep(step, {
             workflowId: executionId,
             stepId: step.id,
             input: triggerData,
-            credentials: {},
-            previousStepOutputs: previousOutputs
+            credentials,
+            previousStepOutputs: previousOutputs,
+            tenantId
           });
 
           if (!result.success) {

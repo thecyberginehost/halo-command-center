@@ -13,9 +13,10 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { integrationId, action, parameters, credentials, tenantId } = body;
+    const { integrationId, action, parameters, credentials, tenantId, context } = body;
 
     console.log(`Executing integration: ${integrationId}, action: ${action} for tenant: ${tenantId}`);
+    console.log('Available credentials:', Object.keys(credentials || {}));
 
     // Initialize Supabase client
     const supabase = createClient(
@@ -29,7 +30,7 @@ Deno.serve(async (req) => {
       id: executionId,
       tenant_id: tenantId,
       integration_id: integrationId,
-      input: { action, parameters },
+      input: { action, parameters, hasCredentials: Object.keys(credentials || {}).length > 0 },
       status: 'running',
       started_at: new Date().toISOString()
     });

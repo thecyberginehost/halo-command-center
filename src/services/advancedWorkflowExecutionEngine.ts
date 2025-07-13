@@ -1,5 +1,6 @@
 import { ExecutionContext, ExecutionResult, IntegrationNode } from '@/types/integrations';
 import { PerformanceMonitoringService } from './performanceMonitoringService';
+import { CredentialsService } from './credentialsService';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface ExecutionStep {
@@ -48,6 +49,7 @@ export class AdvancedWorkflowExecutionEngine {
   private activeExecutions = new Map<string, WorkflowExecution>();
   private executionQueue: Array<{ execution: WorkflowExecution; options: ExecutionOptions }> = [];
   private performanceMonitor = new PerformanceMonitoringService();
+  private credentialsService = new CredentialsService();
   private maxConcurrentExecutions = 10;
   private isProcessing = false;
 
@@ -196,12 +198,15 @@ export class AdvancedWorkflowExecutionEngine {
 
     for (let attempt = 0; attempt <= retryPolicy.maxRetries; attempt++) {
       try {
+        // Get credentials for this step
+        const credentials = await this.getCredentialsForStep(step, execution.tenantId);
+        
         // Create execution context
         const context: ExecutionContext = {
           workflowId: execution.workflowId,
           stepId: step.id,
           input: this.buildStepInput(step, execution),
-          credentials: {}, // Will be populated by the integration
+          credentials,
           previousStepOutputs: Object.fromEntries(execution.stepOutputs),
           tenantId: execution.tenantId,
           userId: undefined // TODO: Add user context
@@ -256,6 +261,34 @@ export class AdvancedWorkflowExecutionEngine {
     }
 
     throw lastError || new Error('Unknown execution error');
+  }
+
+  // Get credentials for a specific step
+  private async getCredentialsForStep(step: ExecutionStep, tenantId: string): Promise<Record<string, any>> {
+    try {
+      // Map integration IDs to service types
+      const serviceTypeMap = {
+        'openai': 'openai',
+        'anthropic': 'anthropic', 
+        'gmail': 'gmail',
+        'slack': 'slack',
+        'salesforce': 'salesforce',
+        'hubspot': 'hubspot'
+      };
+
+      const serviceType = serviceTypeMap[step.integration.id];
+      if (!serviceType) return {};
+
+      // Get credentials for this service type
+      const credentials = await this.credentialsService.getCredentialsByService(tenantId, serviceType);
+      if (credentials.length === 0) return {};
+
+      // Return the first available credential (or could be configured per step)
+      return credentials[0].credentials;
+    } catch (error) {
+      console.error('Failed to get credentials for step:', error);
+      return {};
+    }
   }
 
   private async executeIntegration(
