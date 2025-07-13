@@ -86,11 +86,16 @@ serve(async (req) => {
       });
 
     // Build authorization URL
+    const scopeString = oauthConfig.scopes.join(' ');
+    console.log('Building OAuth URL for HubSpot with scopes:', scopeString);
+    console.log('Client ID:', oauthConfig.client_id);
+    console.log('Redirect URI:', oauthConfig.redirect_uri);
+    
     const params = new URLSearchParams({
       response_type: 'code',
       client_id: oauthConfig.client_id,
       redirect_uri: oauthConfig.redirect_uri,
-      scope: oauthConfig.scopes.join(' '),
+      scope: scopeString,
       state,
     });
 
