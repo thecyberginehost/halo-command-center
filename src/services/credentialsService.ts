@@ -6,6 +6,7 @@ export interface TenantCredential {
   name: string;
   description?: string;
   service_type: string;
+  auth_type?: string; // Add auth type field
   credentials: any; // Use any to match the database Json type
   is_active: boolean;
   created_at: string;
@@ -16,6 +17,7 @@ export interface CreateCredentialRequest {
   name: string;
   description?: string;
   service_type: string;
+  auth_type?: string; // Add auth type field  
   credentials: Record<string, string>;
 }
 

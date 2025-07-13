@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
@@ -17,13 +18,76 @@ import { Plus, Key, Edit, Trash2, TestTube } from 'lucide-react';
 const credentialsService = new CredentialsService();
 
 const serviceTypes = [
-  { value: 'openai', label: 'OpenAI', description: 'OpenAI API for GPT models', icon: '🤖', fields: ['api_key'] },
-  { value: 'anthropic', label: 'Anthropic', description: 'Anthropic API for Claude models', icon: '🧠', fields: ['api_key'] },
-  { value: 'gmail', label: 'Gmail', description: 'Gmail API for email sending', icon: '📧', fields: ['client_id', 'client_secret', 'refresh_token'] },
-  { value: 'slack', label: 'Slack', description: 'Slack API for messaging', icon: '💬', fields: ['bot_token', 'signing_secret'] },
-  { value: 'salesforce', label: 'Salesforce', description: 'Salesforce CRM integration', icon: '☁️', fields: ['client_id', 'client_secret', 'username', 'password', 'security_token'] },
-  { value: 'hubspot', label: 'HubSpot', description: 'HubSpot CRM integration', icon: '🎯', fields: ['api_key'] },
-  { value: 'webhook', label: 'Webhook', description: 'Custom webhook endpoints', icon: '🔗', fields: ['url', 'auth_header'] },
+  { 
+    value: 'openai', 
+    label: 'OpenAI', 
+    description: 'OpenAI API for GPT models', 
+    icon: '🤖', 
+    authTypes: {
+      api_key: ['api_key'],
+      oauth: ['client_id', 'client_secret']
+    }
+  },
+  { 
+    value: 'anthropic', 
+    label: 'Anthropic', 
+    description: 'Anthropic API for Claude models', 
+    icon: '🧠', 
+    authTypes: {
+      api_key: ['api_key'],
+      oauth: ['client_id', 'client_secret']
+    }
+  },
+  { 
+    value: 'gmail', 
+    label: 'Gmail', 
+    description: 'Gmail API for email sending', 
+    icon: '📧', 
+    authTypes: {
+      api_key: ['api_key'],
+      oauth: ['email', 'password', 'client_id', 'client_secret', 'refresh_token']
+    }
+  },
+  { 
+    value: 'slack', 
+    label: 'Slack', 
+    description: 'Slack API for messaging', 
+    icon: '💬', 
+    authTypes: {
+      api_key: ['bot_token'],
+      oauth: ['email', 'password', 'workspace_url', 'client_id', 'client_secret']
+    }
+  },
+  { 
+    value: 'salesforce', 
+    label: 'Salesforce', 
+    description: 'Salesforce CRM integration', 
+    icon: '☁️', 
+    authTypes: {
+      api_key: ['consumer_key', 'consumer_secret', 'security_token'],
+      oauth: ['email', 'password', 'instance_url', 'client_id', 'client_secret']
+    }
+  },
+  { 
+    value: 'hubspot', 
+    label: 'HubSpot', 
+    description: 'HubSpot CRM integration', 
+    icon: '🎯', 
+    authTypes: {
+      api_key: ['api_key'],
+      oauth: ['email', 'password', 'client_id', 'client_secret']
+    }
+  },
+  { 
+    value: 'webhook', 
+    label: 'Webhook', 
+    description: 'Custom webhook endpoints', 
+    icon: '🔗', 
+    authTypes: {
+      api_key: ['url', 'auth_header'],
+      oauth: ['url', 'client_id', 'client_secret']
+    }
+  },
 ];
 
 export default function Credentials() {
@@ -42,6 +106,7 @@ export default function Credentials() {
     service_type: '',
     credentials: {}
   });
+  const [authType, setAuthType] = useState<'api_key' | 'oauth'>('api_key');
 
   useEffect(() => {
     if (currentTenant) {
@@ -71,13 +136,20 @@ export default function Credentials() {
     if (!currentTenant) return;
     
     try {
-      await credentialsService.createCredential(currentTenant.id, formData);
+      // Add auth_type to the credential data
+      const credentialData = {
+        ...formData,
+        auth_type: authType
+      };
+      
+      await credentialsService.createCredential(currentTenant.id, credentialData);
       toast({
         title: "Success",
         description: "Credential created successfully"
       });
       setCreateDialogOpen(false);
       setFormData({ name: '', description: '', service_type: '', credentials: {} });
+      setAuthType('api_key');
       loadCredentials();
     } catch (error) {
       toast({
@@ -127,9 +199,12 @@ export default function Credentials() {
     return service ? `${service.icon} ${service.label}` : serviceType;
   };
 
-  const renderCredentialFields = (serviceType: string) => {
+  const renderCredentialFields = (serviceType: string, selectedAuthType: 'api_key' | 'oauth') => {
     const service = serviceTypes.find(s => s.value === serviceType);
     if (!service) return null;
+
+    const fields = service.authTypes[selectedAuthType];
+    if (!fields) return null;
 
     const fieldLabels = {
       'api_key': 'API Key',
@@ -138,10 +213,15 @@ export default function Credentials() {
       'refresh_token': 'Refresh Token',
       'bot_token': 'Bot Token',
       'signing_secret': 'Signing Secret',
-      'username': 'Username',
+      'email': 'Email',
       'password': 'Password',
+      'username': 'Username',
       'security_token': 'Security Token',
-      'url': 'Webhook URL',
+      'consumer_key': 'Consumer Key',
+      'consumer_secret': 'Consumer Secret',
+      'instance_url': 'Instance URL',
+      'workspace_url': 'Workspace URL',
+      'url': 'URL',
       'auth_header': 'Authorization Header'
     };
 
@@ -153,18 +233,33 @@ export default function Credentials() {
       'signing_secret': 'password',
       'password': 'password',
       'security_token': 'password',
-      'auth_header': 'password'
+      'auth_header': 'password',
+      'consumer_secret': 'password',
+      'email': 'email',
+      'url': 'url',
+      'instance_url': 'url',
+      'workspace_url': 'url'
+    };
+
+    const fieldPlaceholders = {
+      'email': 'your-email@example.com',
+      'password': 'Your account password',
+      'instance_url': 'https://yourcompany.salesforce.com',
+      'workspace_url': 'https://yourworkspace.slack.com',
+      'url': 'https://api.example.com/webhook',
+      'client_id': 'Your app client ID',
+      'client_secret': 'Your app client secret'
     };
 
     return (
       <div className="space-y-4">
-        {service.fields.map((field) => (
+        {fields.map((field) => (
           <div key={field}>
             <Label htmlFor={field}>{fieldLabels[field] || field}</Label>
             <Input
               id={field}
               type={fieldTypes[field] || 'text'}
-              placeholder={`Enter your ${fieldLabels[field]?.toLowerCase() || field}`}
+              placeholder={fieldPlaceholders[field] || `Enter your ${fieldLabels[field]?.toLowerCase() || field}`}
               value={formData.credentials[field] || ''}
               onChange={(e) => setFormData(prev => ({
                 ...prev,
@@ -174,10 +269,19 @@ export default function Credentials() {
           </div>
         ))}
         
-        {serviceType === 'salesforce' && (
+        {/* Service-specific tips */}
+        {serviceType === 'salesforce' && selectedAuthType === 'api_key' && (
           <div className="mt-4 p-3 bg-muted/50 rounded-lg">
             <p className="text-sm text-muted-foreground">
-              💡 <strong>Tip:</strong> For Salesforce, you can find your security token in Setup → Personal Information → Reset My Security Token
+              💡 <strong>Tip:</strong> For Salesforce API access, get your Consumer Key/Secret from a Connected App in Setup → App Manager
+            </p>
+          </div>
+        )}
+        
+        {serviceType === 'salesforce' && selectedAuthType === 'oauth' && (
+          <div className="mt-4 p-3 bg-muted/50 rounded-lg">
+            <p className="text-sm text-muted-foreground">
+              💡 <strong>Tip:</strong> Use your regular Salesforce login credentials and instance URL (e.g., https://yourcompany.salesforce.com)
             </p>
           </div>
         )}
@@ -186,6 +290,22 @@ export default function Credentials() {
           <div className="mt-4 p-3 bg-muted/50 rounded-lg">
             <p className="text-sm text-muted-foreground">
               💡 <strong>Tip:</strong> Get your API key from <a href="https://platform.openai.com/api-keys" target="_blank" className="text-primary hover:underline">OpenAI Platform</a>
+            </p>
+          </div>
+        )}
+
+        {serviceType === 'slack' && selectedAuthType === 'oauth' && (
+          <div className="mt-4 p-3 bg-muted/50 rounded-lg">
+            <p className="text-sm text-muted-foreground">
+              💡 <strong>Tip:</strong> Use your Slack workspace credentials. The workspace URL should be like https://yourworkspace.slack.com
+            </p>
+          </div>
+        )}
+
+        {serviceType === 'gmail' && selectedAuthType === 'oauth' && (
+          <div className="mt-4 p-3 bg-muted/50 rounded-lg">
+            <p className="text-sm text-muted-foreground">
+              💡 <strong>Tip:</strong> For Gmail OAuth, you'll need to set up a Google Cloud project and get OAuth credentials
             </p>
           </div>
         )}
@@ -247,7 +367,10 @@ export default function Credentials() {
                     <Label htmlFor="service_type">Service Type</Label>
                     <Select
                       value={formData.service_type}
-                      onValueChange={(value) => setFormData(prev => ({ ...prev, service_type: value, credentials: {} }))}
+                      onValueChange={(value) => {
+                        setFormData(prev => ({ ...prev, service_type: value, credentials: {} }));
+                        setAuthType('api_key'); // Reset to API key when service changes
+                      }}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select service type" />
@@ -268,7 +391,36 @@ export default function Credentials() {
                     </Select>
                   </div>
                   
-                  {formData.service_type && renderCredentialFields(formData.service_type)}
+                  {formData.service_type && (
+                    <div>
+                      <Label>Authentication Method</Label>
+                      <RadioGroup
+                        value={authType}
+                        onValueChange={(value: 'api_key' | 'oauth') => {
+                          setAuthType(value);
+                          setFormData(prev => ({ ...prev, credentials: {} })); // Clear credentials when auth type changes
+                        }}
+                        className="flex space-x-6 mt-2"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="api_key" id="api_key" />
+                          <Label htmlFor="api_key" className="text-sm">API Key / Token</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="oauth" id="oauth" />
+                          <Label htmlFor="oauth" className="text-sm">Email / Password (OAuth)</Label>
+                        </div>
+                      </RadioGroup>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {authType === 'api_key' 
+                          ? 'Use API keys or tokens for direct API access'
+                          : 'Use your account credentials for OAuth-based authentication'
+                        }
+                      </p>
+                    </div>
+                  )}
+                  
+                  {formData.service_type && renderCredentialFields(formData.service_type, authType)}
                   
                   <Button 
                     onClick={handleCreateCredential} 
@@ -321,6 +473,14 @@ export default function Credentials() {
                     {credential.description && (
                       <CardDescription>{credential.description}</CardDescription>
                     )}
+                    <div className="flex items-center gap-2">
+                      <Badge variant={credential.auth_type === 'api_key' ? 'default' : 'outline'} className="text-xs">
+                        {credential.auth_type === 'api_key' ? '🔑 API Key' : '📧 OAuth'}
+                      </Badge>
+                      <span className="text-xs text-muted-foreground">
+                        {Object.keys(credential.credentials || {}).length} fields configured
+                      </span>
+                    </div>
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center justify-between">
