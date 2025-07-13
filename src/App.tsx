@@ -25,6 +25,7 @@ import Marketplace from "./pages/Marketplace";
 import Forum from "./pages/Forum";
 import ForumPost from "./pages/ForumPost";
 import NotFound from "./pages/NotFound";
+import OAuthCallback from "./pages/OAuthCallback";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ const App = () => (
                   <Route path="/forum/:postId" element={<ProtectedRoute><ForumPost /></ProtectedRoute>} />
                   <Route path="/organizations/create" element={<ProtectedRoute><CreateOrganization /></ProtectedRoute>} />
                   <Route path="/workflow-builder/:workflowId" element={<ProtectedRoute><WorkflowBuilderPage /></ProtectedRoute>} />
+                  <Route path="/oauth/callback" element={<OAuthCallback />} />
                   
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />

@@ -13,7 +13,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Plus, Key, Edit, Trash2, TestTube } from 'lucide-react';
+import { Plus, Key, Edit, Trash2, TestTube, ExternalLink } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 const credentialsService = new CredentialsService();
 
@@ -107,6 +108,7 @@ export default function Credentials() {
     credentials: {}
   });
   const [authType, setAuthType] = useState<'api_key' | 'oauth'>('api_key');
+  const [isInitiatingOAuth, setIsInitiatingOAuth] = useState(false);
 
   useEffect(() => {
     if (currentTenant) {
@@ -199,6 +201,44 @@ export default function Credentials() {
     return service ? `${service.icon} ${service.label}` : serviceType;
   };
 
+  const handleOAuthConnect = async () => {
+    if (!currentTenant || !formData.service_type) return;
+    
+    try {
+      setIsInitiatingOAuth(true);
+      
+      const { data, error } = await supabase.functions.invoke('oauth-initiate', {
+        body: {
+          serviceType: formData.service_type,
+          tenantId: currentTenant.id,
+          credentialName: formData.name || `${formData.service_type} OAuth Connection`
+        }
+      });
+
+      if (error) throw error;
+
+      // Store OAuth config in sessionStorage for callback
+      sessionStorage.setItem(`oauth_state_${data.state}`, JSON.stringify({
+        serviceType: formData.service_type,
+        config: data.config,
+        credentialName: formData.name || `${formData.service_type} OAuth Connection`
+      }));
+
+      // Redirect to OAuth provider
+      window.location.href = data.authorizationUrl;
+      
+    } catch (error) {
+      console.error('OAuth initiation error:', error);
+      toast({
+        title: "OAuth Error",
+        description: error.message || "Failed to initiate OAuth flow",
+        variant: "destructive"
+      });
+    } finally {
+      setIsInitiatingOAuth(false);
+    }
+  };
+
   const renderCredentialFields = (serviceType: string, selectedAuthType: 'api_key' | 'oauth') => {
     const service = serviceTypes.find(s => s.value === serviceType);
     if (!service) return null;
@@ -251,6 +291,49 @@ export default function Credentials() {
       'client_secret': 'Your app client secret'
     };
 
+    if (selectedAuthType === 'oauth') {
+      // Show OAuth connect button instead of manual fields
+      return (
+        <div className="space-y-4">
+          <div className="text-center p-6 border-2 border-dashed border-muted rounded-lg">
+            <div className="mb-4">
+              <div className="text-lg font-semibold mb-2">
+                Connect with {service.label}
+              </div>
+              <p className="text-sm text-muted-foreground">
+                You'll be redirected to {service.label} to authorize this connection
+              </p>
+            </div>
+            
+            <Button 
+              onClick={handleOAuthConnect}
+              disabled={isInitiatingOAuth || !formData.name}
+              className="w-full"
+            >
+              {isInitiatingOAuth ? (
+                <>
+                  <div className="w-4 h-4 animate-spin rounded-full border-2 border-current border-t-transparent mr-2" />
+                  Connecting...
+                </>
+              ) : (
+                <>
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Connect with {service.label}
+                </>
+              )}
+            </Button>
+          </div>
+          
+          <div className="mt-4 p-3 bg-muted/50 rounded-lg">
+            <p className="text-sm text-muted-foreground">
+              💡 <strong>OAuth Flow:</strong> Click the button above to securely connect your {service.label} account. 
+              You'll be redirected to {service.label} to authorize the connection, then returned here automatically.
+            </p>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="space-y-4">
         {fields.map((field) => (
@@ -278,34 +361,10 @@ export default function Credentials() {
           </div>
         )}
         
-        {serviceType === 'salesforce' && selectedAuthType === 'oauth' && (
-          <div className="mt-4 p-3 bg-muted/50 rounded-lg">
-            <p className="text-sm text-muted-foreground">
-              💡 <strong>Tip:</strong> Use your regular Salesforce login credentials and instance URL (e.g., https://yourcompany.salesforce.com)
-            </p>
-          </div>
-        )}
-        
         {serviceType === 'openai' && (
           <div className="mt-4 p-3 bg-muted/50 rounded-lg">
             <p className="text-sm text-muted-foreground">
               💡 <strong>Tip:</strong> Get your API key from <a href="https://platform.openai.com/api-keys" target="_blank" className="text-primary hover:underline">OpenAI Platform</a>
-            </p>
-          </div>
-        )}
-
-        {serviceType === 'slack' && selectedAuthType === 'oauth' && (
-          <div className="mt-4 p-3 bg-muted/50 rounded-lg">
-            <p className="text-sm text-muted-foreground">
-              💡 <strong>Tip:</strong> Use your Slack workspace credentials. The workspace URL should be like https://yourworkspace.slack.com
-            </p>
-          </div>
-        )}
-
-        {serviceType === 'gmail' && selectedAuthType === 'oauth' && (
-          <div className="mt-4 p-3 bg-muted/50 rounded-lg">
-            <p className="text-sm text-muted-foreground">
-              💡 <strong>Tip:</strong> For Gmail OAuth, you'll need to set up a Google Cloud project and get OAuth credentials
             </p>
           </div>
         )}
@@ -422,13 +481,15 @@ export default function Credentials() {
                   
                   {formData.service_type && renderCredentialFields(formData.service_type, authType)}
                   
-                  <Button 
-                    onClick={handleCreateCredential} 
-                    className="w-full"
-                    disabled={!formData.name || !formData.service_type || Object.keys(formData.credentials).length === 0}
-                  >
-                    Create Credential
-                  </Button>
+                  {authType === 'api_key' && (
+                    <Button 
+                      onClick={handleCreateCredential} 
+                      className="w-full"
+                      disabled={!formData.name || !formData.service_type || Object.keys(formData.credentials).length === 0}
+                    >
+                      Create Credential
+                    </Button>
+                  )}
                 </div>
               </DialogContent>
             </Dialog>
