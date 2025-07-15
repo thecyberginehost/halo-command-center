@@ -1,7 +1,1 @@
-project_id = "YOUR_SUPABASE_PROJECT_ID"
-
-[functions.generate-workflow]
-verify_jwt = false
-
-[functions.ai-chat]
-verify_jwt = false
+project_id = "xxltijgxrwhdudhzicel"
