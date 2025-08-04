@@ -50,9 +50,9 @@ interface FlowCardProps {
   zoomLevel: number;
 }
 
-function getBrandConfig(integration: any) {
-  const integrationId = integration.id || integration.displayName?.toLowerCase() || '';
-  const Icon = integration.icon;
+function getBrandConfig(nodeData: any, iconUrl?: string, darkIconUrl?: string) {
+  const integrationId = nodeData.id || nodeData.name || nodeData.displayName?.toLowerCase() || '';
+  const Icon = nodeData.icon;
   
   // Get enterprise integration configuration
   const enterpriseIntegration = getIntegrationByType(integrationId);
@@ -60,15 +60,17 @@ function getBrandConfig(integration: any) {
   
   if (enterpriseIntegration) {
     // Use the actual integration icon if available, fallback to default
-    const iconComponent = Icon ? <Icon size={20} className="text-white" /> : <Workflow size={20} className="text-white" />;
+    const iconComponent = Icon ? <Icon size={20} className="text-white" /> : 
+                          iconUrl ? <img src={iconUrl} alt="" className="w-5 h-5" /> : 
+                          <Workflow size={20} className="text-white" />;
     
     // Map enterprise integration to visual brand config
     const brandConfig = {
       shape: 'processor',
-      primaryColor: integration.color || '#3B82F6',
-      secondaryColor: integration.color || '#2563EB',
+      primaryColor: nodeData.color || nodeData.defaults?.color || '#3B82F6',
+      secondaryColor: nodeData.color || nodeData.defaults?.color || '#2563EB',
       icon: iconComponent,
-      brandName: integration.name.toUpperCase(),
+      brandName: (nodeData.displayName || nodeData.name).toUpperCase(),
       processingType: enterpriseIntegration.category
     };
 
@@ -112,7 +114,9 @@ function getBrandConfig(integration: any) {
   }
 
   // Use the actual integration icon for all cases
-  const iconComponent = Icon ? <Icon size={20} className="text-white" /> : <Workflow size={20} className="text-white" />;
+  const iconComponent = Icon ? <Icon size={20} className="text-white" /> : 
+                        iconUrl ? <img src={iconUrl} alt="" className="w-5 h-5" /> : 
+                        <Workflow size={20} className="text-white" />;
   
   // Fallback configurations for legacy integrations
   const iconName = integrationId;
@@ -121,32 +125,32 @@ function getBrandConfig(integration: any) {
   if (iconName.includes('gmail')) {
     return {
       shape: 'processor',
-      primaryColor: integration.color || '#EA4335',
+      primaryColor: nodeData.color || nodeData.defaults?.color || '#EA4335',
       secondaryColor: '#FBBC04',
       icon: iconComponent,
-      brandName: integration.name.toUpperCase(),
+      brandName: (nodeData.displayName || nodeData.name).toUpperCase(),
       processingType: 'email'
     };
   }
   
   // Triggers - Input Controller
-  if (integration.type === 'trigger') {
+  if ((nodeData as any).type === 'trigger' || ((nodeData as any).group && (nodeData as any).group.includes('trigger'))) {
     return {
       shape: 'controller',
-      primaryColor: integration.color || '#EAB308',
+      primaryColor: nodeData.color || nodeData.defaults?.color || '#EAB308',
       secondaryColor: '#F59E0B',
       icon: iconComponent,
-      brandName: integration.name.toUpperCase(),
+      brandName: (nodeData.displayName || nodeData.name).toUpperCase(),
       processingType: 'input'
     };
   }
   
   return {
     shape: 'processor',
-    primaryColor: integration.color || '#3B82F6',
-    secondaryColor: integration.color || '#2563EB',
+    primaryColor: nodeData.color || nodeData.defaults?.color || '#3B82F6',
+    secondaryColor: nodeData.color || nodeData.defaults?.color || '#2563EB',
     icon: iconComponent,
-    brandName: integration.name.toUpperCase(),
+    brandName: (nodeData.displayName || nodeData.name).toUpperCase(),
     processingType: 'general'
   };
 }
@@ -210,11 +214,16 @@ export function FlowCard({
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
   
-  const { integration, config, label, isConfigured, hasError, errorMessage } = node.data;
-  const Icon = integration.icon;
+  const { integration, haloNode, config, label, isConfigured, hasError, errorMessage } = node.data;
+  
+  // Support both legacy integrations and new haloNodes
+  const nodeData = haloNode || integration;
+  const Icon = haloNode ? undefined : integration?.icon; // For legacy support
+  const iconUrl = haloNode?.iconUrl;
+  const darkIconUrl = haloNode?.darkIconUrl;
   
   // Get brand-specific configuration
-  const brandConfig = getBrandConfig(integration);
+  const brandConfig = getBrandConfig(nodeData, iconUrl, darkIconUrl);
   const industrialShape = getIndustrialShape(brandConfig.shape);
   
   // Check if this is an AI node for special processing unit styling
@@ -419,7 +428,7 @@ export function FlowCard({
       </div>
 
       {/* Industrial Connection Ports */}
-      {integration.type !== 'trigger' && (
+      {(nodeData as any).type !== 'trigger' && !(nodeData as any).group?.includes('trigger') && (
         <div
           className="absolute left-0 top-1/2 w-6 h-6 border border-slate-400 
                      cursor-crosshair hover:scale-110 transition-all duration-200 flex items-center justify-center

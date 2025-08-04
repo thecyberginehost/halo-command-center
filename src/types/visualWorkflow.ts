@@ -1,16 +1,18 @@
 import { Node, Edge } from '@xyflow/react';
 import { IntegrationNode } from './integrations';
+import { NodeRegistryEntry } from './haloNode';
 
 export interface VisualWorkflowNode extends Node {
   data: {
-    integration: IntegrationNode;
+    integration?: IntegrationNode; // Legacy support
+    haloNode?: NodeRegistryEntry; // New n8n-style nodes
     config: Record<string, any>;
     label: string;
     isConfigured: boolean;
     hasError?: boolean;
     errorMessage?: string;
   };
-  type: 'integrationNode';
+  type: 'integrationNode' | 'haloNode';
 }
 
 export interface VisualWorkflowEdge extends Edge {
@@ -40,6 +42,7 @@ export interface NodeConfigPanelProps {
 }
 
 export interface NodePaletteProps {
-  integrations: IntegrationNode[];
-  onAddNode: (integration: IntegrationNode, position: { x: number; y: number }) => void;
+  integrations?: IntegrationNode[];
+  onAddNode?: (integration: IntegrationNode, position: { x: number; y: number }) => void;
+  onAddHaloNode?: (node: NodeRegistryEntry, position: { x: number; y: number }) => void;
 }

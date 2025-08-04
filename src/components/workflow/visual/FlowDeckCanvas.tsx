@@ -2,9 +2,10 @@ import React, { useCallback, useRef, useState, useEffect, useMemo } from 'react'
 import { useToast } from '@/hooks/use-toast';
 import { VisualWorkflowNode, VisualWorkflowEdge } from '@/types/visualWorkflow';
 import { IntegrationNode } from '@/types/integrations';
+import { NodeRegistryEntry } from '@/types/haloNode';
 import { FlowCard } from './FlowCard';
 import { ConnectionRenderer } from './ConnectionRenderer';
-import { FlowDeckToolbar } from './FlowDeckToolbar';
+import { AddNodePalette } from '../../AddNodePalette';
 import { ConfigurationPanel } from './ConfigurationPanel';
 import { VoiceController } from './VoiceController';
 import { Button } from '@/components/ui/button';
@@ -143,6 +144,46 @@ export function FlowDeckCanvas({
     });
   }, [viewport, toast]);
 
+  const addHaloNode = useCallback((haloNode: NodeRegistryEntry) => {
+    // Add node at a default position for now
+    const position = { x: 400, y: 200 };
+    const newNode: VisualWorkflowNode = {
+      id: `${haloNode.name}-${Date.now()}`,
+      type: 'haloNode',
+      position: {
+        x: (position.x - viewport.x) / viewport.zoom,
+        y: (position.y - viewport.y) / viewport.zoom
+      },
+      data: {
+        haloNode,
+        config: {},
+        label: haloNode.displayName,
+        isConfigured: false,
+      },
+    };
+
+    setNodes(prev => [...prev, newNode]);
+    
+    // Add magnetic snap animation
+    setTimeout(() => {
+      const snapPosition = {
+        x: Math.round(newNode.position.x / 20) * 20,
+        y: Math.round(newNode.position.y / 20) * 20
+      };
+      
+      setNodes(prev => prev.map(node => 
+        node.id === newNode.id 
+          ? { ...node, position: snapPosition }
+          : node
+      ));
+    }, 300);
+
+    toast({
+      title: "Node Added",
+      description: `${haloNode.displayName} node added to your workflow`,
+    });
+  }, [viewport, toast]);
+
   const updateNodePosition = useCallback((nodeId: string, position: { x: number; y: number }) => {
     setNodes(prev => prev.map(node => 
       node.id === nodeId 
@@ -170,9 +211,10 @@ export function FlowDeckCanvas({
     const nodeToDuplicate = nodes.find(node => node.id === nodeId);
     if (!nodeToDuplicate) return;
 
+    const baseId = nodeToDuplicate.data.integration?.id || nodeToDuplicate.data.haloNode?.name || 'node';
     const newNode: VisualWorkflowNode = {
       ...nodeToDuplicate,
-      id: `${nodeToDuplicate.data.integration.id}-${Date.now()}`,
+      id: `${baseId}-${Date.now()}`,
       position: {
         x: nodeToDuplicate.position.x + 120,
         y: nodeToDuplicate.position.y + 40,
@@ -404,16 +446,17 @@ export function FlowDeckCanvas({
       <div 
         ref={canvasRef}
         className="w-full h-full cursor-grab active:cursor-grabbing"
-        onMouseDown={handleCanvasMouseDown}
-        onWheel={handleCanvasWheel}
-        onMouseMove={updateConnection}
-        style={{
+        style={{ 
+          marginLeft: '320px',
           backgroundImage: showGrid ? `
             radial-gradient(circle at 1px 1px, rgba(var(--foreground), 0.15) 1px, transparent 0),
             radial-gradient(circle at 20px 20px, rgba(var(--primary), 0.1) 1px, transparent 0)
           ` : undefined,
           backgroundSize: showGrid ? '20px 20px, 40px 40px' : undefined,
         }}
+        onMouseDown={handleCanvasMouseDown}
+        onWheel={handleCanvasWheel}
+        onMouseMove={updateConnection}
       >
         {/* Background Grid Pattern */}
         {showGrid && (
@@ -498,13 +541,14 @@ export function FlowDeckCanvas({
         )}
       </div>
 
-      {/* Bottom Toolbar */}
-      <FlowDeckToolbar 
-        onAddNode={addNode}
-        onChatToggle={onChatToggle}
-        canvasRef={canvasRef}
-        viewport={viewport}
-      />
+      {/* Node Palette - Left Sidebar */}
+      <div className="fixed left-0 top-0 h-full w-80 z-10 bg-background/95 backdrop-blur-lg border-r border-border/50">
+        <AddNodePalette
+          onSelect={addHaloNode}
+          className="h-full"
+        />
+      </div>
+
 
       {/* Configuration Panel */}
       {selectedNode && (

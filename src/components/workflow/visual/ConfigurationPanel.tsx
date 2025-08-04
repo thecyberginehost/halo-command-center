@@ -35,8 +35,10 @@ export function ConfigurationPanel({ node, onConfigChange, onClose }: Configurat
   const [isTestRunning, setIsTestRunning] = useState(false);
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
 
-  const { integration, isConfigured, hasError, errorMessage } = node.data;
-  const Icon = integration.icon;
+  const { integration, haloNode, isConfigured, hasError, errorMessage } = node.data;
+  const nodeData = haloNode || integration;
+  const Icon = haloNode ? undefined : integration?.icon;
+  const iconUrl = haloNode?.iconUrl;
 
   useEffect(() => {
     setConfig(node.data.config || {});
@@ -72,7 +74,7 @@ export function ConfigurationPanel({ node, onConfigChange, onClose }: Configurat
   };
 
   const renderBasicConfig = () => {
-    const fields = (integration as any).properties || [];
+    const fields = (nodeData as any).properties || [];
     
     return (
       <div className="space-y-4">
@@ -226,20 +228,23 @@ async function transform(data) {
             <div 
               className="p-2 rounded-lg"
               style={{ 
-                backgroundColor: integration.color + '20',
-                border: `1px solid ${integration.color}40`
+                backgroundColor: (nodeData as any).color || (nodeData as any).defaults?.color + '20' || '#3B82F620',
+                border: `1px solid ${(nodeData as any).color || (nodeData as any).defaults?.color + '40' || '#3B82F640'}`
               }}
             >
               {Icon && (
                 <Icon 
                   className="h-5 w-5" 
-                  style={{ color: integration.color }}
+                  style={{ color: (nodeData as any).color || (nodeData as any).defaults?.color || '#3B82F6' }}
                 />
+              )}
+              {!Icon && iconUrl && (
+                <img src={iconUrl} alt="" className="w-5 h-5" />
               )}
             </div>
             <div>
-              <h3 className="font-semibold text-sm">{integration.name}</h3>
-              <p className="text-xs text-muted-foreground">{integration.description}</p>
+              <h3 className="font-semibold text-sm">{(nodeData as any).displayName || (nodeData as any).name}</h3>
+              <p className="text-xs text-muted-foreground">{(nodeData as any).description}</p>
             </div>
           </div>
           <Button variant="ghost" size="sm" onClick={onClose}>
@@ -250,10 +255,10 @@ async function transform(data) {
         {/* Status */}
         <div className="flex items-center space-x-2 mt-3">
           <Badge 
-            variant={integration.type === 'trigger' ? 'default' : 'secondary'}
+            variant={(nodeData as any).type === 'trigger' || (nodeData as any).group?.includes('trigger') ? 'default' : 'secondary'}
             className="text-xs"
           >
-            {integration.type}
+            {(nodeData as any).type || 'action'}
           </Badge>
           
           {isConfigured ? (
