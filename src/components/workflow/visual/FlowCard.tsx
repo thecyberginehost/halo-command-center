@@ -52,68 +52,68 @@ interface FlowCardProps {
 
 function getBrandConfig(integration: any) {
   const integrationId = integration.id || integration.displayName?.toLowerCase() || '';
+  const Icon = integration.icon;
   
   // Get enterprise integration configuration
   const enterpriseIntegration = getIntegrationByType(integrationId);
   const processorType = getProcessorTypeForIntegration(integrationId);
   
   if (enterpriseIntegration) {
+    // Use the actual integration icon if available, fallback to default
+    const iconComponent = Icon ? <Icon size={20} className="text-white" /> : <Workflow size={20} className="text-white" />;
+    
     // Map enterprise integration to visual brand config
     const brandConfig = {
       shape: 'processor',
-      primaryColor: '#3B82F6',
-      secondaryColor: '#2563EB',
-      icon: <Workflow size={20} className="text-white" />,
-      brandName: enterpriseIntegration.name.toUpperCase(),
+      primaryColor: integration.color || '#3B82F6',
+      secondaryColor: integration.color || '#2563EB',
+      icon: iconComponent,
+      brandName: integration.name.toUpperCase(),
       processingType: enterpriseIntegration.category
     };
 
-    // Override with specific brand colors and icons
+    // Override with specific brand colors based on category (keep icons as provided)
     switch (enterpriseIntegration.category) {
       case 'communication':
         brandConfig.primaryColor = '#4A154B';
         brandConfig.secondaryColor = '#611F69';
-        brandConfig.icon = <MessageSquare size={20} className="text-white" />;
         break;
       case 'crm':
         brandConfig.primaryColor = '#FF7A59';
         brandConfig.secondaryColor = '#FF5C35';
-        brandConfig.icon = <Users size={20} className="text-white" />;
         break;
       case 'email':
         brandConfig.primaryColor = '#EA4335';
         brandConfig.secondaryColor = '#FBBC04';
-        brandConfig.icon = <Mail size={20} className="text-white" />;
         break;
       case 'database':
         brandConfig.shape = 'storage';
         brandConfig.primaryColor = '#22C55E';
         brandConfig.secondaryColor = '#16A34A';
-        brandConfig.icon = <Database size={20} className="text-white" />;
         break;
       case 'storage':
         brandConfig.shape = 'storage';
         brandConfig.primaryColor = '#0891B2';
         brandConfig.secondaryColor = '#0E7490';
-        brandConfig.icon = <Cloud size={20} className="text-white" />;
         break;
       case 'ai':
         brandConfig.shape = 'ai-processor';
         brandConfig.primaryColor = '#10B981';
         brandConfig.secondaryColor = '#059669';
-        brandConfig.icon = <Bot size={20} className="text-white" />;
         break;
       case 'trigger':
         brandConfig.shape = 'controller';
         brandConfig.primaryColor = '#EAB308';
         brandConfig.secondaryColor = '#F59E0B';
-        brandConfig.icon = <Webhook size={20} className="text-white" />;
         break;
     }
 
     return brandConfig;
   }
 
+  // Use the actual integration icon for all cases
+  const iconComponent = Icon ? <Icon size={20} className="text-white" /> : <Workflow size={20} className="text-white" />;
+  
   // Fallback configurations for legacy integrations
   const iconName = integrationId;
   
@@ -121,10 +121,10 @@ function getBrandConfig(integration: any) {
   if (iconName.includes('gmail')) {
     return {
       shape: 'processor',
-      primaryColor: '#EA4335',
+      primaryColor: integration.color || '#EA4335',
       secondaryColor: '#FBBC04',
-      icon: <Mail size={20} className="text-white" />,
-      brandName: 'GMAIL',
+      icon: iconComponent,
+      brandName: integration.name.toUpperCase(),
       processingType: 'email'
     };
   }
@@ -133,10 +133,10 @@ function getBrandConfig(integration: any) {
   if (integration.type === 'trigger') {
     return {
       shape: 'controller',
-      primaryColor: '#EAB308',
+      primaryColor: integration.color || '#EAB308',
       secondaryColor: '#F59E0B',
-      icon: <Zap size={20} className="text-white" />,
-      brandName: 'TRIGGER',
+      icon: iconComponent,
+      brandName: integration.name.toUpperCase(),
       processingType: 'input'
     };
   }
@@ -145,8 +145,8 @@ function getBrandConfig(integration: any) {
     shape: 'processor',
     primaryColor: integration.color || '#3B82F6',
     secondaryColor: integration.color || '#2563EB',
-    icon: <Workflow size={20} className="text-white" />,
-    brandName: 'PROCESSOR',
+    icon: iconComponent,
+    brandName: integration.name.toUpperCase(),
     processingType: 'general'
   };
 }
