@@ -1,12 +1,9 @@
 import { HaloNodeDefinition, HaloNodeExecuteContext, HaloNodeExecutionData } from '../../types/haloNode';
-import icon from './httprequest.svg';
-import darkIcon from './httprequest.dark.svg';
 
 export const HttpRequestNode: HaloNodeDefinition = {
   displayName: 'HTTP Request',
   name: 'httpRequest',
-  icon,
-  darkIcon,
+  icon: 'httprequest.svg',
   group: ['transform'],
   version: 1,
   description: 'Makes an HTTP request and returns the response data',

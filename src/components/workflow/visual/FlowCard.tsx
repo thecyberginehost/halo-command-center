@@ -52,7 +52,9 @@ interface FlowCardProps {
 
 function getBrandConfig(nodeData: any, iconUrl?: string, darkIconUrl?: string) {
   const integrationId = nodeData.id || nodeData.name || nodeData.displayName?.toLowerCase() || '';
-  const Icon = nodeData.icon;
+  
+  // Only use Icon for legacy integrations - haloNodes use iconUrl instead
+  const Icon = nodeData.icon && typeof nodeData.icon === 'function' ? nodeData.icon : undefined;
   
   // Get enterprise integration configuration
   const enterpriseIntegration = getIntegrationByType(integrationId);
@@ -218,7 +220,7 @@ export function FlowCard({
   
   // Support both legacy integrations and new haloNodes
   const nodeData = haloNode || integration;
-  const Icon = haloNode ? undefined : integration?.icon; // For legacy support
+  const Icon = haloNode ? undefined : integration?.icon; // Only for legacy integrations
   const iconUrl = haloNode?.iconUrl;
   const darkIconUrl = haloNode?.darkIconUrl;
   
