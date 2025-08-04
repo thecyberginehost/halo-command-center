@@ -229,27 +229,36 @@ export function ConnectionRenderer({ edges, nodes, connectionState }: Connection
         return (
           <g key={`ports-${node.id}`}>
             {/* Input Port */}
-            {node.data.integration.type !== 'trigger' && (
-              <g>
-                <rect
-                  x={inputPos.x - 3}
-                  y={inputPos.y - 3}
-                  width="6"
-                  height="6"
-                  rx="1"
-                  fill="#f8fafc"
-                  stroke="#64748b"
-                  strokeWidth="1"
-                  opacity="0.9"
-                />
-                <circle
-                  cx={inputPos.x}
-                  cy={inputPos.y}
-                  r="1"
-                  fill={node.data.integration.color || '#64748b'}
-                />
-              </g>
-            )}
+            {(() => {
+              const isNotTrigger = node.data.integration ? 
+                node.data.integration.type !== 'trigger' : 
+                node.data.haloNode ? 
+                  !node.data.haloNode.group?.includes('trigger') : 
+                  true;
+              const nodeColor = node.data.integration?.color || '#64748b';
+              
+              return isNotTrigger && (
+                <g>
+                  <rect
+                    x={inputPos.x - 3}
+                    y={inputPos.y - 3}
+                    width="6"
+                    height="6"
+                    rx="1"
+                    fill="#f8fafc"
+                    stroke="#64748b"
+                    strokeWidth="1"
+                    opacity="0.9"
+                  />
+                  <circle
+                    cx={inputPos.x}
+                    cy={inputPos.y}
+                    r="1"
+                    fill={nodeColor}
+                  />
+                </g>
+              );
+            })()}
             
             {/* Output Port */}
             <g>
@@ -268,7 +277,7 @@ export function ConnectionRenderer({ edges, nodes, connectionState }: Connection
                 cx={outputPos.x}
                 cy={outputPos.y}
                 r="1"
-                fill={node.data.integration.color || '#64748b'}
+                fill={node.data.integration?.color || '#64748b'}
               />
             </g>
           </g>
