@@ -65,63 +65,51 @@ export const BaseWorkflowNode = memo(({
     >
       <div className="relative">
         <Card 
-          className="min-w-[90px] max-w-[110px] shadow-md transition-all duration-200 hover:shadow-lg"
+          className="w-20 h-20 shadow-md transition-all duration-200 hover:shadow-lg border-2 rounded-2xl"
           style={nodeStyle}
         >
-          <div className="p-1">
-            {/* Node Header */}
-            <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center space-x-1 flex-1 min-w-0">
+          <div className="h-full flex flex-col items-center justify-center p-2">
+            {/* Main Icon - Large and centered */}
+            <div 
+              className="w-8 h-8 rounded-xl flex items-center justify-center mb-1 shadow-sm"
+              style={{ backgroundColor: nodeColor }}
+            >
+              {Icon ? (
+                <Icon 
+                  className="h-5 w-5 text-white" 
+                />
+              ) : (
                 <div 
-                  className="p-0.5 rounded-sm flex items-center justify-center flex-shrink-0"
-                  style={{ backgroundColor: nodeColor + '20' }}
-                >
-                   {Icon ? (
-                     <Icon 
-                       className="h-2.5 w-2.5" 
-                       style={{ color: nodeColor }}
-                     />
-                   ) : (
-                     <div 
-                       className="h-2.5 w-2.5 rounded" 
-                       style={{ backgroundColor: nodeColor + '40' }}
-                     />
-                   )}
-                </div>
-                <span className="font-medium text-xs text-foreground truncate">{label}</span>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onConfigClick?.(id);
-                }}
-                className={`h-2.5 w-2.5 p-0 flex-shrink-0 ${getStatusColor()}`}
-              >
-                {getStatusIcon()}
-              </Button>
-            </div>
-
-            {/* Status Badge */}
-            <div className="flex items-center justify-center">
-              <Badge 
-                variant={integration.type === 'trigger' ? 'default' : 'secondary'}
-                className="text-xs px-1 py-0 text-xs"
-              >
-                {integration.type}
-              </Badge>
-              {hasError && (
-                <Badge variant="destructive" className="text-xs ml-1 px-1 py-0">
-                  Error
-                </Badge>
+                  className="h-5 w-5 rounded-lg bg-white/30" 
+                />
               )}
             </div>
+            
+            {/* Label */}
+            <span className="font-medium text-xs text-foreground text-center leading-tight truncate w-full">
+              {integration.name || label}
+            </span>
+            
+            {/* Status indicator */}
+            <div className="absolute top-1 right-1">
+              <div className={`w-2 h-2 rounded-full ${
+                hasError ? 'bg-destructive' : 
+                isConfigured ? 'bg-green-500' : 'bg-muted-foreground/30'
+              }`} />
+            </div>
 
-            {/* Error Message */}
-            {hasError && errorMessage && (
-              <p className="text-xs text-destructive mt-1 line-clamp-1">{errorMessage}</p>
-            )}
+            {/* Configuration button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                onConfigClick?.(id);
+              }}
+              className="absolute bottom-1 right-1 h-3 w-3 p-0 opacity-0 hover:opacity-100 transition-opacity"
+            >
+              <Settings className="h-2 w-2" />
+            </Button>
           </div>
         </Card>
 

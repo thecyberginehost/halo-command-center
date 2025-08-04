@@ -13,7 +13,7 @@ import { AutomationCard } from '@/components/automations/AutomationCard';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks/usePageTitle';
-import { DemoWorkflowGenerator } from '@/components/DemoWorkflowGenerator';
+
 
 const Automations = () => {
   usePageTitle('Automations');
@@ -23,7 +23,7 @@ const Automations = () => {
   const navigate = useNavigate();
   const [editingWorkflow, setEditingWorkflow] = useState<WorkflowRecord | null>(null);
   const [deletingWorkflow, setDeletingWorkflow] = useState<WorkflowRecord | null>(null);
-  const [showDemo, setShowDemo] = useState(false);
+  
 
   const handleCreateAutomation = async () => {
     if (!currentTenant) {
@@ -107,30 +107,6 @@ const Automations = () => {
     event.target.value = '';
   };
 
-  const handleDemoWorkflowGenerated = (workflow: any) => {
-    setShowDemo(false);
-    refreshWorkflows(); // Refresh the workflows list
-    toast({
-      title: "Demo Workflow Created!",
-      description: `"${workflow.workflow.name}" is ready for your YC demo`
-    });
-  };
-
-  if (showDemo) {
-    return (
-      <Layout pageTitle="YC Demo Workflows">
-        <div className="mb-6">
-          <Button 
-            onClick={() => setShowDemo(false)} 
-            variant="outline"
-          >
-            ← Back to Automations
-          </Button>
-        </div>
-        <DemoWorkflowGenerator onWorkflowGenerated={handleDemoWorkflowGenerated} />
-      </Layout>
-    );
-  }
 
   return (
     <Layout pageTitle="Automations">
@@ -145,15 +121,6 @@ const Automations = () => {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button 
-              onClick={() => setShowDemo(true)}
-              className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
-            >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-              YC Demo
-            </Button>
             <div className="relative">
               <input
                 type="file"
@@ -199,15 +166,6 @@ const Automations = () => {
             Get started by creating your first workflow automation
           </p>
           <div className="flex gap-2 justify-center">
-            <Button 
-              onClick={() => setShowDemo(true)}
-              className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
-            >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-              Try YC Demo
-            </Button>
             <div className="relative">
               <input
                 type="file"
