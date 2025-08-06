@@ -17,6 +17,7 @@ import { BottomNodeToolbar } from './BottomNodeToolbar';
 import { NodeConfigPanel } from './NodeConfigPanel';
 import { VisualWorkflowNode, VisualWorkflowEdge } from '@/types/visualWorkflow';
 import { IntegrationNode } from '@/types/integrations';
+import { NodeRegistryEntry } from '@/types/haloNode';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Save, Play } from 'lucide-react';
@@ -70,6 +71,7 @@ IntegrationNodeComponent.displayName = 'IntegrationNodeComponent';
 
 const nodeTypes = {
   integrationNode: IntegrationNodeComponent,
+  haloNode: IntegrationNodeComponent, // Use same component for both types
 };
 
 export function VisualWorkflowCanvas({ 
@@ -159,6 +161,76 @@ export function VisualWorkflowCanvas({
     toast({
       title: "Node Added",
       description: `${integration.name} node added to workflow`,
+    });
+  }, [setNodes, toast]);
+
+  const addNodeFromHaloNode = useCallback((haloNode: NodeRegistryEntry, position: { x: number; y: number }) => {
+    // Validate halo node
+    if (!haloNode?.name || !haloNode?.displayName) {
+      console.error('Invalid halo node provided:', haloNode);
+      toast({
+        title: "Error",
+        description: "Cannot add invalid halo node",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setNodes(prev => {
+      // Calculate smart position based on existing nodes
+      const calculateSmartPosition = (): { x: number; y: number } => {
+        if (prev.length === 0) {
+          return { x: 250, y: 200 }; // Better initial position
+        }
+        
+        // Find the rightmost node
+        const rightmostNode = prev.reduce((prevNode, current) => 
+          (prevNode.position.x > current.position.x) ? prevNode : current
+        );
+        
+        // Calculate new position with proper spacing
+        const newPos = {
+          x: rightmostNode.position.x + 180, // Consistent spacing
+          y: rightmostNode.position.y
+        };
+        
+        return newPos;
+      };
+
+      const smartPosition = position.x === 100 && position.y === 100 
+        ? calculateSmartPosition() 
+        : position;
+
+      const newNode: VisualWorkflowNode = {
+        id: `${haloNode.name}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        type: 'haloNode',
+        position: smartPosition,
+        data: {
+          haloNode,
+          config: {},
+          label: haloNode.displayName,
+          isConfigured: false,
+        },
+        draggable: true,
+        selectable: true,
+        connectable: true,
+        deletable: true,
+      };
+      
+      return [...prev, newNode];
+    });
+    
+    // Auto-fit view after adding node
+    setTimeout(() => {
+      const reactFlowInstance = (window as any).reactFlowInstance;
+      if (reactFlowInstance?.fitView) {
+        reactFlowInstance.fitView({ padding: 0.2 });
+      }
+    }, 100);
+    
+    toast({
+      title: "Node Added",
+      description: `${haloNode.displayName} node added to workflow`,
     });
   }, [setNodes, toast]);
 
@@ -415,7 +487,11 @@ export function VisualWorkflowCanvas({
       </div>
 
       {/* Bottom Node Toolbar - Lower z-index to not interfere */}
-      <BottomNodeToolbar onAddNode={addNodeFromIntegration} onChatToggle={onChatToggle} />
+      <BottomNodeToolbar 
+        onAddNode={addNodeFromIntegration} 
+        onAddHaloNode={addNodeFromHaloNode}
+        onChatToggle={onChatToggle} 
+      />
 
       {/* Configuration Panel - Right slide-out with higher z-index */}
       {selectedNode && (
