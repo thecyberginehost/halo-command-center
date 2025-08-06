@@ -43,10 +43,10 @@ serve(async (req) => {
 
   try {
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-    console.log('OpenAI API Key found:', !!openAIApiKey);
-    console.log('API Key length:', openAIApiKey?.length || 0);
+    
     if (!openAIApiKey) {
-      throw new Error('OpenAI API key not configured');
+      console.error('OpenAI API key not found in environment');
+      throw new Error('OpenAI API key not configured. Please add your OpenAI API key to the edge function secrets.');
     }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -326,19 +326,28 @@ REQUEST TYPE: ${requestType}`;
         model: 'gpt-4o',
         messages: messages,
         temperature: 0.7,
-        max_tokens: 1000,
+        max_tokens: 2000,
         presence_penalty: 0.1,
         frequency_penalty: 0.1,
       }),
     });
 
-    console.log('OpenAI response status:', response.status);
-    console.log('OpenAI response headers:', Object.fromEntries(response.headers.entries()));
-
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('OpenAI API Error:', response.status, errorText);
-      throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
+      console.error('OpenAI API Error Response:', {
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers.entries()),
+        body: errorText
+      });
+      
+      if (response.status === 401) {
+        throw new Error('Invalid OpenAI API key. Please check your API key configuration.');
+      } else if (response.status === 429) {
+        throw new Error('OpenAI API rate limit exceeded. Please try again later.');
+      } else {
+        throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
+      }
     }
 
     const data = await response.json();

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search } from 'lucide-react';
+import { Search, Sparkles } from 'lucide-react';
 import { nodeRegistry } from '../nodeRegistry';
 import { NodeRegistryEntry } from '../types/haloNode';
 import { Input } from './ui/input';
@@ -7,9 +7,11 @@ import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { ScrollArea } from './ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { Button } from './ui/button';
 
 interface AddNodePaletteProps {
   onSelect: (node: NodeRegistryEntry) => void;
+  onAIAssistantClick?: () => void;
   className?: string;
 }
 
@@ -29,7 +31,7 @@ const useTheme = () => {
   return { isDark };
 };
 
-export function AddNodePalette({ onSelect, className = '' }: AddNodePaletteProps) {
+export function AddNodePalette({ onSelect, onAIAssistantClick, className = '' }: AddNodePaletteProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const { isDark } = useTheme();
 
@@ -70,6 +72,17 @@ export function AddNodePalette({ onSelect, className = '' }: AddNodePaletteProps
       {/* Header */}
       <div className="p-4 border-b">
         <h2 className="text-lg font-semibold mb-3">Add Node</h2>
+        
+        {/* AI Assistant Button */}
+        {onAIAssistantClick && (
+          <Button 
+            onClick={onAIAssistantClick} 
+            className="w-full mb-3 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+          >
+            <Sparkles className="h-4 w-4 mr-2" />
+            Ask AI Assistant
+          </Button>
+        )}
         
         {/* Search */}
         <div className="relative">

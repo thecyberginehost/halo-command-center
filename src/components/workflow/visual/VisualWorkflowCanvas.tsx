@@ -13,7 +13,6 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { BaseWorkflowNode } from './BaseWorkflowNode';
-import { BottomNodeToolbar } from './BottomNodeToolbar';
 import { NodeConfigPanel } from './NodeConfigPanel';
 import { VisualWorkflowNode, VisualWorkflowEdge } from '@/types/visualWorkflow';
 import { IntegrationNode } from '@/types/integrations';
@@ -485,13 +484,6 @@ export function VisualWorkflowCanvas({
           </div>
         )}
       </div>
-
-      {/* Bottom Node Toolbar - Lower z-index to not interfere */}
-      <BottomNodeToolbar 
-        onAddNode={addNodeFromIntegration} 
-        onAddHaloNode={addNodeFromHaloNode}
-        onChatToggle={onChatToggle} 
-      />
 
       {/* Configuration Panel - Right slide-out with higher z-index */}
       {selectedNode && (

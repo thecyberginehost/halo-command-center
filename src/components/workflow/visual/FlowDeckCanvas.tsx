@@ -545,6 +545,7 @@ export function FlowDeckCanvas({
       <div className="fixed left-0 top-0 h-full w-80 z-10 bg-background/95 backdrop-blur-lg border-r border-border/50">
         <AddNodePalette
           onSelect={addHaloNode}
+          onAIAssistantClick={onChatToggle}
           className="h-full"
         />
       </div>
