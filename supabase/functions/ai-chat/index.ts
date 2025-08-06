@@ -46,14 +46,28 @@ serve(async (req) => {
     
     if (!openAIApiKey) {
       console.error('OpenAI API key not found in environment');
-      throw new Error('OpenAI API key not configured. Please add your OpenAI API key to the edge function secrets.');
+      return new Response(JSON.stringify({ 
+        error: 'OpenAI API key not configured',
+        fallbackMessage: "I'm having trouble accessing my AI capabilities right now. Please check the API key configuration."
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
     }
+
+    console.log('Processing AI chat request...');
+    const requestBody = await req.json();
+    console.log('Request body keys:', Object.keys(requestBody));
+
+    const { message, tenantId, context, conversationHistory = [], requestType = 'chat' }: ChatRequest = requestBody;
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-    const { message, tenantId, context, conversationHistory = [], requestType = 'chat' }: ChatRequest = await req.json();
+    console.log('Message:', message?.substring(0, 100));
+    console.log('TenantId:', tenantId);
+    console.log('RequestType:', requestType);
 
     // Detect workflow building intents and search queries first
     const isWorkflowRequest = requestType === 'build_workflow' || 
@@ -316,6 +330,7 @@ REQUEST TYPE: ${requestType}`;
       { role: 'user', content: message }
     ];
 
+    console.log('Sending request to OpenAI...');
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -323,7 +338,7 @@ REQUEST TYPE: ${requestType}`;
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-4.1-2025-04-14',
         messages: messages,
         temperature: 0.7,
         max_tokens: 2000,
@@ -331,6 +346,8 @@ REQUEST TYPE: ${requestType}`;
         frequency_penalty: 0.1,
       }),
     });
+
+    console.log('OpenAI response status:', response.status);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -351,6 +368,7 @@ REQUEST TYPE: ${requestType}`;
     }
 
     const data = await response.json();
+    console.log('OpenAI response received successfully');
     const assistantMessage = data.choices[0].message.content;
 
     // Parse workflow building instructions
@@ -359,6 +377,7 @@ REQUEST TYPE: ${requestType}`;
     if (jsonMatch) {
       try {
         workflowData = JSON.parse(jsonMatch[1]);
+        console.log('Workflow data parsed successfully');
       } catch (e) {
         console.log('Failed to parse workflow JSON:', e);
       }

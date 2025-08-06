@@ -170,13 +170,20 @@ RESPONSE FORMAT:
       // Call AI Chat service
       const { data, error } = await supabase.functions.invoke('ai-chat', {
         body: {
-          messages: conversationHistory,
+          message: content,
+          tenantId: currentTenant?.id,
           context: {
-            workflowContext,
-            tenantId: currentTenant?.id,
-            platform: 'HALO',
-            features: ['workflow_generation', 'integration_analysis', 'masp_guidance']
-          }
+            currentPage: `/automations/create/${workflowContext?.currentWorkflow?.id || 'new'}`,
+            currentWorkflow: workflowContext?.currentWorkflow,
+            currentWorkflowNodes: workflowContext?.currentWorkflow?.nodes || [],
+            currentWorkflowEdges: workflowContext?.currentWorkflow?.connections || [],
+            workflowCount: 1
+          },
+          conversationHistory: messages.slice(-10).map(msg => ({
+            role: msg.role,
+            content: msg.content
+          })),
+          requestType: 'chat'
         }
       });
 
@@ -187,7 +194,7 @@ RESPONSE FORMAT:
       if (error) throw error;
 
       const response: ResonantDirectiveResponse = {
-        content: data.response || 'I apologize, but I encountered an issue processing your request.',
+        content: data.message || data.fallbackMessage || 'I apologize, but I encountered an issue processing your request.',
         action: data.action,
         workflowData: data.workflowData,
         suggestions: data.suggestions,
