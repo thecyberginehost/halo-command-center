@@ -118,9 +118,9 @@ export function AddNodePalette({ onSelect, onAIAssistantClick, className = '' }:
         ) : (
           // Multiple categories - show in tabs
           <Tabs defaultValue={categories[0]} className="h-full">
-            <TabsList className="grid w-full grid-cols-2 mx-4 mt-4">
-              {categories.slice(0, 2).map((category) => (
-                <TabsTrigger key={category} value={category} className="capitalize">
+            <TabsList className={`grid w-full mx-4 mt-4 ${categories.length === 2 ? 'grid-cols-2' : categories.length === 3 ? 'grid-cols-3' : 'grid-cols-4'}`}>
+              {categories.map((category) => (
+                <TabsTrigger key={category} value={category} className="capitalize text-xs">
                   {category}
                 </TabsTrigger>
               ))}
