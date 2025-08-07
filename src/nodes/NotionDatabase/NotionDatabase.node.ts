@@ -4,7 +4,7 @@ export const NotionDatabaseNode: HaloNodeDefinition = {
   displayName: 'Notion Database',
   name: 'notionDatabase',
   icon: 'notiondatabase.svg',
-  group: ['productivity'],
+  group: ['databases'],
   version: 1,
   description: 'Create entries in a Notion database',
   defaults: {
