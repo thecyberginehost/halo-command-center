@@ -117,33 +117,37 @@ export function AddNodePalette({ onSelect, onAIAssistantClick, className = '' }:
           </div>
         ) : (
           // Multiple categories - show in tabs
-          <Tabs defaultValue={categories[0]} className="h-full">
-            <div className="px-4 pt-4">
-              <TabsList className="w-full bg-muted/30 p-1 h-auto">
+          <Tabs defaultValue={categories[0]} className="h-full flex flex-col">
+            <div className="px-3 pt-3 pb-1">
+              <TabsList className="grid w-full grid-cols-3 bg-muted/50 p-1 rounded-lg h-auto gap-1">
                 {categories.map((category) => (
                   <TabsTrigger 
                     key={category} 
                     value={category} 
-                    className="flex-1 capitalize text-sm font-medium py-2.5 px-3 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+                    className="capitalize text-xs font-medium py-2 px-2 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm rounded-md transition-all hover:bg-background/50 truncate"
                   >
-                    {category}
+                    {category === 'communication' ? 'Comms' : 
+                     category === 'databases' ? 'DB' : 
+                     category}
                   </TabsTrigger>
                 ))}
               </TabsList>
             </div>
-            {categories.map((category) => (
-              <TabsContent key={category} value={category} className="px-4 pb-4 space-y-3 mt-4 focus-visible:outline-none">
-                {nodesByGroup[category].map((node) => (
-                  <NodeCard
-                    key={node.name}
-                    node={node}
-                    isDark={isDark}
-                    onClick={() => handleNodeClick(node)}
-                    onDragStart={(e) => handleDragStart(e, node)}
-                  />
-                ))}
-              </TabsContent>
-            ))}
+            <div className="flex-1 overflow-hidden">
+              {categories.map((category) => (
+                <TabsContent key={category} value={category} className="px-3 pb-3 space-y-2 mt-0 h-full overflow-y-auto focus-visible:outline-none">
+                  {nodesByGroup[category].map((node) => (
+                    <NodeCard
+                      key={node.name}
+                      node={node}
+                      isDark={isDark}
+                      onClick={() => handleNodeClick(node)}
+                      onDragStart={(e) => handleDragStart(e, node)}
+                    />
+                  ))}
+                </TabsContent>
+              ))}
+            </div>
           </Tabs>
         )}
       </ScrollArea>
