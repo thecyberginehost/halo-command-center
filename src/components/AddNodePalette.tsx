@@ -118,15 +118,21 @@ export function AddNodePalette({ onSelect, onAIAssistantClick, className = '' }:
         ) : (
           // Multiple categories - show in tabs
           <Tabs defaultValue={categories[0]} className="h-full">
-            <TabsList className={`grid w-full mx-4 mt-4 ${categories.length === 2 ? 'grid-cols-2' : categories.length === 3 ? 'grid-cols-3' : 'grid-cols-4'}`}>
-              {categories.map((category) => (
-                <TabsTrigger key={category} value={category} className="capitalize text-xs">
-                  {category}
-                </TabsTrigger>
-              ))}
-            </TabsList>
+            <div className="px-4 pt-4">
+              <TabsList className="w-full bg-muted/30 p-1 h-auto">
+                {categories.map((category) => (
+                  <TabsTrigger 
+                    key={category} 
+                    value={category} 
+                    className="flex-1 capitalize text-sm font-medium py-2.5 px-3 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+                  >
+                    {category}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </div>
             {categories.map((category) => (
-              <TabsContent key={category} value={category} className="p-4 space-y-2 mt-0">
+              <TabsContent key={category} value={category} className="px-4 pb-4 space-y-3 mt-4 focus-visible:outline-none">
                 {nodesByGroup[category].map((node) => (
                   <NodeCard
                     key={node.name}
