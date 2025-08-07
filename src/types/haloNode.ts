@@ -9,10 +9,17 @@ export interface HaloNodeProperty {
   options?: Array<{
     name: string;
     value: string | number;
+    displayName?: string;
   }>;
   typeOptions?: {
     multipleValues?: boolean;
+    multipleValueButtonText?: string;
     rows?: number;
+    readOnly?: boolean;
+  };
+  displayOptions?: {
+    show?: Record<string, any>;
+    hide?: Record<string, any>;
   };
 }
 
