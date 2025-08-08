@@ -105,15 +105,52 @@ export function FlowDeckCanvas({
     }));
   }, [viewport]);
 
+  // Smart positioning utility
+  const getSmartNodePosition = useCallback(() => {
+    if (nodes.length === 0) {
+      // First node - place in center-left of visible area
+      return { x: 100, y: 200 };
+    }
+    
+    // Find the rightmost node
+    const rightmostNode = nodes.reduce((rightmost, node) => 
+      node.position.x > rightmost.position.x ? node : rightmost
+    );
+    
+    const nodeWidth = 160; // FlowCard width
+    const nodeHeight = 80; // FlowCard height
+    const horizontalSpacing = 200; // Space between nodes horizontally
+    const verticalSpacing = 120; // Space between rows
+    const maxNodesPerRow = 4; // Max nodes before wrapping
+    
+    // Calculate new position
+    const currentRowNodeCount = nodes.filter(node => 
+      Math.abs(node.position.y - rightmostNode.position.y) < verticalSpacing / 2
+    ).length;
+    
+    if (currentRowNodeCount < maxNodesPerRow) {
+      // Add to current row
+      return {
+        x: rightmostNode.position.x + horizontalSpacing,
+        y: rightmostNode.position.y
+      };
+    } else {
+      // Start new row
+      return {
+        x: 100, // Reset to left
+        y: rightmostNode.position.y + verticalSpacing
+      };
+    }
+  }, [nodes]);
+
   // Node Operations
   const addNode = useCallback((integration: IntegrationNode, position: { x: number; y: number }) => {
+    const smartPosition = getSmartNodePosition();
+    
     const newNode: VisualWorkflowNode = {
       id: `${integration.id}-${Date.now()}`,
       type: 'integrationNode',
-      position: {
-        x: (position.x - viewport.x) / viewport.zoom,
-        y: (position.y - viewport.y) / viewport.zoom
-      },
+      position: smartPosition,
       data: {
         integration,
         config: {},
@@ -142,18 +179,15 @@ export function FlowDeckCanvas({
       title: "Card Added",
       description: `${integration.name} card added to your workflow deck`,
     });
-  }, [viewport, toast]);
+  }, [getSmartNodePosition, toast]);
 
   const addHaloNode = useCallback((haloNode: NodeRegistryEntry) => {
-    // Add node at a default position for now
-    const position = { x: 400, y: 200 };
+    const smartPosition = getSmartNodePosition();
+    
     const newNode: VisualWorkflowNode = {
       id: `${haloNode.name}-${Date.now()}`,
       type: 'haloNode',
-      position: {
-        x: (position.x - viewport.x) / viewport.zoom,
-        y: (position.y - viewport.y) / viewport.zoom
-      },
+      position: smartPosition,
       data: {
         haloNode,
         config: {},
@@ -182,7 +216,7 @@ export function FlowDeckCanvas({
       title: "Node Added",
       description: `${haloNode.displayName} node added to your workflow`,
     });
-  }, [viewport, toast]);
+  }, [getSmartNodePosition, toast]);
 
   const updateNodePosition = useCallback((nodeId: string, position: { x: number; y: number }) => {
     setNodes(prev => prev.map(node => 
@@ -533,8 +567,8 @@ export function FlowDeckCanvas({
                 Welcome to your Flow Deck
               </h3>
               <p className="text-muted-foreground">
-                Start building your automation by adding cards from the deck below. 
-                Connect them to create powerful workflows.
+                Start building your automation by adding cards from the sidebar. 
+                Click and drag between the connection ports on cards to link them together.
               </p>
             </div>
           </div>
