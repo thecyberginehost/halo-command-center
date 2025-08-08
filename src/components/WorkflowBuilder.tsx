@@ -13,7 +13,7 @@ import { WorkflowRecord } from '@/types/tenant';
 import { WorkflowInputPanel } from './workflow/WorkflowInputPanel';
 import { WorkflowPreviewPanel } from './workflow/WorkflowPreviewPanel';
 import { EnterpriseAIWorkflowGenerator } from './workflow/EnterpriseAIWorkflowGenerator';
-import { VisualWorkflowCanvas } from './workflow/visual/VisualWorkflowCanvas';
+import { FlowDeckCanvas } from './workflow/visual/FlowDeckCanvas';
 
 interface WorkflowBuilderProps {
   onClose: () => void;
@@ -205,7 +205,7 @@ const WorkflowBuilder = ({ onClose, initialWorkflow }: WorkflowBuilderProps) => 
             />
           </div>
         ) : isVisualMode ? (
-          <VisualWorkflowCanvas 
+          <FlowDeckCanvas 
             onSaveWorkflow={handleSaveWorkflow}
           />
         ) : (
