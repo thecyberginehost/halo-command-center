@@ -10,6 +10,7 @@ import { ConfigurationPanel } from './ConfigurationPanel';
 import { VoiceController } from './VoiceController';
 import { Button } from '@/components/ui/button';
 import { Save, Play, Sparkles, Grid3X3, Eye } from 'lucide-react';
+import nodeRegistry from '@/nodeRegistry';
 
 interface FlowDeckCanvasProps {
   initialNodes?: VisualWorkflowNode[];
@@ -510,7 +511,7 @@ export function FlowDeckCanvas({
         {/* SVG for Connections */}
         <svg 
           ref={svgRef}
-          className="absolute inset-0 pointer-events-none w-full h-full"
+          className="absolute inset-0 w-full h-full"
           style={{ transform: canvasTransform }}
         >
           <defs>
@@ -528,9 +529,56 @@ export function FlowDeckCanvas({
             nodes={nodes}
             connectionState={connectionState}
             onAddNodeBetween={(edgeId, position) => {
-              // Show node palette or add a basic node at position
-              console.log('Add node between:', edgeId, position);
-              // For now, just log - could implement node insertion logic
+              const edge = edges.find(e => e.id === edgeId);
+              if (!edge) return;
+
+              const conditionNodeDef = nodeRegistry.find(n => n.name === 'condition') || nodeRegistry[0];
+              if (!conditionNodeDef) return;
+
+              const newNodeId = `${conditionNodeDef.name}-${Date.now()}`;
+              const newNode: VisualWorkflowNode = {
+                id: newNodeId,
+                type: 'haloNode',
+                position: { x: position.x - 80, y: position.y - 40 },
+                data: {
+                  haloNode: conditionNodeDef,
+                  config: {},
+                  label: conditionNodeDef.displayName,
+                  isConfigured: false,
+                },
+              };
+
+              setNodes(prev => [...prev, newNode]);
+
+              setEdges(prev => {
+                const remaining = prev.filter(e => e.id !== edgeId);
+                const edgeToNew: VisualWorkflowEdge = {
+                  id: `${edge.source}-${newNodeId}`,
+                  source: edge.source,
+                  target: newNodeId,
+                  sourceHandle: edge.sourceHandle,
+                  targetHandle: 'input',
+                  type: 'smoothstep',
+                  animated: true,
+                  style: { stroke: 'hsl(var(--primary))', strokeWidth: 3 },
+                };
+                const newToTarget: VisualWorkflowEdge = {
+                  id: `${newNodeId}-${edge.target}`,
+                  source: newNodeId,
+                  target: edge.target,
+                  sourceHandle: 'output',
+                  targetHandle: edge.targetHandle,
+                  type: 'smoothstep',
+                  animated: true,
+                  style: { stroke: 'hsl(var(--primary))', strokeWidth: 3 },
+                };
+                return [...remaining, edgeToNew, newToTarget];
+              });
+
+              toast({
+                title: 'Route added',
+                description: `${conditionNodeDef.displayName} inserted between nodes`,
+              });
             }}
           />
         </svg>

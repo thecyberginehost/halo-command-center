@@ -164,6 +164,7 @@ export function ConnectionRenderer({ edges, nodes, connectionState, onAddNodeBet
             {/* Add Node Button */}
             {onAddNodeBetween && (
               <g>
+                <title>Add route</title>
                 <circle
                   cx={(sourcePos.x + targetPos.x) / 2}
                   cy={(sourcePos.y + targetPos.y) / 2}
