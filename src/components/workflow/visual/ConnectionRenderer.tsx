@@ -12,9 +12,10 @@ interface ConnectionRendererProps {
   edges: VisualWorkflowEdge[];
   nodes: VisualWorkflowNode[];
   connectionState: ConnectionState;
+  onAddNodeBetween?: (edgeId: string, position: { x: number; y: number }) => void;
 }
 
-export function ConnectionRenderer({ edges, nodes, connectionState }: ConnectionRendererProps) {
+export function ConnectionRenderer({ edges, nodes, connectionState, onAddNodeBetween }: ConnectionRendererProps) {
   
   const getNodeCenter = (nodeId: string) => {
     const node = nodes.find(n => n.id === nodeId);
@@ -160,11 +161,43 @@ export function ConnectionRenderer({ edges, nodes, connectionState }: Connection
               opacity="0.7"
             />
             
+            {/* Add Node Button */}
+            {onAddNodeBetween && (
+              <g>
+                <circle
+                  cx={(sourcePos.x + targetPos.x) / 2}
+                  cy={(sourcePos.y + targetPos.y) / 2}
+                  r="12"
+                  fill="white"
+                  stroke="#64748b"
+                  strokeWidth="2"
+                  className="cursor-pointer hover:fill-gray-50 transition-colors"
+                  onClick={() => onAddNodeBetween(edge.id, {
+                    x: (sourcePos.x + targetPos.x) / 2,
+                    y: (sourcePos.y + targetPos.y) / 2
+                  })}
+                />
+                <text
+                  x={(sourcePos.x + targetPos.x) / 2}
+                  y={(sourcePos.y + targetPos.y) / 2 + 1}
+                  textAnchor="middle"
+                  className="text-slate-600 font-bold cursor-pointer select-none"
+                  style={{ fontSize: '12px' }}
+                  onClick={() => onAddNodeBetween(edge.id, {
+                    x: (sourcePos.x + targetPos.x) / 2,
+                    y: (sourcePos.y + targetPos.y) / 2
+                  })}
+                >
+                  +
+                </text>
+              </g>
+            )}
+            
             {/* Pipeline Label */}
             {edge.data?.label && (
               <text
                 x={(sourcePos.x + targetPos.x) / 2}
-                y={(sourcePos.y + targetPos.y) / 2 - 10}
+                y={(sourcePos.y + targetPos.y) / 2 - 25}
                 textAnchor="middle"
                 className="text-xs fill-slate-600 font-mono"
                 style={{ fontSize: '8px' }}

@@ -35,6 +35,7 @@ import {
 } from 'lucide-react';
 import { VisualWorkflowNode } from '@/types/visualWorkflow';
 import { getProcessorTypeForIntegration, getIntegrationByType } from '@/lib/workflow/enterpriseIntegrations';
+import { NodeContextMenu } from './NodeContextMenu';
 
 interface FlowCardProps {
   node: VisualWorkflowNode;
@@ -215,6 +216,7 @@ export function FlowCard({
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
+  const [lastClickTime, setLastClickTime] = useState(0);
   
   const { integration, haloNode, config, label, isConfigured, hasError, errorMessage } = node.data;
   
@@ -269,12 +271,24 @@ export function FlowCard({
     return <Settings className="h-3 w-3" />;
   };
 
-  // Drag handling
+  // Click handling
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (e.button !== 0) return; // Only left click
     
     e.preventDefault();
     e.stopPropagation();
+    
+    // Check for double-click
+    const currentTime = Date.now();
+    const timeDiff = currentTime - lastClickTime;
+    
+    if (timeDiff < 300) {
+      // Double-click detected - open configuration
+      onConfigClick(node.id);
+      return;
+    }
+    
+    setLastClickTime(currentTime);
     
     setIsDragging(true);
     setDragStart({
@@ -283,7 +297,7 @@ export function FlowCard({
     });
     
     onSelect(node.id);
-  }, [node.position, node.id, onSelect]);
+  }, [node.position, node.id, onSelect, lastClickTime, onConfigClick]);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!isDragging) return;
@@ -310,6 +324,24 @@ export function FlowCard({
     onConnectionEnd(node.id, handle);
   }, [node.id, onConnectionEnd]);
 
+  // Context menu handlers
+  const handleTest = useCallback(() => {
+    console.log('Testing node:', node.id);
+    // Could implement actual test logic here
+  }, [node.id]);
+
+  const handleEnable = useCallback(() => {
+    onConfigClick(node.id); // Open config to enable
+  }, [node.id, onConfigClick]);
+
+  const handleDisable = useCallback(() => {
+    onConfigClick(node.id); // Open config to disable
+  }, [node.id, onConfigClick]);
+
+  const handleViewDetails = useCallback(() => {
+    onConfigClick(node.id); // Open config for details
+  }, [node.id, onConfigClick]);
+
   // Effects
   useEffect(() => {
     if (isDragging) {
@@ -326,20 +358,30 @@ export function FlowCard({
   const cardScale = Math.max(0.8, Math.min(1.2, 1 / zoomLevel));
 
   return (
-    <div
-      ref={cardRef}
-      className="absolute cursor-pointer select-none"
-      style={{
-        left: node.position.x,
-        top: node.position.y,
-        transform: `scale(${cardScale})`,
-        transformOrigin: 'center',
-        zIndex: isSelected ? 100 : isHovered ? 50 : 10,
-      }}
-      onMouseDown={handleMouseDown}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+    <NodeContextMenu
+      node={node}
+      onConfigure={() => onConfigClick(node.id)}
+      onDuplicate={() => onDuplicate(node.id)}
+      onDelete={() => onDelete(node.id)}
+      onTest={handleTest}
+      onEnable={handleEnable}
+      onDisable={handleDisable}
+      onViewDetails={handleViewDetails}
     >
+      <div
+        ref={cardRef}
+        className="absolute cursor-pointer select-none"
+        style={{
+          left: node.position.x,
+          top: node.position.y,
+          transform: `scale(${cardScale})`,
+          transformOrigin: 'center',
+          zIndex: isSelected ? 100 : isHovered ? 50 : 10,
+        }}
+        onMouseDown={handleMouseDown}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
       {/* Enterprise Processing Unit Structure */}
       <div className="absolute inset-0 pointer-events-none">
         {/* Industrial Frame with Metallic Finish */}
@@ -624,6 +666,7 @@ export function FlowCard({
           }}
         />
       )}
-    </div>
+      </div>
+    </NodeContextMenu>
   );
 }

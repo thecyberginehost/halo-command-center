@@ -527,6 +527,11 @@ export function FlowDeckCanvas({
             edges={edges}
             nodes={nodes}
             connectionState={connectionState}
+            onAddNodeBetween={(edgeId, position) => {
+              // Show node palette or add a basic node at position
+              console.log('Add node between:', edgeId, position);
+              // For now, just log - could implement node insertion logic
+            }}
           />
         </svg>
 

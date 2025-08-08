@@ -60,8 +60,14 @@ export const BaseWorkflowNode = memo(({
   };
   return (
     <NodeContextMenu
+      node={{ id, data, type: 'integrationNode', position: { x: 0, y: 0 } } as VisualWorkflowNode}
+      onConfigure={() => onConfigClick?.(id)}
       onDuplicate={() => onDuplicate?.(id)}
       onDelete={() => onDelete?.(id)}
+      onTest={() => console.log('Test node:', id)}
+      onEnable={() => console.log('Enable node:', id)}
+      onDisable={() => console.log('Disable node:', id)}
+      onViewDetails={() => console.log('View details:', id)}
     >
       <div className="relative">
         <Card 

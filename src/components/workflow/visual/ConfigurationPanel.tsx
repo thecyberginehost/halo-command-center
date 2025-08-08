@@ -19,7 +19,10 @@ import {
   Settings, 
   Code,
   TestTube,
-  Info
+  Info,
+  Link,
+  Plus,
+  Key
 } from 'lucide-react';
 import { VisualWorkflowNode } from '@/types/visualWorkflow';
 
@@ -34,6 +37,7 @@ export function ConfigurationPanel({ node, onConfigChange, onClose }: Configurat
   const [activeTab, setActiveTab] = useState('basic');
   const [isTestRunning, setIsTestRunning] = useState(false);
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [connections, setConnections] = useState<any[]>([]);
 
   const { integration, haloNode, isConfigured, hasError, errorMessage } = node.data;
   const nodeData = haloNode || integration;
@@ -219,6 +223,122 @@ async function transform(data) {
     </div>
   );
 
+  const renderConnectionsConfig = () => (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <Label className="text-sm font-medium">Connections</Label>
+          <p className="text-xs text-muted-foreground">
+            Manage authentication and connection credentials
+          </p>
+        </div>
+        <Button size="sm" variant="outline">
+          <Plus className="h-3 w-3 mr-1" />
+          Add Connection
+        </Button>
+      </div>
+
+      <Separator />
+
+      {connections.length === 0 ? (
+        <div className="text-center py-8 text-muted-foreground">
+          <Key className="h-8 w-8 mx-auto mb-2" />
+          <p className="text-sm">No connections configured</p>
+          <p className="text-xs">Add a connection to authenticate with external services</p>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {connections.map((connection, index) => (
+            <Card key={index}>
+              <CardContent className="p-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Link className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">{connection.name}</p>
+                      <p className="text-xs text-muted-foreground">{connection.type}</p>
+                    </div>
+                  </div>
+                  <Badge variant={connection.status === 'connected' ? 'default' : 'secondary'}>
+                    {connection.status}
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      <div className="space-y-2">
+        <Label htmlFor="connectionType">Connection Type</Label>
+        <Select
+          value={config.connectionType || ''}
+          onValueChange={(value) => setConfig(prev => ({ ...prev, connectionType: value }))}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select connection type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="oauth">OAuth 2.0</SelectItem>
+            <SelectItem value="apikey">API Key</SelectItem>
+            <SelectItem value="basic">Basic Auth</SelectItem>
+            <SelectItem value="token">Bearer Token</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {config.connectionType === 'apikey' && (
+        <div className="space-y-2">
+          <Label htmlFor="apikey">API Key</Label>
+          <Input
+            id="apikey"
+            type="password"
+            value={config.apikey || ''}
+            onChange={(e) => setConfig(prev => ({ ...prev, apikey: e.target.value }))}
+            placeholder="Enter your API key"
+          />
+        </div>
+      )}
+
+      {config.connectionType === 'basic' && (
+        <>
+          <div className="space-y-2">
+            <Label htmlFor="username">Username</Label>
+            <Input
+              id="username"
+              value={config.username || ''}
+              onChange={(e) => setConfig(prev => ({ ...prev, username: e.target.value }))}
+              placeholder="Enter username"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              value={config.password || ''}
+              onChange={(e) => setConfig(prev => ({ ...prev, password: e.target.value }))}
+              placeholder="Enter password"
+            />
+          </div>
+        </>
+      )}
+
+      {config.connectionType === 'token' && (
+        <div className="space-y-2">
+          <Label htmlFor="bearerToken">Bearer Token</Label>
+          <Input
+            id="bearerToken"
+            type="password"
+            value={config.bearerToken || ''}
+            onChange={(e) => setConfig(prev => ({ ...prev, bearerToken: e.target.value }))}
+            placeholder="Enter bearer token"
+          />
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <div className="fixed top-0 right-0 h-full w-96 bg-background border-l shadow-xl z-50 animate-slide-in-right">
       {/* Header */}
@@ -284,10 +404,14 @@ async function transform(data) {
       {/* Configuration Tabs */}
       <div className="flex-1 overflow-hidden">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-          <TabsList className="grid w-full grid-cols-4 mx-4 mt-4">
+          <TabsList className="grid w-full grid-cols-5 mx-4 mt-4">
             <TabsTrigger value="basic" className="text-xs">
               <Settings className="h-3 w-3 mr-1" />
               Basic
+            </TabsTrigger>
+            <TabsTrigger value="connections" className="text-xs">
+              <Link className="h-3 w-3 mr-1" />
+              Connections
             </TabsTrigger>
             <TabsTrigger value="advanced" className="text-xs">
               <Info className="h-3 w-3 mr-1" />
@@ -308,6 +432,14 @@ async function transform(data) {
               <ScrollArea className="h-full px-4">
                 <div className="py-4">
                   {renderBasicConfig()}
+                </div>
+              </ScrollArea>
+            </TabsContent>
+
+            <TabsContent value="connections" className="h-full">
+              <ScrollArea className="h-full px-4">
+                <div className="py-4">
+                  {renderConnectionsConfig()}
                 </div>
               </ScrollArea>
             </TabsContent>
