@@ -10,7 +10,7 @@ import WelcomePopup from './chat/WelcomePopup';
 import ReminderNotification from './chat/ReminderNotification';
 import WorkflowBuilder from './WorkflowBuilder';
 import { useChat } from '@/contexts/ChatContext';
-import { ResonantDirectiveChat } from './automation/ResonantDirectiveChat';
+import { AncillaChat } from './automation/AncillaChat';
 
 
 interface LayoutProps {
@@ -54,7 +54,7 @@ const Layout = ({ children, pageTitle = "Dashboard" }: LayoutProps) => {
     handleSendMessage(() => setShowWorkflowBuilder(true));
   };
 
-  // Convert messages to ResonantDirectiveChat format
+  // Convert messages to AncillaChat format
   const chatMessages = messages.map(msg => ({
     role: msg.sender === 'user' ? 'user' : 'assistant',
     content: msg.text
@@ -86,7 +86,7 @@ const Layout = ({ children, pageTitle = "Dashboard" }: LayoutProps) => {
         </main>
       </SidebarInset>
       
-      <ResonantDirectiveChat
+      <AncillaChat
         isOpen={isChatOpen}
         onClose={handleChatClose}
       />

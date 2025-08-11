@@ -5,21 +5,21 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { X, MessageSquare, Send, Sparkles, RotateCcw, StopCircle } from 'lucide-react';
 import { MessageFormatter } from '@/components/chat/MessageFormatter';
-import { useResonantDirective, ResonantDirectiveMessage } from '@/hooks/useResonantDirective';
+import { useAncilla, AncillaMessage } from '@/hooks/useAncilla';
 
-interface ResonantDirectiveChatProps {
+interface AncillaChatProps {
   isOpen: boolean;
   onClose: () => void;
   workflowId?: string;
   onWorkflowGenerated?: (workflowData: any) => void;
 }
 
-export function ResonantDirectiveChat({
+export function AncillaChat({
   isOpen,
   onClose,
   workflowId,
   onWorkflowGenerated
-}: ResonantDirectiveChatProps) {
+}: AncillaChatProps) {
   const {
     messages,
     isProcessing,
@@ -27,7 +27,7 @@ export function ResonantDirectiveChat({
     clearMessages,
     cancelRequest,
     retryLastMessage
-  } = useResonantDirective();
+  } = useAncilla();
 
   const [chatInput, setChatInput] = useState('');
 
@@ -63,7 +63,7 @@ export function ResonantDirectiveChat({
               <Sparkles className="h-4 w-4 text-white" />
             </div>
             <div>
-              <span className="text-white font-semibold text-sm">Resonant Directive</span>
+              <span className="text-white font-semibold text-sm">Ancilla</span>
               <div className="flex items-center gap-2">
                 <p className="text-xs text-white/90 font-medium">AI Automation Architect</p>
                 {isProcessing && (

@@ -115,7 +115,7 @@ export default function Documentation() {
                     </div>
                     <div>
                       <h4 className="font-semibold">Use AI Assistant</h4>
-                      <p className="text-muted-foreground">Ask Resonant Directive: "Create a workflow that sends welcome emails to new contacts"</p>
+                      <p className="text-muted-foreground">Ask Ancilla: "Create a workflow that sends welcome emails to new contacts"</p>
                     </div>
                   </div>
                   
@@ -266,7 +266,7 @@ export default function Documentation() {
               <CardHeader>
                 <CardTitle>Migration Assistant</CardTitle>
                 <CardDescription>
-                  Use Resonant Directive to help with complex migrations
+                  Use Ancilla to help with complex migrations
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -296,7 +296,7 @@ export default function Documentation() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Bot className="h-5 w-5" />
-                  Resonant Directive AI Assistant
+                  Ancilla AI Assistant
                 </CardTitle>
                 <CardDescription>
                   Your intelligent automation companion for workflow creation and management
@@ -307,7 +307,7 @@ export default function Documentation() {
                   <div>
                     <h4 className="font-semibold mb-3">Natural Language Workflow Creation</h4>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Describe what you want to automate in plain English, and Resonant Directive will generate the complete workflow.
+                      Describe what you want to automate in plain English, and Ancilla will generate the complete workflow.
                     </p>
                     <div className="space-y-2">
                       <Badge variant="secondary">Example Prompts</Badge>

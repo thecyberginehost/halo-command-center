@@ -30,7 +30,7 @@ export const useAutomationChat = ({
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
     {
       role: 'assistant',
-      content: "I'm Resonant Directive, your AI automation architect! I can build complete workflows from your descriptions, analyze your current automation, and suggest optimizations. What would you like to create?"
+      content: "I'm Ancilla, your AI automation architect! I can build complete workflows from your descriptions, analyze your current automation, and suggest optimizations. What would you like to create?"
     }
   ]);
   const [chatInput, setChatInput] = useState('');

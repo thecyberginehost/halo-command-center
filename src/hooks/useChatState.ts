@@ -40,7 +40,7 @@ export const useChatState = () => {
       // Initialize with welcome message only if no saved messages
       const welcomeMessage: Message = {
         id: 1,
-        text: "Hello! I'm Resonant Directive, your AI automation assistant. I can help you create workflows, optimize automations, and provide insights. What would you like to work on today?",
+        text: "Hello! I'm Ancilla, your AI automation assistant. I can help you create workflows, optimize automations, and provide insights. What would you like to work on today?",
         sender: 'ai',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };

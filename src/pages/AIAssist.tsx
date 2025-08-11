@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Layout from '@/components/Layout';
-import { ResonantDirectiveChat } from '@/components/automation/ResonantDirectiveChat';
+import { AncillaChat } from '@/components/automation/AncillaChat';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { MessageSquare, Lightbulb, Zap, Target, Code, Users, Shield } from 'lucide-react';
@@ -10,7 +10,7 @@ export default function AIAssist() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const { messages, inputValue, setInputValue, handleSendMessage } = useChatState();
 
-  // Convert messages to ResonantDirectiveChat format
+  // Convert messages to AncillaChat format
   const chatMessages = messages.map(msg => ({
     role: msg.sender === 'user' ? 'user' : 'assistant',
     content: msg.text
@@ -66,7 +66,7 @@ export default function AIAssist() {
                     <MessageSquare className="w-8 h-8 text-white" />
                   </div>
                   <h1 className="text-3xl font-bold text-halo-text mb-3">
-                    Meet Resonant Directive
+                    Meet Ancilla
                   </h1>
                   <p className="text-lg text-halo-textSecondary mb-6 max-w-2xl mx-auto">
                     Your AI automation architect for HALO. I specialize in building enterprise-grade workflows 
@@ -142,7 +142,7 @@ export default function AIAssist() {
               <div className="mb-8">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h1 className="text-3xl font-bold text-halo-text mb-2">Resonant Directive</h1>
+                    <h1 className="text-3xl font-bold text-halo-text mb-2">Ancilla</h1>
                     <p className="text-halo-textSecondary">
                       Your AI automation architect - ready to help you build powerful workflows.
                     </p>
@@ -160,7 +160,7 @@ export default function AIAssist() {
           </div>
         </div>
 
-        <ResonantDirectiveChat
+        <AncillaChat
           isOpen={isChatOpen}
           onClose={() => setIsChatOpen(false)}
         />

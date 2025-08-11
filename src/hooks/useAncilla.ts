@@ -5,7 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { VisualWorkflowNode } from '@/types/visualWorkflow';
 import { allIntegrations } from '@/lib/integrations';
 
-export interface ResonantDirectiveMessage {
+export interface AncillaMessage {
   id: string;
   role: 'user' | 'assistant' | 'system';
   content: string;
@@ -33,7 +33,7 @@ export interface WorkflowContext {
   }>;
 }
 
-export interface ResonantDirectiveResponse {
+export interface AncillaResponse {
   content: string;
   action?: 'create_workflow' | 'modify_workflow' | 'suggest_integration' | 'explain_concept' | 'error';
   workflowData?: {
@@ -45,12 +45,12 @@ export interface ResonantDirectiveResponse {
   error?: string;
 }
 
-export function useResonantDirective() {
-  const [messages, setMessages] = useState<ResonantDirectiveMessage[]>([
+export function useAncilla() {
+  const [messages, setMessages] = useState<AncillaMessage[]>([
     {
       id: 'welcome',
       role: 'assistant',
-      content: `🚀 **Welcome to Resonant Directive!**
+      content: `🚀 **Welcome to Ancilla!**
 
 I'm your AI Automation Architect, ready to help you build powerful workflows for HALO. I can:
 
@@ -110,7 +110,7 @@ What automation challenge can I help you solve today?`,
       ]
     };
 
-    return `You are Resonant Directive, the AI Automation Architect for HALO platform. 
+    return `You are Ancilla, the AI Automation Architect for HALO platform. 
 
 CONTEXT: ${JSON.stringify(context, null, 2)}
 
@@ -131,7 +131,7 @@ RESPONSE FORMAT:
 - Highlight security and compliance considerations`;
   }, [currentTenant, workflowContext]);
 
-  const sendMessage = useCallback(async (content: string): Promise<ResonantDirectiveResponse> => {
+  const sendMessage = useCallback(async (content: string): Promise<AncillaResponse> => {
     // Cancel any ongoing request
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -140,7 +140,7 @@ RESPONSE FORMAT:
     // Create new abort controller
     abortControllerRef.current = new AbortController();
 
-    const userMessage: ResonantDirectiveMessage = {
+    const userMessage: AncillaMessage = {
       id: `user-${Date.now()}`,
       role: 'user',
       content,
@@ -193,7 +193,7 @@ RESPONSE FORMAT:
 
       if (error) throw error;
 
-      const response: ResonantDirectiveResponse = {
+      const response: AncillaResponse = {
         content: data.message || data.fallbackMessage || 'I apologize, but I encountered an issue processing your request.',
         action: data.action,
         workflowData: data.workflowData,
@@ -202,7 +202,7 @@ RESPONSE FORMAT:
       };
 
       // Add assistant response to messages
-      const assistantMessage: ResonantDirectiveMessage = {
+      const assistantMessage: AncillaMessage = {
         id: `assistant-${Date.now()}`,
         role: 'assistant',
         content: response.content,
@@ -239,16 +239,16 @@ RESPONSE FORMAT:
         return { content: '', error: 'Request cancelled' };
       }
 
-      console.error('Resonant Directive error:', error);
+      console.error('Ancilla error:', error);
       
       const errorMessage = error.message || 'An unexpected error occurred';
-      const errorResponse: ResonantDirectiveResponse = {
+      const errorResponse: AncillaResponse = {
         content: `I apologize, but I encountered an error: ${errorMessage}. Please try again or rephrase your request.`,
         error: errorMessage
       };
 
       // Add error message
-      const errorMsg: ResonantDirectiveMessage = {
+      const errorMsg: AncillaMessage = {
         id: `error-${Date.now()}`,
         role: 'assistant',
         content: errorResponse.content,
@@ -276,7 +276,7 @@ RESPONSE FORMAT:
     setMessages([{
       id: 'welcome',
       role: 'assistant',
-      content: `🚀 **Welcome back to Resonant Directive!**
+      content: `🚀 **Welcome back to Ancilla!**
 
 Ready to build more amazing automations? What can I help you create today?`,
       timestamp: new Date()

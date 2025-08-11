@@ -23,7 +23,7 @@ const WelcomePopup = ({ isVisible, onClose }: WelcomePopupProps) => {
         <div className="pr-4">
           <h3 className="font-semibold text-sm mb-2">Welcome, Reclaimer</h3>
           <p className="text-xs leading-relaxed">
-            I am Resonant Directive, your devoted Ancilla. My protocols are dedicated to accelerating your automation endeavors into hyperdrive. Query me for assistance with workflows, optimizations, and strategic implementations.
+            I am Ancilla, your devoted AI assistant. My protocols are dedicated to accelerating your automation endeavors into hyperdrive. Query me for assistance with workflows, optimizations, and strategic implementations.
           </p>
         </div>
         <div className="absolute -bottom-2 right-8 w-0 h-0 border-l-[8px] border-r-[8px] border-t-[8px] border-l-transparent border-r-transparent border-t-secondary"></div>

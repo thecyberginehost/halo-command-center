@@ -131,7 +131,7 @@ const ChatMessages = ({ messages, isLoading }: ChatMessagesProps) => {
             <div className="max-w-[80%] p-3 rounded-lg text-sm shadow-sm bg-white text-halo-text border border-gray-200">
               <div className="flex items-center space-x-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Resonant Directive is thinking...</span>
+                <span>Ancilla is thinking...</span>
               </div>
             </div>
           </div>

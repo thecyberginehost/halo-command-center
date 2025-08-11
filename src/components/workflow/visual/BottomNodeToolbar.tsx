@@ -268,7 +268,7 @@ export function BottomNodeToolbar({ onAddNode, onAddHaloNode, onChatToggle }: Bo
           {/* Separator */}
           <div className="w-px h-6 bg-border" />
 
-          {/* Resonant Directive AI Assistant */}
+          {/* Ancilla AI Assistant */}
           {onChatToggle && (
             <AIAssistantButton onChatToggle={onChatToggle} />
           )}

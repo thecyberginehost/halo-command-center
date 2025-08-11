@@ -12,7 +12,7 @@ export function AIAssistantButton({ onChatToggle }: AIAssistantButtonProps) {
       size="sm"
       onClick={onChatToggle}
       className="relative h-8 px-3 bg-gradient-to-r from-halo-primary/10 to-halo-accent/10 hover:from-halo-primary/20 hover:to-halo-accent/20 border border-halo-primary/20 hover:border-halo-primary/30 rounded-lg transition-all duration-200"
-      title="Open Resonant Directive AI Assistant"
+      title="Open Ancilla AI Assistant"
     >
       <div className="flex items-center gap-1.5">
         <div className="relative">

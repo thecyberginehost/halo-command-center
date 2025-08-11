@@ -10,7 +10,7 @@ import { AutomationHeader } from '@/components/automation/AutomationHeader';
 import { DeveloperModeEditor } from '@/components/automation/DeveloperModeEditor';
 import { VisualModeCanvas } from '@/components/automation/VisualModeCanvas';
 import { StepSelectorModal } from '@/components/automation/StepSelectorModal';
-import { ResonantDirectiveChat } from '@/components/automation/ResonantDirectiveChat';
+import { AncillaChat } from '@/components/automation/AncillaChat';
 
 import { useAutomationChat } from '@/hooks/useAutomationChat';
 import { useWorkflowOperations } from '@/hooks/useWorkflowOperations';
@@ -204,7 +204,7 @@ async function executeAutomation(input) {
         </div>
       </SidebarInset>
 
-      <ResonantDirectiveChat
+      <AncillaChat
         isOpen={isChatOpen}
         onClose={() => setIsChatOpen(false)}
         onWorkflowGenerated={(workflowData) => {

@@ -161,7 +161,7 @@ const Index = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Activity className="h-5 w-5 text-primary" />
-                  Resonant Directive AI
+                  Ancilla AI
                 </CardTitle>
               </CardHeader>
               <CardContent>

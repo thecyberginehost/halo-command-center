@@ -59,14 +59,14 @@ const Header = ({
 
       {/* Right - Actions & Profile */}
       <div className="flex items-center space-x-3">
-        {/* Resonant Directive AI Assistant */}
+        {/* Ancilla AI Assistant */}
         <Button variant="outline" size="sm" onClick={onChatToggle} className="relative bg-gradient-to-r from-primary/8 to-blue-500/8 border-primary/25 hover:from-primary/15 hover:to-blue-500/15 hover:border-primary/40 transition-all duration-200 px-3 py-2 shadow-sm">
           <div className="flex items-center space-x-2">
             <div className="relative">
               <Bot className="h-4 w-4 text-primary" />
               <Sparkles className="h-2 w-2 text-blue-500 absolute -top-1 -right-1 animate-pulse" />
             </div>
-            <span className="text-xs font-medium text-gray-700 hidden sm:inline">Resonant Directive</span>
+            <span className="text-xs font-medium text-gray-700 hidden sm:inline">Ancilla</span>
           </div>
         </Button>
         

@@ -53,7 +53,7 @@ const menuSections = [
   {
     title: "AI ASSIST",
     items: [
-      { title: "Resonant Directive", icon: Bell, path: "/ai-assist" },
+      { title: "Ancilla", icon: Bell, path: "/ai-assist" },
     ]
   },
   {

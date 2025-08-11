@@ -224,7 +224,7 @@ WORKFLOW STATISTICS:
 
     const pageContext = context?.currentPage ? `CURRENT PAGE: ${context.currentPage}\n` : '';
 
-    const systemPrompt = `You are Resonant Directive, the advanced AI workflow builder for HALO - superior to make.com's AI builder in every way.
+    const systemPrompt = `You are Ancilla, the advanced AI workflow builder for HALO - superior to make.com's AI builder in every way.
 
 ${systemKnowledge}
 
