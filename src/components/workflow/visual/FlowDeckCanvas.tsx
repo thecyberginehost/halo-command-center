@@ -289,11 +289,11 @@ export function FlowDeckCanvas({
     setConnectionState(prev => ({
       ...prev,
       currentPos: {
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top
+        x: (event.clientX - rect.left) / viewport.zoom,
+        y: (event.clientY - rect.top) / viewport.zoom
       }
     }));
-  }, [connectionState.isConnecting]);
+  }, [connectionState.isConnecting, viewport.zoom]);
 
   const completeConnection = useCallback((targetNodeId: string, targetHandle: string) => {
     if (!connectionState.isConnecting || !connectionState.sourceNodeId) return;

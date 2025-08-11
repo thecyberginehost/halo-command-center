@@ -113,84 +113,101 @@ export function ConnectionRenderer({ edges, nodes, connectionState, onAddNodeBet
         </linearGradient>
       </defs>
       
-      {/* Enterprise Data Pipelines */}
+      {/* Enhanced Enterprise Data Pipelines */}
       {edges.map(edge => {
         const sourcePos = getHandlePosition(edge.source, edge.sourceHandle || 'output');
         const targetPos = getHandlePosition(edge.target, edge.targetHandle || 'input');
         const path = generateDataPipelinePath(sourcePos, targetPos);
         
         return (
-          <g key={edge.id}>
-            {/* Main Pipeline */}
+          <g key={edge.id} className="group">
+            {/* Main Pipeline with enhanced visibility */}
             <path
               d={path}
-              stroke="#64748b"
-              strokeWidth="3"
+              stroke="#475569"
+              strokeWidth="6"
               fill="none"
-              opacity="0.8"
-              className="transition-all duration-300"
+              opacity="0.9"
+              className="transition-all duration-300 group-hover:stroke-primary"
+              style={{
+                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))'
+              }}
             />
             
-            {/* Data Flow Indicator */}
+            {/* Animated Data Flow Indicator */}
             <path
               d={path}
-              stroke="#94a3b8"
-              strokeWidth="1"
+              stroke="#3b82f6"
+              strokeWidth="3"
               fill="none"
-              opacity="0.6"
-              strokeDasharray={edge.animated ? "4,2" : "none"}
-              className={edge.animated ? "animate-pulse" : ""}
-            />
+              opacity="0.7"
+              strokeDasharray="12 6"
+              className="group-hover:opacity-100 transition-opacity"
+            >
+              <animate
+                attributeName="stroke-dashoffset"
+                values="0;-18"
+                dur="2s"
+                repeatCount="indefinite"
+              />
+            </path>
             
             {/* Data Packets */}
             {edge.animated && generateDataFlowParticles(path, edge.id)}
             
-            {/* Connection Points */}
+            {/* Enhanced Connection Points */}
             <circle
               cx={sourcePos.x}
               cy={sourcePos.y}
-              r="3"
-              fill="#64748b"
-              opacity="0.7"
+              r="5"
+              fill="#10b981"
+              stroke="#ffffff"
+              strokeWidth="2"
+              style={{
+                filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.2))'
+              }}
             />
             <circle
               cx={targetPos.x}
               cy={targetPos.y}
-              r="3"
-              fill="#64748b"
-              opacity="0.7"
+              r="5"
+              fill="#3b82f6"
+              stroke="#ffffff"
+              strokeWidth="2"
+              style={{
+                filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.2))'
+              }}
             />
             
-            {/* Add Node Button */}
+            {/* Enhanced Add Node Button */}
             {onAddNodeBetween && (
-              <g>
-                <title>Add route</title>
+              <g className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                 <circle
                   cx={(sourcePos.x + targetPos.x) / 2}
                   cy={(sourcePos.y + targetPos.y) / 2}
-                  r="12"
+                  r="16"
                   fill="white"
                   stroke="#64748b"
                   strokeWidth="2"
-                  className="cursor-pointer hover:fill-gray-50 transition-colors"
+                  className="cursor-pointer hover:fill-gray-50 hover:stroke-primary transition-colors"
                   onClick={() => onAddNodeBetween(edge.id, {
                     x: (sourcePos.x + targetPos.x) / 2,
                     y: (sourcePos.y + targetPos.y) / 2
                   })}
+                  style={{
+                    filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.15))'
+                  }}
                 />
                 <text
                   x={(sourcePos.x + targetPos.x) / 2}
                   y={(sourcePos.y + targetPos.y) / 2 + 1}
                   textAnchor="middle"
-                  className="text-slate-600 font-bold cursor-pointer select-none"
-                  style={{ fontSize: '12px' }}
-                  onClick={() => onAddNodeBetween(edge.id, {
-                    x: (sourcePos.x + targetPos.x) / 2,
-                    y: (sourcePos.y + targetPos.y) / 2
-                  })}
+                  className="text-slate-600 font-bold cursor-pointer select-none pointer-events-none"
+                  style={{ fontSize: '16px' }}
                 >
                   +
                 </text>
+                <title>Add node to route</title>
               </g>
             )}
             
@@ -210,7 +227,7 @@ export function ConnectionRenderer({ edges, nodes, connectionState, onAddNodeBet
         );
       })}
       
-      {/* Active Pipeline Formation */}
+      {/* Enhanced Active Pipeline Formation */}
       {connectionState.isConnecting && connectionState.sourceNodeId && (
         <g>
           {(() => {
@@ -219,36 +236,93 @@ export function ConnectionRenderer({ edges, nodes, connectionState, onAddNodeBet
             
             return (
               <>
-                {/* Forming pipeline */}
+                {/* Glowing pipeline trail */}
                 <path
                   d={path}
-                  stroke="#64748b"
-                  strokeWidth="3"
+                  stroke="#3b82f6"
+                  strokeWidth="8"
                   fill="none"
-                  strokeDasharray="4,4"
-                  opacity="0.6"
-                  className="animate-pulse"
+                  opacity="0.3"
+                  style={{
+                    filter: 'blur(3px)'
+                  }}
                 />
+                <path
+                  d={path}
+                  stroke="#3b82f6"
+                  strokeWidth="4"
+                  fill="none"
+                  strokeDasharray="12 6"
+                  opacity="0.9"
+                >
+                  <animate
+                    attributeName="stroke-dashoffset"
+                    values="0;-18"
+                    dur="1s"
+                    repeatCount="indefinite"
+                  />
+                </path>
                 
-                {/* Connection preview */}
+                {/* Enhanced source connection point */}
+                <circle
+                  cx={sourcePos.x}
+                  cy={sourcePos.y}
+                  r="8"
+                  fill="#3b82f6"
+                  stroke="#ffffff"
+                  strokeWidth="3"
+                  style={{
+                    filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.6))'
+                  }}
+                >
+                  <animate
+                    attributeName="r"
+                    values="8;12;8"
+                    dur="1.2s"
+                    repeatCount="indefinite"
+                  />
+                </circle>
+                
+                {/* Enhanced cursor feedback */}
+                <circle
+                  cx={connectionState.currentPos.x}
+                  cy={connectionState.currentPos.y}
+                  r="12"
+                  fill="none"
+                  stroke="#3b82f6"
+                  strokeWidth="3"
+                  opacity="0.6"
+                >
+                  <animate
+                    attributeName="r"
+                    values="12;20;12"
+                    dur="1s"
+                    repeatCount="indefinite"
+                  />
+                </circle>
                 <circle
                   cx={connectionState.currentPos.x}
                   cy={connectionState.currentPos.y}
                   r="6"
-                  fill="none"
-                  stroke="#94a3b8"
-                  strokeWidth="2"
-                  strokeDasharray="2,2"
-                  opacity="0.5"
-                  className="animate-pulse"
+                  fill="#3b82f6"
+                  opacity="0.8"
                 />
-                <circle
-                  cx={connectionState.currentPos.x}
-                  cy={connectionState.currentPos.y}
-                  r="3"
-                  fill="#64748b"
-                  opacity="0.4"
-                />
+                
+                {/* Connection instruction */}
+                <text
+                  x={connectionState.currentPos.x}
+                  y={connectionState.currentPos.y - 25}
+                  textAnchor="middle"
+                  fontSize="12"
+                  fontWeight="500"
+                  fill="#3b82f6"
+                  className="pointer-events-none"
+                  style={{
+                    filter: 'drop-shadow(0 1px 2px rgba(255,255,255,0.8))'
+                  }}
+                >
+                  Drop on input port to connect
+                </text>
               </>
             );
           })()}

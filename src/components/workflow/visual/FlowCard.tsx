@@ -471,43 +471,49 @@ export function FlowCard({
         )}
       </div>
 
-      {/* Industrial Connection Ports */}
+      {/* Enhanced Connection Ports */}
       {(nodeData as any).type !== 'trigger' && !(nodeData as any).group?.includes('trigger') && (
         <div
-          className="absolute left-0 top-1/2 w-6 h-6 border border-slate-400 
-                     cursor-crosshair hover:scale-110 transition-all duration-200 flex items-center justify-center
-                     shadow-sm"
+          className="absolute left-0 top-1/2 w-8 h-8 border-2 border-slate-500 
+                     cursor-crosshair hover:scale-125 hover:border-primary transition-all duration-200 
+                     flex items-center justify-center shadow-lg group"
           style={{ 
-            transform: 'translateY(-50%) translateX(-3px)',
-            borderRadius: '3px',
-            background: `linear-gradient(135deg, #f8fafc, #e2e8f0)`,
-            boxShadow: `inset 0 1px 2px rgba(0,0,0,0.1), 0 0 3px ${brandConfig.primaryColor}40`
+            transform: 'translateY(-50%) translateX(-4px)',
+            borderRadius: '50%',
+            background: `linear-gradient(135deg, #f1f5f9, #cbd5e1)`,
+            boxShadow: `0 2px 6px rgba(0,0,0,0.2), 0 0 8px ${brandConfig.primaryColor}30`
           }}
           onMouseDown={handleConnectionStart('input')}
           onMouseUp={handleConnectionEnd('input')}
+          title="Input Port - Drag to connect"
         >
-          <div className="w-3 h-3 border border-slate-300 rounded-sm bg-white/80 flex items-center justify-center">
-            <div className="w-1 h-1 rounded-full" style={{ backgroundColor: brandConfig.primaryColor }} />
-          </div>
+          <ArrowRight className="w-4 h-4 text-slate-600 group-hover:text-primary transition-colors rotate-180" />
+          <div 
+            className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity animate-ping"
+            style={{ backgroundColor: `${brandConfig.primaryColor}20` }}
+          />
         </div>
       )}
 
       <div
-        className="absolute right-0 top-1/2 w-6 h-6 border border-slate-400 
-                   cursor-crosshair hover:scale-110 transition-all duration-200 flex items-center justify-center
-                   shadow-sm"
+        className="absolute right-0 top-1/2 w-8 h-8 border-2 border-slate-500 
+                   cursor-crosshair hover:scale-125 hover:border-primary transition-all duration-200 
+                   flex items-center justify-center shadow-lg group"
         style={{ 
-          transform: 'translateY(-50%) translateX(3px)',
-          borderRadius: '3px',
-          background: `linear-gradient(135deg, #f8fafc, #e2e8f0)`,
-          boxShadow: `inset 0 1px 2px rgba(0,0,0,0.1), 0 0 3px ${brandConfig.primaryColor}40`
+          transform: 'translateY(-50%) translateX(4px)',
+          borderRadius: '50%',
+          background: `linear-gradient(135deg, #f1f5f9, #cbd5e1)`,
+          boxShadow: `0 2px 6px rgba(0,0,0,0.2), 0 0 8px ${brandConfig.primaryColor}30`
         }}
         onMouseDown={handleConnectionStart('output')}
         onMouseUp={handleConnectionEnd('output')}
+        title="Output Port - Drag to connect"
       >
-        <div className="w-3 h-3 border border-slate-300 rounded-sm bg-white/80 flex items-center justify-center">
-          <div className="w-1 h-1 rounded-full" style={{ backgroundColor: brandConfig.primaryColor }} />
-        </div>
+        <ArrowRight className="w-4 h-4 text-slate-600 group-hover:text-primary transition-colors" />
+        <div 
+          className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity animate-ping"
+          style={{ backgroundColor: `${brandConfig.primaryColor}20` }}
+        />
       </div>
 
       {/* Enterprise Processing Unit Core */}
