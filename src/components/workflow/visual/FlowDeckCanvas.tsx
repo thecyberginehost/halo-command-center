@@ -269,16 +269,20 @@ export function FlowDeckCanvas({
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return;
 
+    // Transform initial mouse coordinates to canvas space
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+
     setConnectionState({
       isConnecting: true,
       sourceNodeId: nodeId,
       sourceHandle: handle,
       currentPos: {
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top
+        x: (mouseX - viewport.x) / viewport.zoom,
+        y: (mouseY - viewport.y) / viewport.zoom
       }
     });
-  }, []);
+  }, [viewport]);
 
   const updateConnection = useCallback((event: React.MouseEvent) => {
     if (!connectionState.isConnecting) return;
@@ -286,14 +290,18 @@ export function FlowDeckCanvas({
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return;
 
+    // Transform mouse coordinates to canvas space
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+    
     setConnectionState(prev => ({
       ...prev,
       currentPos: {
-        x: (event.clientX - rect.left) / viewport.zoom,
-        y: (event.clientY - rect.top) / viewport.zoom
+        x: (mouseX - viewport.x) / viewport.zoom,
+        y: (mouseY - viewport.y) / viewport.zoom
       }
     }));
-  }, [connectionState.isConnecting, viewport.zoom]);
+  }, [connectionState.isConnecting, viewport]);
 
   const completeConnection = useCallback((targetNodeId: string, targetHandle: string) => {
     if (!connectionState.isConnecting || !connectionState.sourceNodeId) return;
